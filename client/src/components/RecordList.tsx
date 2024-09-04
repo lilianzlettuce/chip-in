@@ -53,13 +53,15 @@ type Record = {
   level: string;
 }
 
+const PORT = 6969;
+
 export default function RecordList() {
   const [records, setRecords] = useState<Record[]>([]);
 
   // This method fetches the records from the database.
   useEffect(() => {
     async function getRecords() {
-      const response = await fetch(`http://localhost:5050/record/`);
+      const response = await fetch(`http://localhost:${PORT}/record/`);
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -74,7 +76,7 @@ export default function RecordList() {
 
   // This method will delete a record
   async function deleteRecord(id: string) {
-    await fetch(`http://localhost:5050/record/${id}`, {
+    await fetch(`http://localhost:${PORT}/record/${id}`, {
       method: "DELETE",
     });
     const newRecords = records.filter((el) => el._id !== id);
