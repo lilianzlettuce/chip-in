@@ -7,7 +7,7 @@ export default defineConfig({
   optimizeDeps: { include:['App.js'] },
   build: {
     commonjsOptions: {
-      include: [],
+      include: ['react', 'react-is', 'react-router', 'react/jsx-runtime'],
     },
   }
 })
