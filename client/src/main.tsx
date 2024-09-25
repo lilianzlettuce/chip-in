@@ -1,3 +1,14 @@
+/*import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)*/
+
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {
@@ -12,7 +23,7 @@ import "./index.css";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App message="hello friend" />,
+    element: <App message="hello friend." />,
     children: [
       {
         path: "/",
@@ -22,7 +33,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/edit/:id",
-    element: <App message="grr" />,
+    element: <App message="i am the globglogabgalab" />,
     children: [
       {
         path: "/edit/:id",
@@ -32,7 +43,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/create",
-    element: <App message="ur mom" />,
+    element: <App  message="no"/>,
     children: [
       {
         path: "/create",
