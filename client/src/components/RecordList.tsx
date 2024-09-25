@@ -62,6 +62,9 @@ export default function RecordList() {
   useEffect(() => {
     async function getRecords() {
       const response = await fetch(`http://localhost:${PORT}/record/`);
+      /*const response = await fetch('https://chip-in-backend.onrender.com/record', {
+        mode: 'no-cors',
+      });*/
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
