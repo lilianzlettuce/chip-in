@@ -56,8 +56,9 @@ type Record = {
 console.log('react app port: ' + process.env.REACT_APP_PORT)
 console.log('react app server url: ' + process.env.REACT_APP_SERVER_URL)
 
+// Get env vars
 const PORT = process.env.REACT_APP_PORT || 5050;
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}/record/`;
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
 export default function RecordList() {
   const [records, setRecords] = useState<Record[]>([]);
@@ -65,9 +66,9 @@ export default function RecordList() {
   // This method fetches the records from the database.
   useEffect(() => {
     async function getRecords() {
-      const response = await fetch(SERVER_URL);
+      const response = await fetch(`${SERVER_URL}/record/`);
       //const response = await fetch(`http://localhost:${PORT}/record/`);
-      //const response = await fetch('https://chip-in-backend.onrender.com/record');
+      //const response = await fetch('https://chip-in-backend.onrender.com/record/');
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -85,7 +86,7 @@ export default function RecordList() {
     /*await fetch(`http://localhost:${PORT}/record/${id}`, {
       method: "DELETE",
     });*/
-    await fetch(`https://chip-in-backend.onrender.com/record/${id}`, {
+    await fetch(`${SERVER_URL}/record/${id}`, {
       method: "DELETE",
     });
     const newRecords = records.filter((el) => el._id !== id);

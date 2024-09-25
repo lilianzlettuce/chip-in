@@ -11,7 +11,9 @@ export default function Record() {
   const params = useParams();
   const navigate = useNavigate();
 
-  const PORT = 6969;
+  // Get env vars
+  const PORT = process.env.REACT_APP_PORT || 5050;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   useEffect(() => {
     async function fetchData() {
@@ -19,7 +21,7 @@ export default function Record() {
       if(!id) return;
       setIsNew(false);
       const response = await fetch(
-        `http://localhost:${PORT}/record/${id}`
+        `${SERVER_URL}/record/${id}`
       );
       if (!response.ok) {
         const message = `An error has occurred: ${response.statusText}`;
@@ -53,7 +55,7 @@ export default function Record() {
       let response;
       if (isNew) {
         // if we are adding a new record we will POST to /record.
-        response = await fetch(`http://localhost:${PORT}/record`, {
+        response = await fetch(`${SERVER_URL}/record/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -62,7 +64,7 @@ export default function Record() {
         });
       } else {
         // if we are updating a record we will PATCH to /record/:id.
-        response = await fetch(`http://localhost:${PORT}/record/${params.id}`, {
+        response = await fetch(`${SERVER_URL}/record/${params.id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
