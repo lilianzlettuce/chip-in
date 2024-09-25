@@ -53,6 +53,9 @@ type Record = {
   level: string;
 }
 
+console.log('react app port: ' + process.env.REACT_APP_PORT)
+console.log('react app server url: ' + process.env.REACT_APP_SERVER_URL)
+
 const PORT = process.env.REACT_APP_PORT || 5050;
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}/record/`;
 
