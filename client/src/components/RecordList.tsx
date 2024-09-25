@@ -53,7 +53,8 @@ type Record = {
   level: string;
 }
 
-const PORT = 6969;
+const PORT = process.env.REACT_APP_PORT || 5050;
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}/record/`;
 
 export default function RecordList() {
   const [records, setRecords] = useState<Record[]>([]);
@@ -61,10 +62,9 @@ export default function RecordList() {
   // This method fetches the records from the database.
   useEffect(() => {
     async function getRecords() {
-      const response = await fetch(`http://localhost:${PORT}/record/`);
-      /*const response = await fetch('https://chip-in-backend.onrender.com/record', {
-        mode: 'no-cors',
-      });*/
+      const response = await fetch(SERVER_URL);
+      //const response = await fetch(`http://localhost:${PORT}/record/`);
+      //const response = await fetch('https://chip-in-backend.onrender.com/record');
       if (!response.ok) {
         const message = `An error occurred: ${response.statusText}`;
         console.error(message);
@@ -79,7 +79,10 @@ export default function RecordList() {
 
   // This method will delete a record
   async function deleteRecord(id: string) {
-    await fetch(`http://localhost:${PORT}/record/${id}`, {
+    /*await fetch(`http://localhost:${PORT}/record/${id}`, {
+      method: "DELETE",
+    });*/
+    await fetch(`https://chip-in-backend.onrender.com/record/${id}`, {
       method: "DELETE",
     });
     const newRecords = records.filter((el) => el._id !== id);
