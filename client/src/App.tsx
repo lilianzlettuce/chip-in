@@ -19,9 +19,6 @@ export default function App({ message }: AppProps) {
         <a target="_blank">
           <img src={chipInLogo} className="logo" alt="Vite logo" />
         </a>
-        <a>
-          <img src={chipInLogo} className="logo react" alt="Chip In logo" />
-        </a>
       </div>
       <p>
           <code>src/App.tsx</code>

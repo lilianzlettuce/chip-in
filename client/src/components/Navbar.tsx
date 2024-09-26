@@ -45,7 +45,15 @@ export default function Navbar() {
         </div>
 
         <div className="border-t-4">
-          <h1>Households</h1>
+          <div className="my-2 flex justify-center items-center">
+            <h1 className="mr-2">Households</h1>
+            <button 
+              className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background 
+                transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+                disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" >
+              +
+            </button>
+          </div>
           <div className="flex flex-col justify-between items-center h-1/3">
             <NavLink to="/households/1"
                 style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
