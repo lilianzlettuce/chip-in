@@ -1,7 +1,12 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/chip-in-logo1.png"
 
+import { useParams } from 'react-router-dom';
+
 export default function Navbar() {
+  const { householdId, userId } = useParams();
+  console.log(`${householdId}, ${userId}`);
+
   return (
     <div>
       <nav className="fixed min-w-48 h-screen mr-4 border-r-4 border-black flex flex-col justify-between items-center">
@@ -16,25 +21,46 @@ export default function Navbar() {
           Create Employee
         </NavLink>
 
-        <div className="flex flex-col justify-between items-center h-2/5 bg-pink-100">
-          <NavLink to="/home/:householdId"
-              className="">
+        <div className="flex flex-col justify-between items-center">
+          <NavLink to={`/households/${householdId ? householdId : 1}/home`}
+              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+              className="p-3">
             Home
           </NavLink>
-          <NavLink to="/dashboard/:householdId"
-              className="">
+          <NavLink to={`/households/${householdId ? householdId : 1}/dashboard`}
+              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+              className="p-3">
             Dashboard
           </NavLink>
-          <NavLink to="/my-expenses/:householdId/:userId"
-              className="">
+          <NavLink to={`/households/${householdId ? householdId : 1}/my-expenses/${userId ? userId : 1}`}
+              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+              className="p-3">
             My Expenses
           </NavLink>
-          <NavLink to="/recipes/:householdId"
-              className="">
+          <NavLink to={`/households/${householdId ? householdId : 1}/recipes`}
+              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+              className="p-3">
             Recipes
           </NavLink>
         </div>
-        <NavLink to="/profile/:userId"
+
+        <div className="border-t-4">
+          <h1>Households</h1>
+          <div className="flex flex-col justify-between items-center h-1/3">
+            <NavLink to="/households/1"
+                style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                className="p-3">
+              Basement Dwellers
+            </NavLink>
+            <NavLink to="/households/2"
+                style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                className="p-3">
+              Example Household 2
+            </NavLink>
+          </div>
+        </div>
+
+        <NavLink to={`/profile/${userId ? userId : 1}`}
             className="w-full h-16 flex justify-center items-center bg-black text-white">
           Profile
         </NavLink>

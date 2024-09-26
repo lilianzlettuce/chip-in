@@ -43,35 +43,26 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/home/:householdId",
-    element: <Home />,
+    path: "/households/:householdId",
+    element: <App message="go sniff a muffin, you buffoon" />,
     errorElement: <ErrorPage />,
     children: [
-      {},
-    ],
-  },
-  {
-    path: "/dashboard/:householdId",
-    element: <Dashboard />,
-    errorElement: <ErrorPage />,
-    children: [
-      {},
-    ],
-  },
-  {
-    path: "/my-expenses/:householdId/:userId",
-    element: <MyExpenses />,
-    errorElement: <ErrorPage />,
-    children: [
-      {},
-    ],
-  },
-  {
-    path: "/recipes/:householdId",
-    element: <Recipes />,
-    errorElement: <ErrorPage />,
-    children: [
-      {},
+      {
+        path: "home",
+        element: <Home />
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />
+      },
+      {
+        path: "my-expenses/:userId",
+        element: <MyExpenses />
+      },
+      {
+        path: "recipes",
+        element: <Recipes />
+      },
     ],
   },
   {
