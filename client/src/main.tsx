@@ -1,14 +1,3 @@
-/*import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)*/
-
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {
@@ -18,17 +7,39 @@ import {
 import App from "./App";
 import Record from "./components/Record";
 import RecordList from "./components/RecordList";
+
+import Root from "./routes/Root";
+import Profile from "./routes/Profile";
+import ErrorPage from "./error-page";
+
 import "./index.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App message="hello friend." />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
-        element: <RecordList />,
+        element: <RecordList />
       },
+    ],
+  },
+  {
+    path: "/app",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
+    ],
+  },
+  {
+    path: "/profile/:id",
+    element: <Profile />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
     ],
   },
   {
