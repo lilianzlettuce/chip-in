@@ -26,8 +26,8 @@ Log in to the chip-in project on Vercel, navigate to Settings -> Environment Var
 
 Should look something like this:
 ```
-    MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.<projectId>.mongodb.net/?retryWrites=true&w=majority&appName=<appName>
     PORT=6969
+    MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.<projectId>.mongodb.net/?retryWrites=true&w=majority&appName=<appName>
 ```
 
 Replace < username >, < password >, < cluster >, < projectId >, < appName > with your own.
@@ -70,7 +70,7 @@ Should look something like this:
 ### Server
 ```
 cd server/
-node --env-file=config.env server.js
+npm start
 ```
 
 ### Client
