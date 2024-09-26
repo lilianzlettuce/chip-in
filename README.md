@@ -22,7 +22,7 @@ Set up .env file
 touch config.env
 ```
 
-Log in to the chip-in project on Vercel, navigate to Settings -> Environment Variables. Copy and paste the **mongoDB connection string (MONGO_DB_URI)** and **port number (PORT)** into config.env.
+Log in to the chip-in project on Vercel, navigate to Settings -> Environment Variables. Copy and paste the **mongoDB connection string (MONGODB_URI)** and **port number (PORT)** into config.env.
 
 Should look something like this:
 ```
