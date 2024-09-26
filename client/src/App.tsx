@@ -16,10 +16,10 @@ export default function App({ message }: AppProps) {
     <Layout>
       <Outlet />
       <div>
-        <a href="https://vitejs.dev" target="_blank">
+        <a target="_blank">
           <img src={chipInLogo} className="logo" alt="Vite logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        <a>
           <img src={chipInLogo} className="logo react" alt="Chip In logo" />
         </a>
       </div>

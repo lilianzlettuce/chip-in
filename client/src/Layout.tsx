@@ -6,7 +6,7 @@ const Layout = ({ children }: { children: JSX.Element|JSX.Element[]}) => {
     <>
       <div className="flex justify-between items-start">
         <Navbar />
-        <div className="w-4/5 p-4">
+        <div className="w-4/5 min-h-screen p-4 flex flex-col justify-between">
           {children}
           <Footer />
         </div>

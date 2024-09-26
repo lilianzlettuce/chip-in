@@ -9,6 +9,10 @@ import Record from "./components/Record";
 import RecordList from "./components/RecordList";
 
 import Root from "./routes/Root";
+import Home from "./routes/Home";
+import Dashboard from "./routes/Dashboard";
+import MyExpenses from "./routes/MyExpenses";
+import Recipes from "./routes/Recipes";
 import Profile from "./routes/Profile";
 import ErrorPage from "./error-page";
 
@@ -17,13 +21,17 @@ import "./index.css";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App message="hello friend." />,
+    element: <App message="this is an example of how to pass in a prop" />,
     errorElement: <ErrorPage />,
     children: [
       {
         path: "/",
         element: <RecordList />
       },
+      {
+        path: "/profile",
+        element: <Profile />
+      }
     ],
   },
   {
@@ -35,7 +43,39 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/profile/:id",
+    path: "/home/:householdId",
+    element: <Home />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
+    ],
+  },
+  {
+    path: "/dashboard/:householdId",
+    element: <Dashboard />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
+    ],
+  },
+  {
+    path: "/my-expenses/:householdId/:userId",
+    element: <MyExpenses />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
+    ],
+  },
+  {
+    path: "/recipes/:householdId",
+    element: <Recipes />,
+    errorElement: <ErrorPage />,
+    children: [
+      {},
+    ],
+  },
+  {
+    path: "/profile/:userId",
     element: <Profile />,
     errorElement: <ErrorPage />,
     children: [
