@@ -24,10 +24,12 @@ touch config.env
 
 Log in to the chip-in project on Vercel, navigate to Settings -> Environment Variables. Copy and paste the **mongoDB connection string (MONGODB_URI)** and **port number (PORT)** into config.env.
 
+NB: Make sure to specify the database in the URI.
+
 Should look something like this:
 ```
     PORT=6969
-    MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.<projectId>.mongodb.net/?retryWrites=true&w=majority&appName=<appName>
+    MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.<projectId>.mongodb.net/<dbName>?retryWrites=true&w=majority&appName=<appName>
 ```
 
 Replace < username >, < password >, < cluster >, < projectId >, < appName > with your own.
