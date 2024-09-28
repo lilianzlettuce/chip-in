@@ -3,6 +3,7 @@ import cors from "cors";
 //import records from "./routes/record.js";
 import "./db/connection.js"
 import items from "./routes/item.js"
+import users from "./routes/user.js"
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -18,6 +19,8 @@ console.log('hello')
 
 //Item route
 app.use("/item", items);
+app.use("/user", users);
+
 
 //* Serve static assets in production, must be at this location of this file
 /*if (process.env.NODE_ENV === 'production') {
