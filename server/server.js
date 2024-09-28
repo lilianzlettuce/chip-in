@@ -4,6 +4,8 @@ import cors from "cors";
 import "./db/connection.js"
 import items from "./routes/item.js"
 import users from "./routes/user.js"
+import households from "./routes/household.js"
+
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -20,6 +22,7 @@ console.log('hello')
 //Item route
 app.use("/item", items);
 app.use("/user", users);
+app.use("/household", households)
 
 
 //* Serve static assets in production, must be at this location of this file

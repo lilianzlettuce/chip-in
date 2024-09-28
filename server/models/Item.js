@@ -7,7 +7,8 @@ const itemSchema = new mongoose.Schema({
     sharedBetween: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }],
     purchaseDate: { type: Date, required: false},
     expirationDate: { type: Date, required: false},
-    cost: {type: Number, required: false}
+    cost: {type: Number, required: false},
+    archived: {type: Boolean, default: false}
 });
 
 const Item = mongoose.model("Item", itemSchema)
