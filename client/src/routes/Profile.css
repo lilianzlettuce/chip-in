@@ -1,0 +1,65 @@
+.profile-summary-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #87a69d; /* Use a similar color to match the screenshot */
+  border-radius: 15px;
+  padding: 20px;
+  width: 1000px; /* Width of the entire card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  color: #ffffff; /* White text color */
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+}
+
+.profile-image {
+  width: 80px; /* Set the width and height for the profile image */
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border: 2px solid #ffffff; /* White border for the image */
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.profile-joined {
+  font-size: 0.9rem;
+  margin: 5px 0 0 0;
+}
+
+.payment-summary {
+  text-align: right;
+}
+
+.summary-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.summary-details {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 10px 20px; /* Gap between the items */
+}
+
+.summary-item {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.summary-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
