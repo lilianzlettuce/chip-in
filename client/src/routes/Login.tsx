@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import './Login.css';
 
@@ -5,12 +6,15 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate();
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log('Login submitted:', { email, password });
   };
 
   const handleForgotPassword = () => {
+    navigate('/forgotpass');
     console.log('Forgot Password clicked');
   };
 

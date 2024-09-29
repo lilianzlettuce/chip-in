@@ -15,14 +15,20 @@ import MyExpenses from "./routes/MyExpenses";
 import Recipes from "./routes/Recipes";
 import Profile from "./routes/Profile";
 import Login from "./routes/Login";
+import ForgotPass from "./routes/ForgotPass";
 import ErrorPage from "./error-page";
 
 import "./index.css";
 
 const router = createBrowserRouter([
   {
-    path: "/login", // New login route
+    path: "/login",
     element: <Login />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/forgotpass",
+    element: <ForgotPass />,
     errorElement: <ErrorPage />,
   },
   {
