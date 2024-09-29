@@ -4,12 +4,12 @@ const debtSchema = new mongoose.Schema({
     owedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     owedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     amount: { type: Number, required: true}
-});
+}, { _id: false });
 
 const alertSchema = new mongoose.Schema({
     category: { type: String, required: true},
     content: { type: String, required: true}
-});
+}, { _id: false });
 
 
 const householdSchema = new mongoose.Schema({
