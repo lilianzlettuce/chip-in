@@ -14,11 +14,17 @@ import Dashboard from "./routes/Dashboard";
 import MyExpenses from "./routes/MyExpenses";
 import Recipes from "./routes/Recipes";
 import Profile from "./routes/Profile";
+import Login from "./routes/Login";
 import ErrorPage from "./error-page";
 
 import "./index.css";
 
 const router = createBrowserRouter([
+  {
+    path: "/login", // New login route
+    element: <Login />,
+    errorElement: <ErrorPage />,
+  },
   {
     path: "/",
     element: <App message="this is an example of how to pass in a prop" />,
