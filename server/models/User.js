@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true},
     email: { type: String, required: true },
     password: { type: String, required: true },
-    households: { type: [String], required: false },
+    households: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Household', required: false }],
     preferences: { type: [Boolean], required: false},
 });
 

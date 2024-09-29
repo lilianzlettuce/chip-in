@@ -1,5 +1,6 @@
 import express from 'express';
 import Household from '../models/Household.js';
+import User from '../models/User.js'
 
 const router = express.Router();
 
@@ -66,6 +67,54 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+//add user to household
+router.post("/addUser/:id", async (req, res) => {
+    const {userId} = req.body;
+    const householdId = req.params.id;
+
+    try {
+        // find household
+        const household = await Household.findById(householdId);
+        if (!household) {
+            return res.status(404).json({ message: 'Household not found' });
+        }
+        
+        // find user
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        // add household to user
+        user.households.push(householdId);
+
+        // create new debts
+        for (let i = 0; i < household.members.length; i++) {
+            household.debts.push({
+                owedBy: userId,
+                owedTo: household.members[i],
+                amount: 0
+            });
+            household.debts.push({
+                owedBy: household.members[i],
+                owedTo: userId,
+                amount: 0
+            });
+        }
+
+        // add user to household members list
+        household.members.push(userId);
+
+        // update documents
+        await user.save();
+        await household.save();
+
+        res.status(200).json(household);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 export default router;
