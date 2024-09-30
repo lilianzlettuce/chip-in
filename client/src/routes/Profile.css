@@ -122,7 +122,8 @@
 }
 
 .profile-label {
-  flex: 1;
+  flex: none;
+  width: 200px;
   background-color: #325374;
   color: #fff;
   padding: 10px 15px;
@@ -131,7 +132,8 @@
 }
 
 .profile-input {
-  flex: 2;
+  flex: none;
+  width: 400px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -149,6 +151,8 @@
   padding: 8px 15px;
   cursor: pointer;
   display: flex;
+  flex: none;
+  width: 200px;
   align-items: center;
   transition: background-color 0.3s ease;
 }
