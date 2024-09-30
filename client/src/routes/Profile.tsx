@@ -5,6 +5,7 @@ import './Profile.css'; // Import CSS for styling
 import Layout from "../Layout";
 
 // Define a TypeScript interface for the component props
+// ---------- UI Function for Profile Summary Card --------------------------
 interface ProfileSummaryProps {
   name: string;
   joinedDate: string;
@@ -68,11 +69,69 @@ const profileProps = {
    amountOwed: 3000000,
  };
 
+
+ // ---------- UI Function for Profile Setting --------------------------
+ interface ProfileSettingsProps {
+  name: string;
+  username: string;
+  password: string;
+}
+
+const ProfileSettings: React.FC<ProfileSettingsProps> = ({
+  name,
+  username,
+  password
+}) => {
+  return (
+    <div className="profile-settings-container">
+      {/* Header Section */}
+      <div className="profile-header">
+        <h2>Profile</h2>
+        <div className="profile-actions">
+          <button className="delete-account">DELETE ACCOUNT</button>
+          <button className="edit-profile">EDIT PROFILE</button>
+        </div>
+      </div>
+
+      {/* Profile Fields Section */}
+      <div className="profile-fields">
+        {/* Display Name */}
+        <div className="profile-row">
+          <label className="profile-label">Display Name</label>
+          <label className="profile-input">{name}</label>
+          <button className="change-button">CHANGE NAME</button>
+        </div>
+
+        {/* Username */}
+        <div className="profile-row">
+          <label className="profile-label">Username</label>
+          <label className="profile-input">{username}</label>
+          <button className="change-button">CHANGE USERNAME</button>
+        </div>
+
+        {/* Password */}
+        <div className="profile-row">
+          <label className="profile-label">Password</label>
+          <label className="profile-input">{password}</label>
+          <button className="change-button">CHANGE PASSWORD</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const settingsProps = {
+  name: "Lettuce the Great",
+  username: "@lettuce",
+  password: "*************"
+};
+
 const Profile: React.FC = () => {
   return (
     <Layout>
       <div>
         <ProfileSummary {...profileProps} />
+        <ProfileSettings {...settingsProps} />
       </div>
     </Layout>
     
