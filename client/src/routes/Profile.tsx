@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState} from 'react';
 
 import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
@@ -81,7 +81,39 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   name,
   username,
   password
+
+  
 }) => {
+  
+  const [displayName, setDisplayName] = useState(name);
+  const [displayUsername, setDisplayUsername] = useState(username);
+  const [displayPassword, setDisplayPassword] = useState(password);
+
+  // state variable to track whether input fields are editable
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Event handler function for the button click
+  const handleChangeNameClick = () => {
+    if (isEditing == true) {
+      alert(`${displayName} has been changed successfully`);
+    }
+  };
+  const handleChangeUserNameClick = () => {
+    if (isEditing == true) {
+      alert(`${displayUsername} has been changed successfully`);
+    }
+  };
+  const handleChangePasswordClick = () => {
+    if (isEditing == true) {
+      alert(`${displayPassword} has been changed successfully`);
+    }
+  };
+
+  // Event handler to toggle edit mode or display mode
+  const handleEditClick = () => {
+    setIsEditing((prevState) => !prevState);
+  }
+
   return (
     <div className="profile-settings-container">
       {/* Header Section */}
@@ -89,7 +121,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <h2>Profile</h2>
         <div className="profile-actions">
           <button className="delete-account">DELETE ACCOUNT</button>
-          <button className="edit-profile">EDIT PROFILE</button>
+          <button className="edit-profile" onClick={handleEditClick}> 
+            {isEditing ? "DISPLAY PROFILE" : "EDIT PROFILE"}</button>
         </div>
       </div>
 
@@ -98,22 +131,31 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         {/* Display Name */}
         <div className="profile-row">
           <label className="profile-label">Display Name</label>
-          <label className="profile-input">{name}</label>
-          <button className="change-button">CHANGE NAME</button>
+          <input type="text" className="profile-input"
+              value = {displayName}
+              readOnly = {!isEditing} // doesn't allow users to change text field
+              onChange={(e) => setDisplayName(e.target.value)} />
+          <button className="change-button" onClick={handleChangeNameClick}>CHANGE NAME</button>
         </div>
 
         {/* Username */}
         <div className="profile-row">
           <label className="profile-label">Username</label>
-          <label className="profile-input">{username}</label>
-          <button className="change-button">CHANGE USERNAME</button>
+          <input type="text" className="profile-input"
+              value = {displayUsername}
+              readOnly = {!isEditing} // doesn't allow users to change text field
+              onChange={(e) => setDisplayUsername(e.target.value)} />
+          <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
         </div>
 
         {/* Password */}
         <div className="profile-row">
           <label className="profile-label">Password</label>
-          <label className="profile-input">{password}</label>
-          <button className="change-button">CHANGE PASSWORD</button>
+          <input type="text" className="profile-input"
+              value = {displayPassword}
+              readOnly = {!isEditing} // doesn't allow users to change text field
+              onChange={(e) => setDisplayPassword(e.target.value)} />
+          <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
         </div>
       </div>
     </div>
