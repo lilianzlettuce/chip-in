@@ -18,10 +18,10 @@ const ForgotPass: React.FC = () => {
       });
 
       if (response.ok) {
-        setMessage('Password reset link sent to your email');
+        setMessage('Password reset code sent to your email');
       } else {
         const result = await response.json();
-        setMessage(result.message || 'Failed to send password reset link');
+        setMessage(result.message || 'Failed to send password reset code');
       }
     } catch (error) {
       setMessage('An error occurred. Please try again later.');
