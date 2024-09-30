@@ -168,12 +168,69 @@ const settingsProps = {
   password: "*************"
 };
 
+
+// ---------- UI Function for Notification Settings --------------------------
+const Settings: React.FC = () => {
+  // State to track switch states
+  const [householdAlerts, setHouseholdAlerts] = useState(true);
+  const [paymentReminders, setPaymentReminders] = useState(true);
+
+  // Toggle function for switches
+  const handleToggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+    setter((prevState) => !prevState);
+  };
+
+  return (
+    <div className="settings-container">
+      {/* Settings Header */}
+      <div className="settings-header">
+        <h2>Settings</h2>
+ 
+      </div>
+
+      {/* Notifications Section */}
+      <div className="notifications-section">
+        <h3>Notifications</h3>
+        <div className="notification-row">
+          <div className="notification-item">
+            <label className="notification-label">Household Alerts</label>
+            <div className="toggle-container">
+              <span className="toggle-label">ON</span>
+              <input
+                type="checkbox"
+                className="toggle-switch"
+                checked={householdAlerts}
+                onChange={() => handleToggle(setHouseholdAlerts)}
+              />
+              <span className="toggle-label">OFF</span>
+            </div>
+          </div>
+          <div className="notification-item">
+            <label className="notification-label">Payment Reminders</label>
+            <div className="toggle-container">
+              <span className="toggle-label">ON</span>
+              <input
+                type="checkbox"
+                className="toggle-switch"
+                checked={paymentReminders}
+                onChange={() => handleToggle(setPaymentReminders)}
+              />
+              <span className="toggle-label">OFF</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Profile: React.FC = () => {
   return (
     <Layout>
       <div>
         <ProfileSummary {...profileProps} />
         <ProfileSettings {...settingsProps} />
+        <Settings/>
       </div>
     </Layout>
     
