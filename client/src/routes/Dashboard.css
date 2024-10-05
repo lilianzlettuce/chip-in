@@ -1,55 +1,63 @@
 .dashboard-container {
-    padding: 2rem;
-    background-color: #FFF9F1;
-    text-align: center;
-  }
-  
-  .dashboard-title {
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 2rem;
-  }
-  
-  .dashboard-controls {
-    margin-bottom: 1.5rem;
-  }
-  
-  .dashboard-button {
-    background-color: #333;
-    color: #FFF;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .dashboard-button:hover {
-    background-color: #555;
-  }
-  
-  .dashboard-item-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .dashboard-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem;
-    background-color: #FAF3E0;
-    margin-bottom: 0.5rem;
-    border-radius: 5px;
-    font-size: 1.2rem;
-  }
-  
-  .item-name {
-    font-weight: bold;
-  }
-  
-  .item-expiration {
-    font-style: italic;
-    color: #666;
-  }  
+  padding: 20px;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.dashboard-controls-inventory {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.dashboard-button {
+  padding: 5px 10px;
+  background-color: transparent;
+  color: black;
+  border: 2px solid #604d16;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+.dashboard-section {
+  margin-bottom: 30px;
+}
+
+.dashboard-item-list {
+  list-style: none;
+  padding: 0;
+}
+
+.dashboard-item {
+  padding: 10px 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.item-name {
+  font-weight: bold;
+}
+
+.item-expiration {
+  color: gray;
+  font-style: italic;
+}
