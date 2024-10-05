@@ -117,4 +117,37 @@ router.post("/addUser/:id", async (req, res) => {
     }
 });
 
+// get grocery list
+router.get("/:id/grocerylist", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('groceryList');
+
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    res.status(200).json(household.groceryList);
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get purchased list
+router.get("/:id/purchasedlist", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchasedList');
+
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    res.status(200).json(household.purchasedList);
+  } catch (error) {
+    res.status(500).json({ error: err.message });
+  }
+});
 export default router;
