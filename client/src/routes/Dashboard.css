@@ -1,41 +1,85 @@
 .dashboard-container {
-  padding: 20px;
+  padding: 40px;
+  background-color: #faf3e0;
+  font-family: 'Helvetica', sans-serif;
+  color: #212020;
 }
 
 .dashboard-title {
-  font-size: 2rem;
-  margin-bottom: 20px;
-}
-
-.dashboard-controls-inventory {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  text-align: left;
+  text-align: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 30px;
+  color: #2d261d;
 }
 
 .dashboard-controls {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px;
 }
 
 .dashboard-button {
-  padding: 5px 10px;
-  background-color: transparent;
-  color: black;
-  border: 2px solid #604d16;
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 0.8rem;
+}
+
+.dashboard-button:hover {
+  background-color: #444;
+}
+
+.filter-dropdown {
+  width: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1em;
+  margin-top: 5px;
+}
+
+.filter-dropdown:hover, .filter-dropdown:focus {
+  border-color: #5e503f;
+}
+
+.dashboard-button {
+  padding: 12px 25px;
+  background-color: #1d1913;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-button:hover {
+  background-color: #19130f;
 }
 
 .dashboard-section {
-  margin-bottom: 30px;
+  margin-top: 40px;
+}
+
+.section-title {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #241f19;
+  margin-bottom: 15px;
 }
 
 .dashboard-item-list {
@@ -44,20 +88,43 @@
 }
 
 .dashboard-item {
-  padding: 10px 15px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  border-radius: 5px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  padding: 15px 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: box-shadow 0.3s ease;
+}
+
+.dashboard-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .item-name {
   font-weight: bold;
+  font-size: 1.3em;
+  color: #333;
 }
 
-.item-expiration {
-  color: gray;
-  font-style: italic;
+.item-category, .item-roommates {
+  font-size: 1em;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .dashboard-controls {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .filter-section {
+      margin-bottom: 15px;
+  }
+
+  .dashboard-button {
+      margin-top: 10px;
+  }
 }
