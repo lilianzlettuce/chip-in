@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 
 interface ServerResponse {
@@ -13,6 +13,9 @@ const SignUp: React.FC = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [msg, setMsg] = useState('');
+
+    const navigate = useNavigate();
 
     // Get env vars
     const PORT = process.env.REACT_APP_PORT || 5050;
@@ -28,7 +31,8 @@ const SignUp: React.FC = () => {
             password: password
         }
 
-        const res = await fetch(`${SERVER_URL}/signup`, {
+        // Send auth request to server
+        const res = await fetch(`${SERVER_URL}/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-type": "application/json"
@@ -41,14 +45,15 @@ const SignUp: React.FC = () => {
             throw new Error('Internal server error');
         }
     
-        const data: ServerResponse = await res.json(); // Expecting JSON response
-    
+        // Get JSON response from server and display message
+        const data: ServerResponse = await res.json();
         if (data.message) {
-            console.log('Success:', data.message); // Success message from server
+            console.log('Success:', data.message);
+            navigate("/login");
+            //setMsg(data.message);
         } else if (data.error) {
-            console.log('Error:', data.error); // Error message from server
-        } else {
-            console.log('New user created:', data); // The newly created user object
+            console.log('Error:', data.error);
+            setMsg(data.error);
         }
     };
 
@@ -84,10 +89,12 @@ const SignUp: React.FC = () => {
                         required
                         className="auth-input"
                     />
+                    <div className={`text-${msg ? "red" : "green"}-400 text-left text-sm`}>
+                        {msg}
+                    </div>
                     <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">Sign up</button>
                 </form>
-                <Link to="/login"
-                    className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
+                <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
                         Already have an account? Sign in here.
                 </Link>
             </div>

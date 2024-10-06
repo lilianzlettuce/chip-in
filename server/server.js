@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
-//import records from "./routes/record.js";
+
 import "./db/connection.js";
 import items from "./routes/item.js";
 import users from "./routes/user.js";
 import households from "./routes/household.js";
+import auth from "./routes/auth.js";
 
 import User from "./models/User.js";
 
@@ -15,10 +16,6 @@ app.use(cors());
 app.use(express.json());
 
 console.log('hello');
-
-// Record route
-//app.use("/record", records);
-//app.use("/api/record", records);
 
 //Item route
 app.use("/item", items);
@@ -34,11 +31,11 @@ app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
 
-app.post("/signup", async (req, res) => {
-  const user = req.body;
+// Auth route
+app.use("/auth", auth);
 
-  console.log("in app.post");
-  console.log(user);
+/*app.post("/signup", async (req, res) => {
+  const user = req.body;
 
   try {
     // Check if valid email and username
@@ -46,13 +43,10 @@ app.post("/signup", async (req, res) => {
     const usernameTaken = await User.findOne({username: user.username});
 
     if (emailTaken) {
-      console.log("email in use")
-      res.json({message: "Email already in use."});
+      res.json({ error: "Email already in use." });
     } else if (usernameTaken) {
-      console.log("username in use")
       res.json({ error: "Username already in use. Be more original." });
     } else {
-      console.log("create user")
       // Create user
       user.password = req.body.password;
 
@@ -63,10 +57,9 @@ app.post("/signup", async (req, res) => {
       })
 
       newUser.save();
-      //res.json({message: "Success"});
-      res.status(201).json(newUser);
+      res.status(201).json({message: "Account created successfully."});
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
+});*/
