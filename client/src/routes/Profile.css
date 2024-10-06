@@ -25,6 +25,18 @@
   border: 2px solid #ffffff; /* White border for the image */
 }
 
+.change-image {
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 8px 15px;
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  width: 200px;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
 .profile-info {
   display: flex;
   flex-direction: column;
@@ -160,6 +172,29 @@
 .change-button:hover {
   background-color: #333;
   color: #fff;
+}
+
+/* ----------------- CSS for uploading image --------------*/
+.upload-button {
+  background-color: #325374; /* Green background */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #325374;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 /* ----------------- CSS for settings ---------------------*/

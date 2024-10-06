@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect} from 'react';
 
 import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
@@ -9,30 +9,102 @@ import Layout from "../Layout";
 interface ProfileSummaryProps {
   name: string;
   joinedDate: string;
-  //imageUrl: string;
+  imageUrl: string;
   spent: number;
   paidBack: number;
   itemsBought: number;
   amountOwed: number;
 }
 
+// const UploadImage : 
+
 const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   name,
   joinedDate,
-  //imageUrl,
+  imageUrl,
   spent,
   paidBack,
   itemsBought,
   amountOwed,
 }) => {
+
+  // START UPLOAD PICTURE
+  const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
+  //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
+
+  // Effect to set the initial image if imageUrl is not provided
+  useEffect(() => {
+    if (!imageUrl) {
+      setProfileImage(lettuce);
+    }
+  }, [imageUrl]);
+
+  // Handler to update the image preview when a new image is uploaded
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result as string); // Update profile image state with uploaded image
+      };
+      reader.readAsDataURL(file);
+
+      //setImageFile(file); // Store the actual file in state
+      // TBD:  Set the ImageFile for now, send the updated image to the server
+      handleSubmit(file); // Pass the file object to handleSubmit directly
+    }
+  };
+
+  // send to server
+  const handleSubmit = async (file: File | null) => {
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file); // Attach the file to the form data
+  
+      try {
+        const response = await fetch('your-server-endpoint/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        if (response.ok) {
+          console.log('Image uploaded successfully!');
+        } else {
+          console.error('Failed to upload image.');
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    } else {
+      console.warn('No image file selected.');
+    }
+  };
+
+  // END UPLOAD PICTURE
+
   return (
     <div className="profile-summary-card">
       {/* Profile Image and Information Section */}
       <div className="profile-section">
-        <img className="profile-image" src={lettuce} alt="logo"  />
+        {/*<img className="profile-image" src={lettuce} alt="logo"  />*/}
+        <img className="profile-image" src={profileImage} alt="Profile"  />
         <div className="profile-info">
           <h2 className="profile-name">{name}</h2>
           <p className="profile-joined">Joined {joinedDate}</p>
+          {/* UPLOAD IMAGE HERE */}
+          {/* Update Picture Button and Hidden File Input */}
+          <button
+            className="upload-button"
+            onClick={() => document.getElementById('file-input')?.click()}
+          >
+            Update Picture
+          </button>
+          <input
+            id="file-input"
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }} // Hide the native file input
+            onChange={handleImageUpload}
+          />
         </div>
       </div>
 
@@ -58,11 +130,11 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   );
 };
 
-//export default ProfileSummary;
+//export default ProfileSummary (hardcoded for now. comes from server later);
 const profileProps = {
    name: "Lettuce the Great",
    joinedDate: "9/17/2024",
-   //imageUrl: "lettuce",
+   imageUrl: "",
    spent: 500,
    paidBack: 200,
    itemsBought: 15,
@@ -89,11 +161,15 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const [displayUsername, setDisplayUsername] = useState(username);
   const [displayPassword, setDisplayPassword] = useState(password);
 
+  //const [tempName, setTempName] = useState(displayName);
+  //const [tempUsername, setTempUsername] = useState(displayUsername);
+  //const [tempPassword, setTempPassword] = useState(displayPassword);
   // state variable to track whether input fields are editable
   const [isEditing, setIsEditing] = useState(false);
 
   // Event handler function for the button click
   const handleChangeNameClick = () => {
+    //setSavedName(tempName);
     if (isEditing == true) {
       alert(`${displayName} has been changed successfully`);
     }
@@ -135,7 +211,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               value = {displayName}
               readOnly = {!isEditing} // doesn't allow users to change text field
               onChange={(e) => setDisplayName(e.target.value)} />
-          <button className="change-button" onClick={handleChangeNameClick}>CHANGE NAME</button>
+           {isEditing && (
+              <button className="change-button" onClick={handleChangeNameClick}>CHANGE NAME</button>
+           )}
         </div>
 
         {/* Username */}
@@ -145,7 +223,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               value = {displayUsername}
               readOnly = {!isEditing} // doesn't allow users to change text field
               onChange={(e) => setDisplayUsername(e.target.value)} />
+          {isEditing && (
           <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
+          )}
         </div>
 
         {/* Password */}
@@ -155,7 +235,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               value = {displayPassword}
               readOnly = {!isEditing} // doesn't allow users to change text field
               onChange={(e) => setDisplayPassword(e.target.value)} />
+          {isEditing && (
           <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
+          )}
         </div>
       </div>
     </div>
