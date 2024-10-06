@@ -4,12 +4,15 @@ import './ForgotPass.css';
 const ForgotPass: React.FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);  // Start loading
+    setMessage(null);  // Clear previous messages
 
     try {
-      const response = await fetch('placeholder', {
+      const response = await fetch('http://localhost:6969/user/resetpass', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,6 +28,8 @@ const ForgotPass: React.FC = () => {
       }
     } catch (error) {
       setMessage('An error occurred. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +50,13 @@ const ForgotPass: React.FC = () => {
               className="form-input"
             />
           </div>
-          <button type="submit" className="forgot-password-button">Send Password Reset Code</button>
+          <button 
+            type="submit" 
+            className="forgot-password-button"
+            disabled={loading}
+          >
+            {loading ? "Sending..." : "Send Password Reset Code"}
+          </button>
         </form>
         {message && <p className="message">{message}</p>}
       </div>

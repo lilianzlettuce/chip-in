@@ -81,12 +81,15 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.post("/forgotpass", async (req, res) => {
+router.post("/resetpass", async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
     return res.status(400).send({ message: 'Email is required' });
   }
+
+  console.log(process.env.EMAIL_USER);
+  console.log(process.env.EMAIL_PASS);
 
   try {
     // Check if the user exists
@@ -109,7 +112,7 @@ router.post("/forgotpass", async (req, res) => {
     // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error(error);
+        console.error("Error sending email: " + error);
         return res.status(500).send({ message: 'Error sending email' });
       }
 
