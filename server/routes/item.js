@@ -11,18 +11,19 @@ router.post('/addtogrocery', async (req, res) => {
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
 
   try {
-    const household = await Household.findById(householdId)
+    const item = await newItem.save();
+
+    const household = await Household.findByIdAndUpdate(
+      householdId,
+      {$push: {groceryList: item._id}},
+      {new: true, useFindandModify: false}
+    );
     
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-
-    const item = await newItem.save();
-
-    household.groceryList.push(item._id)
-    await household.save()
     
-    res.status(201).json(newItem);
+    res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -39,18 +40,19 @@ router.post('/addtopurchased', async (req, res) => {
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
 
   try {
-    const household = await Household.findById(householdId)
+    const item = await newItem.save();
+
+    const household = await Household.findByIdAndUpdate(
+      householdId,
+      {$push: {purchasedList: item._id}},
+      {new: true, useFindandModify: false}
+    );
     
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-
-    const item = await newItem.save();
     
-    household.purchasedList.push(item._id)
-    await household.save()
-    
-    res.status(201).json(newItem);
+    res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
