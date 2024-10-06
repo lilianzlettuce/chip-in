@@ -8,7 +8,8 @@ const SignUp: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        console.log('Login submitted:', { email, password });
+        console.log('signup submitted:', { email, username, password });
+        //axios.post()
     };
 
     return (
