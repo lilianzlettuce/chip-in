@@ -44,9 +44,9 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  const { username, email, password, households, preferences, pfp } = req.body;
+  const { username, email, password, households, preferences, pfp, bio } = req.body;
 
-  const newUser = new User({ username, email, password, households, preferences, pfp });
+  const newUser = new User({ username, email, password, households, preferences, pfp, bio });
 
   try {
     await newUser.save();
@@ -58,10 +58,10 @@ router.post("/", async (req, res) => {
 
 //update by id
 router.patch("/:id", async (req, res) => {
-  const { username, email, password, households, preferences } = req.body;
+  const { username, email, password, households, preferences, bio } = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { username, email, password, households, preferences }, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, { username, email, password, households, preferences, bio }, { new: true });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
