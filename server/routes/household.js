@@ -39,7 +39,6 @@ router.patch('/purchase', async (req, res) => {
   if (!purchasedBy || !purchaseDate || cost == undefined || cost == null) {
     return res.status(400).json({ message: 'Fields must be filled' });
   }
-  console.log(itemId)
   try {
     const updatedItem = await Item.findByIdAndUpdate(
       itemId,
