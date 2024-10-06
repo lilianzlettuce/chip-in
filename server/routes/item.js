@@ -33,8 +33,8 @@ router.post('/addtogrocery', async (req, res) => {
 router.post('/addtopurchased', async (req, res) => {
   const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
-  if (!name || !category || !purchaseDate || !expirationDate || cost === undefined || cost === null) {
-    return res.status(400).json({ message: 'All fields must be populated' });
+  if (!name || !category || !purchaseDate || cost === undefined || cost === null) {
+    return res.status(400).json({ message: 'Fields must be populated' });
   }
 
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });

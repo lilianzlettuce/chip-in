@@ -1,6 +1,7 @@
 import express from 'express';
 import Household from '../models/Household.js';
 import User from '../models/User.js'
+import Item from '../models/Item.js'
 
 const router = express.Router();
 
@@ -42,19 +43,19 @@ router.post("/", async (req, res) => {
 });
 
 //update by id
-router.patch("/:id", async (req, res) => {
-  const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
+// router.patch("/:id", async (req, res) => {
+//   const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
 
-  try {
-    const household = await Household.findByIdAndUpdate(req.params.id, { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
-    if (!household) {
-      return res.status(404).json({ message: "Household not found" });
-    }
-    res.status(200).json(household);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//   try {
+//     const household = await Household.findByIdAndUpdate(req.params.id, { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
+//     if (!household) {
+//       return res.status(404).json({ message: "Household not found" });
+//     }
+//     res.status(200).json(household);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 //delete by id
 router.delete("/:id", async (req, res) => {
@@ -151,3 +152,43 @@ router.get("/:id/purchasedlist", async (req, res) => {
   }
 });
 export default router;
+
+//move from grocery to purchased
+router.patch('/purchase', async (req, res) => {
+  const { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+
+  if (!purchasedBy || !purchaseDate || cost == undefined || cost == null) {
+    return res.status(400).json({ message: 'Fields must be filled' });
+  }
+  console.log(itemId)
+  try {
+    const updatedItem = await Item.findByIdAndUpdate(
+      itemId,
+      {
+        purchasedBy,
+        purchaseDate,
+        ...(sharedBetween && {sharedBetween}),
+        ...(expirationDate && {expirationDate}),
+        cost,
+      },
+      {new: true, runValidators: true}
+    );
+
+    const household = await Household.findByIdAndUpdate(
+      householdId,
+      {
+        $pull: {groceryList: updatedItem._id},
+        $push: {purchasedList: updatedItem._id}
+      },
+      {new: true, useFindandModify: false}
+    );
+    
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+    
+    res.status(201).json(updatedItem);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
