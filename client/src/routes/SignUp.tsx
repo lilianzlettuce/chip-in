@@ -1,22 +1,62 @@
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 
+interface ServerResponse {
+    message?: string;
+    error?: string;
+    email?: string;
+    username?: string;
+    password?: string;
+}
+
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('')
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event: React.FormEvent) => {
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 5050;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
+    // Handle user sign in
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        console.log('signup submitted:', { email, username, password });
-        //axios.post()
+        
+        const user = {
+            email: email,
+            username: username,
+            password: password
+        }
+
+        const res = await fetch(`${SERVER_URL}/signup`, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(user)
+        });
+
+        // Check if the response is successful
+        if (!res.ok) {
+            throw new Error('Internal server error');
+        }
+    
+        const data: ServerResponse = await res.json(); // Expecting JSON response
+    
+        if (data.message) {
+            console.log('Success:', data.message); // Success message from server
+        } else if (data.error) {
+            console.log('Error:', data.error); // Error message from server
+        } else {
+            console.log('New user created:', data); // The newly created user object
+        }
     };
 
     return (
         <div className="h-screen flex justify-center items-center">
             <div className="bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
                 <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-5">Create an Account</h2>
-                <form onSubmit={handleSubmit} className="">
+                <form onSubmit={(e) => handleSubmit(e)} className="">
                     <input
                         type="email"
                         id="email"
