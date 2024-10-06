@@ -1,0 +1,307 @@
+/* ----------------- CSS for profile summary card ---------------------*/
+.profile-summary-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #87a69d; /* Use a similar color to match the screenshot */
+  border-radius: 15px;
+  padding: 20px;
+  width: 1000px; /* Width of the entire card */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  color: #ffffff; /* White text color */
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+}
+
+.profile-image {
+  width: 80px; /* Set the width and height for the profile image */
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border: 2px solid #ffffff; /* White border for the image */
+}
+
+.change-image {
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 8px 15px;
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  width: 200px;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.profile-joined {
+  font-size: 0.9rem;
+  margin: 5px 0 0 0;
+}
+
+.payment-summary {
+  text-align: right;
+}
+
+.summary-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.summary-details {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 10px 20px; /* Gap between the items */
+}
+
+.summary-item {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.summary-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+
+
+/* ----------------- CSS for profile settings ---------------------*/
+.profile-settings-container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f3eb;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.profile-header h2 {
+  margin: 0;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-account,
+.edit-profile {
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-account:hover,
+.edit-profile:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.profile-fields {
+  margin-top: 20px;
+}
+
+.profile-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-label {
+  flex: none;
+  width: 200px;
+  background-color: #325374;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.profile-input {
+  flex: none;
+  width: 400px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-right: 15px;
+}
+
+.profile-input[readonly] {
+  background-color: #f5f5f5;
+}
+
+.change-button {
+  background-color: transparent;
+  border: 1px solid #333;
+  padding: 8px 15px;
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  width: 200px;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.change-button:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+/* ----------------- CSS for uploading image --------------*/
+.upload-button {
+  background-color: #325374; /* Green background */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #325374;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ----------------- CSS for settings ---------------------*/
+
+.settings-container {
+  width: 90%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f3eb;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+}
+
+.settings-header h2 {
+  margin: 0;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-account:hover,
+.edit-profile:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Notifications Section Styles */
+.notifications-section {
+  align-items: left;
+  margin-top: 20px;
+}
+
+.notification-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background-color: #325374;
+  color: #fff;
+  border-radius: 8px;
+}
+
+.notification-label {
+  background-color: #325374;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+/* Toggle Switch Styles */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-switch {
+  width: 40px;
+  height: 20px;
+  appearance: none;
+  background-color: #ddd;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-switch:checked {
+  background-color: #61dafb;
+}
+
+.toggle-switch::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-switch:checked::before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  color: #fff;
+}
+
