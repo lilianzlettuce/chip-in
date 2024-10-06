@@ -1,7 +1,20 @@
 import express from 'express';
 import User from '../models/User.js';
+import nodemailer from 'nodemailer';
 
 const router = express.Router();
+
+function generateCode() {
+  return Math.floor(10000 + Math.random() * 90000); // Generates a random 5-digit number
+}
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // env variable for email
+    pass: process.env.EMAIL_PASS, // env variable for password
+  },
+});
 
 //get all
 router.get('/', async (req, res) => {
@@ -65,6 +78,48 @@ router.delete("/:id", async (req, res) => {
     res.status(200).json({ message: "User deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/forgotpass", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).send({ message: 'Email is required' });
+  }
+
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    // Generate unique 5-digit code
+    const resetCode = generateCode();
+
+    // Email options
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your Password Reset Code',
+      text: `Your password reset code is: ${resetCode}`,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send({ message: 'Error sending email' });
+      }
+
+      console.log('Email sent: ' + info.response);
+      return res.status(200).send({ message: 'Password reset code sent', code: resetCode });
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'An error occurred' });
   }
 });
 
