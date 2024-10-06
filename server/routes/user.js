@@ -3,6 +3,22 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
+//upload pfp
+router.patch('/pfp/:id', async (req, res) => {
+  const { pfp } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      {pfp},
+      {new: true, useFindandModify: false}
+    );
+    res.status(200).json({msg: "new pfp saved to database"})
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 //get all
 router.get('/', async (req, res) => {
   try {
@@ -28,9 +44,9 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  const { username, email, password, households, preferences } = req.body;
+  const { username, email, password, households, preferences, pfp } = req.body;
 
-  const newUser = new User({ username, email, password, households, preferences });
+  const newUser = new User({ username, email, password, households, preferences, pfp });
 
   try {
     await newUser.save();

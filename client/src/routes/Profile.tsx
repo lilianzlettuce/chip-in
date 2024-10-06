@@ -29,55 +29,107 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
 }) => {
 
   // START UPLOAD PICTURE
-  const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
+  //const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
+  const [profileImage, setProfileImage] = useState<string>(imageUrl); // State to handle profile image
+
   //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
 
   // Effect to set the initial image if imageUrl is not provided
+  // useEffect(() => {
+  //   if (!imageUrl) {
+  //     setProfileImage(lettuce);
+  //   }
+  // }, [imageUrl]);
+
+  //effect to retrieve user profile from backend
   useEffect(() => {
-    if (!imageUrl) {
-      setProfileImage(lettuce);
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(`http://localhost:6969/user/6702f13dee75c86e8e01f9bd`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.pfp) {
+            setProfileImage(data.pfp);
+          }
+        } else {
+          console.error('failed to fetch user profile')
+        }
+      } catch (err) {
+        console.error('error fetching user profile:', err)
+      }
     }
-  }, [imageUrl]);
+
+    fetchUserProfile();
+  });
 
   // Handler to update the image preview when a new image is uploaded
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onload = () => {
+        const imageString = reader.result as string;
         setProfileImage(reader.result as string); // Update profile image state with uploaded image
+        handleSubmit(imageString);
       };
       reader.readAsDataURL(file);
 
       //setImageFile(file); // Store the actual file in state
       // TBD:  Set the ImageFile for now, send the updated image to the server
-      handleSubmit(file); // Pass the file object to handleSubmit directly
+       // Pass the file object to handleSubmit directly
     }
   };
 
-  // send to server
-  const handleSubmit = async (file: File | null) => {
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file); // Attach the file to the form data
+  //send image to server
+  const handleSubmit = async (base64String: string) => {
+    const userId = '6702f13dee75c86e8e01f9bd'; // Hardcoded user ID for now
+    const url = `http://localhost:6969/user/pfp/${userId}`;
   
-      try {
-        const response = await fetch('your-server-endpoint/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        if (response.ok) {
-          console.log('Image uploaded successfully!');
-        } else {
-          console.error('Failed to upload image.');
-        }
-      } catch (error) {
-        console.error('Error uploading image:', error);
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pfp: base64String, 
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('Profile picture updated successfully!');
+      } else {
+        console.error('Failed to update profile picture.');
       }
-    } else {
-      console.warn('No image file selected.');
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
+  
+
+  // send to server
+  // const handleSubmit = async (file: File | null) => {
+  //   if (file) {
+  //     const formData = new FormData();
+  //     formData.append('file', file); // Attach the file to the form data
+  
+  //     try {
+  //       const response = await fetch('your-server-endpoint/upload', {
+  //         method: 'POST',
+  //         body: formData,
+  //       });
+  //       if (response.ok) {
+  //         console.log('Image uploaded successfully!');
+  //       } else {
+  //         console.error('Failed to upload image.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error uploading image:', error);
+  //     }
+  //   } else {
+  //     console.warn('No image file selected.');
+  //   }
+  // };
 
   // END UPLOAD PICTURE
 
