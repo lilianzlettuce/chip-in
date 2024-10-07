@@ -66,6 +66,24 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
+      // file type validation
+      // Validate the file type using the MIME type
+      const validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/svg+xml"];
+      
+      if (!validImageTypes.includes(file.type)) {
+        alert("Invalid file format. Please upload a JPG, PNG, or SVG image.");
+        return; // Exit the function if the file type is not valid
+      }
+
+      // Optionally, you can check file extension as an extra measure
+      const validExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      
+      if (!validExtensions.includes(fileExtension)) {
+        alert("Invalid file extension. Please upload a file with .jpg, .jpeg, .png, .svg extension.");
+        return; // Exit the function if the file extension is not valid
+      }
+      
       const reader = new FileReader();
       reader.onload = () => {
         const imageString = reader.result as string;
