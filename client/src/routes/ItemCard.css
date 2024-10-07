@@ -73,7 +73,12 @@
     border: none;
     color: white;
     padding: 5px 10px;
-    cursor: pointer;
+    cursor: hand;
     border-radius: 5px;
   }
-  
+
+  .action-button:hover{
+    background-color: #de6161;
+  }
+
+ 
