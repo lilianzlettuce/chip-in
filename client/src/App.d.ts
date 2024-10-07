@@ -1,4 +1,4 @@
-import './App.css';
+import './global.css';
 type AppProps = {
     message: string;
 };
