@@ -231,10 +231,37 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       alert(`${displayUsername} has been changed successfully`);
     }
   };
-  const handleChangePasswordClick = () => {
+  
+  /*const handleChangePasswordClick = () => {
     if (isEditing == true) {
       alert(`${displayPassword} has been changed successfully`);
     }
+  };*/
+  // handles validation
+  const handleChangePasswordClick = () => {
+    // Password validation
+    if (isEditing) {
+      if (!isValidPassword(displayPassword)) {
+        alert("Password must be at least 12 characters long and contain at least one letter and one number.");
+        return;
+      }
+      // Password meets all criteria
+      alert("Password has been changed successfully");
+    }
+  };
+  
+  // Helper function to validate password
+  const isValidPassword = (password: string): boolean => {
+    // Check for minimum length of 12 characters
+    const isLongEnough = password.length >= 12;
+  
+    // Check for at least one alphabet (case insensitive)
+    const hasAlphabet = /[a-zA-Z]/.test(password);
+
+    // Check for at least one number
+    const hasNumber = /[0-9]/.test(password);
+
+    return isLongEnough && hasAlphabet && hasNumber;
   };
 
   // Event handler to toggle edit mode or display mode
@@ -283,7 +310,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         {/* Password */}
         <div className="profile-row">
           <label className="profile-label">Password</label>
-          <input type="text" className="profile-input"
+          {/* Change input type based on isEditing state 
+           type="password": This input type is specifically designed to hide user input, showing only a series of * */}
+          <input type={isEditing ? "text" : "password"} // Use "password" type when not editing
+              className="profile-input"
               value = {displayPassword}
               readOnly = {!isEditing} // doesn't allow users to change text field
               onChange={(e) => setDisplayPassword(e.target.value)} />
