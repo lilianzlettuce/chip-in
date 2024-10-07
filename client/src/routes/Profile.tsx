@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 
-import lettuce from '../assets/lettuce.png'
+//import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
 import Layout from "../Layout";
 

@@ -8,19 +8,22 @@ import App from "./App";
 import Record from "./components/Record";
 import RecordList from "./components/RecordList";
 
-import Root from "./routes/Root";
 import Home from "./routes/Home";
 import Dashboard from "./routes/Dashboard";
 import MyExpenses from "./routes/MyExpenses";
 import Recipes from "./routes/Recipes";
 import Profile from "./routes/Profile";
 import Login from "./routes/Login";
+import SignUp from "./routes/SignUp";
 import ForgotPass from "./routes/ForgotPass";
 import ErrorPage from "./error-page";
 
-import "./index.css";
-
 const router = createBrowserRouter([
+  {
+    path: "/signup",
+    element: <SignUp />,
+    errorElement: <ErrorPage />,
+  },
   {
     path: "/login",
     element: <Login />,
@@ -44,14 +47,6 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <Profile />
       }
-    ],
-  },
-  {
-    path: "/app",
-    element: <Root />,
-    errorElement: <ErrorPage />,
-    children: [
-      {},
     ],
   },
   {
