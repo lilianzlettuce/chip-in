@@ -1,0 +1,79 @@
+/* Card container */
+.card-container {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    position: relative;
+    width: 300px;
+    font-family: Arial, sans-serif;
+    text-align: left;
+  }
+  
+  /* Category badge */
+  .category-badge {
+    background-color: #f0f5ea;
+    padding: 5px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 12px;
+    color: #000;
+  }
+  
+  /* Item info: name and price */
+  .item-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 20px;
+  }
+  
+  .price {
+    background-color: #f4cacd;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  /* Shared by section */
+  .shared-by-text {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  /* Footer: added by and expiration */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .expiry {
+    background-color: #548bae;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  
+  /* Actions: edit and delete buttons */
+  .actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .action-button {
+    background-color: #555;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
