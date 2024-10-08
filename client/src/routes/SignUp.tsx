@@ -39,20 +39,14 @@ const SignUp: React.FC = () => {
             },
             body: JSON.stringify(user)
         });
-
-        // Check if the response is successful
-        if (!res.ok) {
-            throw new Error('Internal server error');
-        }
     
         // Get JSON response from server and display message
         const data: ServerResponse = await res.json();
         if (data.message) {
-            console.log('Success:', data.message);
+            alert("Success! Log in now.");
             navigate("/login");
             //setMsg(data.message);
         } else if (data.error) {
-            console.log('Error:', data.error);
             setMsg(data.error);
         }
     };
@@ -95,7 +89,7 @@ const SignUp: React.FC = () => {
                     <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">Sign up</button>
                 </form>
                 <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
-                        Already have an account? Sign in here.
+                    Already have an account? Sign in here.
                 </Link>
             </div>
         </div>
