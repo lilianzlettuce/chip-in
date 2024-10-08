@@ -5,6 +5,7 @@ import './Login.css';
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [msg, setMsg] = useState('');
 
   const navigate = useNavigate();
 
@@ -42,7 +43,7 @@ const Login: React.FC = () => {
       } else if (data.error) {
         // Display any errors if failed login
         console.log(data.error)
-        //setMsg(data.error);
+        setMsg(data.error);
       }
     });
   };
@@ -103,6 +104,9 @@ const Login: React.FC = () => {
               required
               className="form-input"
             />
+          </div>
+          <div className="text-red-400 text-left text-sm">
+            {msg}
           </div>
           <button type="submit" className="login-button">Login</button>
         </form>
