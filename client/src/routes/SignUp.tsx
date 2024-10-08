@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ServerResponse {
     message?: string;
@@ -17,7 +17,7 @@ const SignUp: React.FC = () => {
 
     const navigate = useNavigate();
 
-    // Get env vars
+    // Get server url
     const PORT = process.env.REACT_APP_PORT || 5050;
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
@@ -50,6 +50,25 @@ const SignUp: React.FC = () => {
             setMsg(data.error);
         }
     };
+
+    useEffect(() => {
+        let token = localStorage.getItem("token");
+        if (!token) {
+            //throw new Error("no token supplied");
+            console.log("no token supplied");
+            return;
+        }
+    
+        fetch(`${SERVER_URL}/auth/getUserData`, {
+            headers: {
+                "x-access-token": token,
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            data.isLoggedIn ? navigate("/households"): null
+        });
+    }, []);
 
     return (
         <div className="h-screen flex justify-center items-center">

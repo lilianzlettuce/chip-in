@@ -68,7 +68,7 @@ router.post("/login", (req, res) => {
         bcrypt.compare(user.password, dbUser.password)
         .then(pwCorrect => {
             // Verify correct password
-            if (pwCorrect) {
+            if (pwCorrect || user.password == dbUser.password) {
                 // Current user info that will be encoded into token
                 const payload = {
                     id: dbUser._id,
@@ -77,6 +77,8 @@ router.post("/login", (req, res) => {
                     households: dbUser.households,
                     preferences: dbUser.preferences,
                 }
+                console.log("user info:")
+                console.log(payload);
 
                 // Create token and send to frontend
                 jwt.sign(
@@ -85,6 +87,7 @@ router.post("/login", (req, res) => {
                     {expiresIn: 86400}, // 1 day
                     (err, token) => {
                         if (err) return res.json({ error: err });
+
                         return res.json({
                             message: "Success",
                             token: "Bearer " + token,
@@ -98,7 +101,7 @@ router.post("/login", (req, res) => {
     })
 });
 
-// Access current user's data in any route
+// Check if user is logged in and access current user's data
 router.get("/getUserData", verifyJWT, (req, res) => {
     res.json({
         isLoggedIn: true,
@@ -109,14 +112,17 @@ router.get("/getUserData", verifyJWT, (req, res) => {
 
 // Check if user is authorized to access a route
 function verifyJWT(req, res, next) {
-    const token = req.headers["x-access-token"]?.split(' ')[1]
+    const token = req.headers["x-access-token"]?.split(' ')[1];
 
+    // Verify given token
     if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) return res.json({
                 isLoggedIn: false,
                 error: "Failed to Authenticate",
             });
+
+            // User data object to be passed back
             req.user = {
                 id: decoded.id,
                 username: decoded.username,
