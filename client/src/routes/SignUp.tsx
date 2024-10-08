@@ -52,13 +52,14 @@ const SignUp: React.FC = () => {
     };
 
     useEffect(() => {
+        // Check if token exists
         let token = localStorage.getItem("token");
         if (!token) {
-            //throw new Error("no token supplied");
             console.log("no token supplied");
             return;
         }
     
+        // Redirect to profile if user is signed in
         fetch(`${SERVER_URL}/auth/getUserData`, {
             headers: {
                 "x-access-token": token,
@@ -66,7 +67,7 @@ const SignUp: React.FC = () => {
         })
         .then(res => res.json())
         .then(data => {
-            data.isLoggedIn ? navigate("/households"): null
+            data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
         });
     }, []);
 

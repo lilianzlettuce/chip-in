@@ -36,11 +36,11 @@ const Login: React.FC = () => {
         localStorage.setItem("token", data.token);
       }
 
+      // Redirect to profile upon successful login
       if (data.message) {
-        console.log(data.message)
-        //navigate("/");
-        //setMsg(data.message);
+        navigate(`/profile/${data.id}`);
       } else if (data.error) {
+        // Display any errors if failed login
         console.log(data.error)
         //setMsg(data.error);
       }
@@ -57,6 +57,7 @@ const Login: React.FC = () => {
       return;
     }
 
+    // Redirect to profile if user is signed in
     fetch(`${SERVER_URL}/auth/getUserData`, {
       headers: {
         "x-access-token": token,
@@ -66,7 +67,7 @@ const Login: React.FC = () => {
     .then(data => {
       console.log("logged in: " + data.isLoggedIn);
       console.log("username: " + data.username)
-      data.isLoggedIn ? navigate("/households"): null
+      data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
     });
   }, []);
 

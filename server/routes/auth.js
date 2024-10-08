@@ -91,6 +91,7 @@ router.post("/login", (req, res) => {
                         return res.json({
                             message: "Success",
                             token: "Bearer " + token,
+                            id: dbUser._id,
                         });
                     }
                 );
@@ -105,8 +106,11 @@ router.post("/login", (req, res) => {
 router.get("/getUserData", verifyJWT, (req, res) => {
     res.json({
         isLoggedIn: true,
+        id: req.user.id,
         username: req.user.username,
         email: req.user.email,
+        households: req.user.households,
+        preferences: req.user.preferences,
     })
 })
 
