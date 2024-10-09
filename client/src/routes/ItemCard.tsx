@@ -59,30 +59,41 @@ return (
 };
 
 
-const Dashboard: React.FC = () => {
-    const [showItemCard, setShowItemCard] = useState(true);
-    const handleDelete = () => {
-        setShowItemCard(false);
-    }
+const CallItemCard: React.FC = () => {
+    const [items, setItems] = useState([
+        {
+          id: 1,
+          category: "Fruit",
+          name: "Banana",
+          price: 100,
+          sharedBy: ["dog", "ur mom", "richard"],
+          addedBy: "Chelsea",
+          expiryDate: "12/5"
+        },
+      ]);
     
-    const ItemCardProps = {
-        category: "Fruit",
-        name: "Banana",
-        price: 100,
-        sharedBy: ["dog", "ur mom", "richard"],
-        addedBy: "Chelsea",
-        expiryDate: "12/5",
-        onDelete: handleDelete
-     };
-     
-    return (
-    <div>
-        { /*<ItemCard {...ItemCardProps} /> */}
-        {showItemCard && <ItemCard {...ItemCardProps} />}
-        {showItemCard && <ItemCard {...ItemCardProps} />}
-    </div>
-    );
+      const handleDelete = (id: number) => {
+        // Remove the item by id
+        setItems(items.filter(item => item.id !== id));
+      }
+    
+      return (
+        <div>
+          {items.map(item => (
+            <ItemCard
+              key={item.id} // Provide a unique key for each item card
+              category={item.category}
+              name={item.name}
+              price={item.price}
+              sharedBy={item.sharedBy}
+              addedBy={item.addedBy}
+              expiryDate={item.expiryDate}
+              onDelete={() => handleDelete(item.id)} // Pass the specific id to delete
+            />
+          ))}
+        </div>
+      );
 };
 
 
-export default Dashboard
+export default CallItemCard
