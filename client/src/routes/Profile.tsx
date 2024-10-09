@@ -213,33 +213,69 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const [displayUsername, setDisplayUsername] = useState(username);
   const [displayPassword, setDisplayPassword] = useState(password);
 
-  //const [tempName, setTempName] = useState(displayName);
-  //const [tempUsername, setTempUsername] = useState(displayUsername);
-  //const [tempPassword, setTempPassword] = useState(displayPassword);
+  const [tempName, setTempName] = useState(name);
+  const [tempUsername, setTempUsername] = useState(username);
+  const [tempPassword, setTempPassword] = useState(password);
   // state variable to track whether input fields are editable
   const [isEditing, setIsEditing] = useState(false);
 
   // Event handler function for the button click
   const handleChangeNameClick = () => {
-    //setSavedName(tempName);
     if (isEditing == true) {
-      alert(`${displayName} has been changed successfully`);
+      setDisplayName(tempName);
+      alert(`${tempName} has been changed successfully`);
     }
   };
   const handleChangeUserNameClick = () => {
     if (isEditing == true) {
-      alert(`${displayUsername} has been changed successfully`);
+      setDisplayUsername(tempUsername);
+      alert(`${tempUsername} has been changed successfully`);
     }
   };
-  const handleChangePasswordClick = () => {
+  
+  /*const handleChangePasswordClick = () => {
     if (isEditing == true) {
       alert(`${displayPassword} has been changed successfully`);
     }
+  };*/
+  // handles validation
+  const handleChangePasswordClick = () => {
+    // Password validation
+    if (isEditing) {
+      if (!isValidPassword(tempPassword)) {
+        alert("Password must be at least 12 characters long and contain at least one letter and one number.");
+        return;
+      }
+      else {
+        setDisplayPassword(tempPassword);
+        // Password meets all criteria
+        alert("Password has been changed successfully");
+      }
+    }
+  };
+  
+  // Helper function to validate password
+  const isValidPassword = (password: string): boolean => {
+    // Check for minimum length of 12 characters
+    const isLongEnough = password.length >= 12;
+  
+    // Check for at least one alphabet (case insensitive)
+    const hasAlphabet = /[a-zA-Z]/.test(password);
+
+    // Check for at least one number
+    const hasNumber = /[0-9]/.test(password);
+
+    return isLongEnough && hasAlphabet && hasNumber;
   };
 
   // Event handler to toggle edit mode or display mode
   const handleEditClick = () => {
     setIsEditing((prevState) => !prevState);
+    if (!isEditing) {
+      setTempName(displayName);
+      setTempUsername(displayUsername);
+      setTempPassword(displayPassword);
+    }
   }
 
   return (
@@ -260,9 +296,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className="profile-row">
           <label className="profile-label">Display Name</label>
           <input type="text" className="profile-input"
-              value = {displayName}
+              value = {isEditing ? tempName : displayName}
               readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setDisplayName(e.target.value)} />
+              onChange={(e) => setTempName(e.target.value)} />
            {isEditing && (
               <button className="change-button" onClick={handleChangeNameClick}>CHANGE NAME</button>
            )}
@@ -272,9 +308,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className="profile-row">
           <label className="profile-label">Username</label>
           <input type="text" className="profile-input"
-              value = {displayUsername}
+              value = {isEditing ? tempUsername : displayUsername}
               readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setDisplayUsername(e.target.value)} />
+              onChange={(e) => setTempUsername(e.target.value)} />
           {isEditing && (
           <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
           )}
@@ -283,10 +319,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         {/* Password */}
         <div className="profile-row">
           <label className="profile-label">Password</label>
-          <input type="text" className="profile-input"
-              value = {displayPassword}
+          {/* Change input type based on isEditing state 
+           type="password": This input type is specifically designed to hide user input, showing only a series of * */}
+          <input type={isEditing ? "text" : "password"} // Use "password" type when not editing
+              className="profile-input"
+              value = {isEditing ? tempPassword : displayPassword}
               readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setDisplayPassword(e.target.value)} />
+              onChange={(e) => setTempPassword(e.target.value)} />
           {isEditing && (
           <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
           )}
