@@ -71,8 +71,6 @@ router.patch('/purchase', async (req, res) => {
   }
 });
 
-
-
 //get all
 router.get('/', async (req, res) => {
   try {
@@ -96,6 +94,20 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+//get roommates from household
+router.get("/members/:id", async(req, res) => {
+  try {
+    const household = await Household.findById(req.params.id).populate('members');
+    if (!household) {
+      return res.status(404).json({ message: "Household not found" });
+    }
+    res.status(200).json(household.members);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 //create
 router.post("/", async (req, res) => {
   const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
@@ -111,19 +123,19 @@ router.post("/", async (req, res) => {
 });
 
 //update by id
-// router.patch("/:id", async (req, res) => {
-//   const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
+router.patch("/:id", async (req, res) => {
+  const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
 
-//   try {
-//     const household = await Household.findByIdAndUpdate(req.params.id, { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
-//     if (!household) {
-//       return res.status(404).json({ message: "Household not found" });
-//     }
-//     res.status(200).json(household);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+  try {
+    const household = await Household.findByIdAndUpdate(req.params.id, { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
+    if (!household) {
+      return res.status(404).json({ message: "Household not found" });
+    }
+    res.status(200).json(household);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //delete by id
 router.delete("/:id", async (req, res) => {
@@ -208,7 +220,13 @@ router.get("/:id/purchasedlist", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const household = await Household.findById(id).populate('purchasedList');
+    const household = await Household.findById(id).populate({
+      path: 'purchasedList',
+      populate: {
+        path: 'purchasedBy',  
+        select: 'username'    
+      }
+    });
 
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });

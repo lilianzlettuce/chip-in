@@ -6,8 +6,7 @@ import items from "./routes/item.js";
 import users from "./routes/user.js";
 import households from "./routes/household.js";
 import auth from "./routes/auth.js";
-
-import User from "./models/User.js";
+import filter from "./routes/filter.js"
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -21,6 +20,8 @@ console.log('hello');
 app.use("/item", items);
 app.use("/user", users);
 app.use("/household", households);
+app.use("/filter", filter);
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
