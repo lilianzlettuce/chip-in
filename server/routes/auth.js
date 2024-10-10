@@ -7,12 +7,12 @@ import PasswordValidator from 'password-validator';
 // Create pw schema and add properties
 let pwSchema = new PasswordValidator();
 pwSchema
-.is().min(6)                                    // Minimum length
+/*.is().min(6)                                    // Minimum length
 .is().max(25)                                  // Maximum length
 .has().uppercase()                              // Must have uppercase letters
 .has().lowercase()                              // Must have lowercase letters
 .has().digits()                                // Must have digits
-.has().not().spaces();
+.has().not().spaces();*/
 
 const router = express.Router();
 
