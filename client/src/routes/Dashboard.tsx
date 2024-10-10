@@ -11,7 +11,7 @@ export default function Dashboard() {
     const [groceryItems, setGroceryItems] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
-    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet']); // Sample categories
+    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet']);
     const [roommates, setRoommates] = useState([]);
     const [sortAscending, setSortAscending] = useState(true);
 
@@ -22,6 +22,40 @@ export default function Dashboard() {
             fetchGroceryItems();
         }
     }, [householdID]);
+
+    const moveItem = async (item: any, targetList: string) => {
+        const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
+        const householdId = user?.households[0];
+
+        try {
+            const response = await fetch(`http://localhost:6969/item${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    householdId,
+                    name: item.name,
+                    category: item.category,
+                    purchasedBy: item.purchasedBy,
+                    sharedBetween: item.sharedBetween,
+                    purchaseDate: new Date(),
+                    expirationDate: item.expirationDate,
+                    cost: item.price,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Refresh the lists after moving the item
+            await fetchPurchasedItems();
+            await fetchGroceryItems();
+        } catch (error) {
+            console.error('Error moving item:', error);
+        }
+    };
 
     const fetchPurchasedItems = async () => {
         if (!householdID) return;
@@ -95,13 +129,13 @@ export default function Dashboard() {
         try {
             const queryParams = new URLSearchParams();
             if (selectedCategories.length > 0) {
-                queryParams.append('category', selectedCategories.join(','));
+                selectedCategories.forEach(category => queryParams.append('category', category));
             }
             if (selectedRoommates.length > 0) {
                 queryParams.append('sharedBetween', selectedRoommates.join(','));
             }
 
-            const purchasedResponse = await fetch(`http://localhost:6969/filter/filterby/${householdID}?${queryParams}`);
+            const purchasedResponse = await fetch(`http://localhost:6969/filter/filterby/${householdID}?${queryParams.toString()}`);
             if (!purchasedResponse.ok) {
                 throw new Error(`HTTP error! status: ${purchasedResponse.status}`);
             }
@@ -133,13 +167,22 @@ export default function Dashboard() {
         if (!householdID) return;
 
         try {
-            const sortParam = sortAscending ? 'expirationDate' : 'purchaseDate';
-            const response = await fetch(`http://localhost:6969/filter/sortby/${householdID}?sortby=${sortParam}`);
+            const response = await fetch(`http://localhost:6969/household/${householdID}/purchasedlist`);
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const sortedData = await response.json();
+
+            const data = await response.json();
+
+            const sortedData = data.sort((a: any, b: any) => {
+                const dateA = new Date(a.expirationDate).getTime();
+                const dateB = new Date(b.expirationDate).getTime();
+                return sortAscending ? dateA - dateB : dateB - dateA;
+            });
+
             setPurchasedItems(sortedData);
+
             setSortAscending(!sortAscending);
         } catch (error) {
             console.error('Error sorting items:', error);
@@ -151,12 +194,17 @@ export default function Dashboard() {
     };
 
     const isExpiringSoon = (expirationDate: string) => {
+        if (!expirationDate) return false;
+    
         const now = new Date();
         const expiration = new Date(expirationDate);
         const timeDiff = expiration.getTime() - now.getTime();
         const daysDiff = timeDiff / (1000 * 3600 * 24);
+    
+        console.log(`Checking expiration for ${expirationDate}: ${daysDiff} days remaining`);
+    
         return daysDiff <= 5 && daysDiff <= 0;
-    };
+    };    
 
     return (
         <div className="dashboard-container">
@@ -223,6 +271,7 @@ export default function Dashboard() {
                         purchasedItems.map((item: any) => (
                             <li key={item['_id']}>
                                 <ItemCard
+                                    id={item['_id']}
                                     category={item['category'] || 'Unknown'}
                                     name={item['name'] || 'Unnamed'}
                                     price={item['price'] ?? 0}
@@ -231,6 +280,8 @@ export default function Dashboard() {
                                     expiryDate={item['expirationDate'] ? new Date(item['expirationDate']).toLocaleDateString() : 'N/A'}
                                     isExpiringSoon={item['expirationDate'] && isExpiringSoon(item['expirationDate'])}
                                     onDelete={() => handleDelete(item['_id'])}
+                                    onMove={() => moveItem(item, 'grocery')}
+                                    listType="purchased"
                                 />
                             </li>
                         ))
@@ -245,9 +296,10 @@ export default function Dashboard() {
                     {groceryItems.length === 0 ? (
                         <li className="dashboard-item">No items to purchase</li>
                     ) : (
-                        groceryItems.map(item => (
+                        groceryItems.map((item: any) => (
                             <li key={item['_id']}>
                                 <ItemCard
+                                    id={item['_id']}
                                     category={item['category']}
                                     name={item['name']}
                                     price={item['price'] || 0}
@@ -256,6 +308,8 @@ export default function Dashboard() {
                                     expiryDate="N/A"
                                     isExpiringSoon={false}
                                     onDelete={() => handleDelete(item['_id'])}
+                                    onMove={() => moveItem(item, 'purchased')}
+                                    listType="grocery"
                                 />
                             </li>
                         ))
@@ -264,4 +318,4 @@ export default function Dashboard() {
             </div>
         </div>
     );
-}        
+}

@@ -53,9 +53,9 @@ router.get('/filterby/:id', async (req, res) => {
   
         let filteredItems = household.purchasedList;
     
-        // Apply filters if they are provided in the request
         if (category) {
-            filteredItems = filteredItems.filter(item => item.category === category);
+            const categories = Array.isArray(category) ? category : [category];
+            filteredItems = filteredItems.filter(item => categories.includes(item.category));
         }
     
         if (purchasedBy) {
@@ -63,11 +63,11 @@ router.get('/filterby/:id', async (req, res) => {
         }
     
         if (minPrice) {
-            filteredItems = filteredItems.filter(item => (item.cost/100) >= parseFloat(minPrice));
+            filteredItems = filteredItems.filter(item => (item.cost / 100) >= parseFloat(minPrice));
         }
     
         if (maxPrice) {
-            filteredItems = filteredItems.filter(item => (item.cost/100) <= parseFloat(maxPrice));
+            filteredItems = filteredItems.filter(item => (item.cost / 100) <= parseFloat(maxPrice));
         }
 
         const selectedUsernames = sharedBetween ? sharedBetween.split(',') : [];
