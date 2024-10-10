@@ -1,7 +1,14 @@
+import React, {useState, useEffect} from 'react';
+import Layout from "../Layout";
+import CallItemCard from "./ItemCard";
+import './ItemCard.css';
+
 export default function Dashboard() {
     return (
         <div>
-            <h1>This is the Dashboard.</h1>
+            <React.StrictMode>
+                <CallItemCard />
+            </React.StrictMode>
         </div>
     );
 }
