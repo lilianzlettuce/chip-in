@@ -198,6 +198,8 @@ router.post("/addUser/:id", async (req, res) => {
     }
 });
 
+// leave household
+router.patch
 // get grocery list
 router.get("/:id/grocerylist", async (req, res) => {
   const id = req.params.id;
@@ -241,6 +243,50 @@ router.get("/:id/purchasedlist", async (req, res) => {
     res.status(200).json(household.purchasedList);
   } catch (error) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// leave household
+router.post("/leave/:id", async (req, res) => {
+  const { userId } = req.body;
+  const householdId = req.params.id;
+
+  try {
+      const household = await Household.findById(householdId);
+      if (!household) {
+          return res.status(404).json({ message: 'Household not found' });
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (!household.members.includes(userId)) {
+          return res.status(400).json({ message: 'User is not a member of this household' });
+      }
+
+      household.members = household.members.filter(memberId => memberId.toString() !== userId);
+
+      household.debts = household.debts.filter(debt => 
+          debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+      );
+
+      user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+
+      // If the last member leaves, delete the household
+      if (household.members.length === 0) {
+          await Household.findByIdAndDelete(householdId); 
+          res.status(200).json({ message: 'Household deleted as the last member left' });
+      } else {
+          // Otherwise save the changes
+          await household.save();
+          await user.save();
+          res.status(200).json({ message: 'User successfully removed from household' });
+      }
+
+  } catch (err) {
+      res.status(500).json({ error: err.message });
   }
 });
 export default router;
