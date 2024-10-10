@@ -1,11 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/chip-in-logo1.png"
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { useUserContext } from '../UserContext';
 
 export default function Navbar() {
   const { householdId/*, userId*/ } = useParams();
+
+  const { user } = useUserContext();
+  console.log("user.userid: " + user?.id);
+  console.log("user.username: " + user?.username)
 
   // User data fields
   const [userId, setUserId] = useState("");
@@ -27,45 +33,6 @@ export default function Navbar() {
     navigate("/login");
   }
 
-  const deleteAccount = () => {
-    fetch(`${SERVER_URL}/user/${userId}`, {
-      method: "DELETE",
-    })
-    .then(() => {
-      localStorage.removeItem("token");
-      navigate("/signup");
-    });
-  }
-
-  useEffect(() => {
-    //localStorage.removeItem("token");
-    let token = localStorage.getItem("token");
-    console.log("token: " + token);
-    if (!token) {
-      //throw new Error("no token supplied");
-      console.log("no token supplied");
-      return;
-    }
-
-    // Redirect to profile if user is signed in
-    fetch(`${SERVER_URL}/auth/getUserData`, {
-      headers: {
-        "x-access-token": token,
-      },
-    })
-    .then(res => res.json())
-    .then(data => {
-      const { isLoggedIn, id, username, email/*, households, preferences*/ } = data;
-      setUserId(id);
-      setUsername(username);
-      setEmail(email);
-
-      console.log("logged in: " + isLoggedIn);
-      console.log("username: " + data.username)
-      //data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
-    });
-  }, []);
-
   return (
     <div>
       <nav className="fixed min-w-48 h-screen mr-4 border-r-4 border-black flex flex-col justify-between items-center">
@@ -78,13 +45,6 @@ export default function Navbar() {
               transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
               disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" >
           Sign Out
-        </div>
-
-        <div onClick={deleteAccount}
-            className="cursor-pointer inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background 
-              transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
-              disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" >
-          Delete Account
         </div>
 
         <div className="flex flex-col justify-between items-center">

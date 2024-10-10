@@ -6,7 +6,7 @@ import PasswordValidator from 'password-validator';
 
 // Create pw schema and add properties
 let pwSchema = new PasswordValidator();
-pwSchema
+pwSchema // uncomment for deployment
 /*.is().min(6)                                    // Minimum length
 .is().max(25)                                  // Maximum length
 .has().uppercase()                              // Must have uppercase letters
