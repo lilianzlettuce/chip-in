@@ -12,7 +12,7 @@ export default function ErrorPage() {
         <p>Sorry, an unexpected error has occurred.</p> <br/>
         <p>This page is just like your dad,</p>
         <p>
-          <i>{error.cod} {error.statusText || error.message}</i>
+          <i>{error.code} {error.statusText || error.message}</i>
         </p>
       </div>
     </Layout>
