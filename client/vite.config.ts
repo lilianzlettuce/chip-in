@@ -18,5 +18,15 @@ export default defineConfig(({ mode }) => {
       'process.env.REACT_APP_SERVER_URL': JSON.stringify(env.REACT_APP_SERVER_URL)
     },
     plugins: [react()],
+    server: {
+      port: 5173,
+      proxy: {
+        "/auth": {
+          target: "http://localhost:5173/",
+          changeOrigin: true,
+          //rewrite: (path) => path.replace(/^\/api/, "/api"),
+        },
+      },
+    },
   }
 })
