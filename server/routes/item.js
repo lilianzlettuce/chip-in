@@ -1,7 +1,62 @@
 import express from 'express';
 import Item from '../models/Item.js';
+import Household from '../models/Household.js';
 
 const router = express.Router();
+
+//create item and add to grocery list
+router.post('/addtogrocery', async (req, res) => {
+  const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+
+  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
+
+  try {
+    const item = await newItem.save();
+
+    const household = await Household.findByIdAndUpdate(
+      householdId,
+      {$push: {groceryList: item._id}},
+      {new: true, useFindandModify: false}
+    );
+    
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+    
+    res.status(201).json(item);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//create item and add to purchased list
+router.post('/addtopurchased', async (req, res) => {
+  const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+
+  if (!name || !category || !purchaseDate || cost === undefined || cost === null) {
+    return res.status(400).json({ message: 'Fields must be populated' });
+  }
+
+  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
+
+  try {
+    const item = await newItem.save();
+
+    const household = await Household.findByIdAndUpdate(
+      householdId,
+      {$push: {purchasedList: item._id}},
+      {new: true, useFindandModify: false}
+    );
+    
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+    
+    res.status(201).json(item);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 //get all
 router.get('/', async (req, res) => {

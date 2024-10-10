@@ -5,7 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        green: {
+          400: "#84A59D"
+        },
+        emerald: "#006D77",
+      },
+      boxShadow: {
+        "auth-card": "0 4px 12px rgba(0, 0, 0, 0.1)",
+      },
+    },
   },
   plugins: [],
 }

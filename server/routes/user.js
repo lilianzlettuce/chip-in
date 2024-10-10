@@ -4,6 +4,22 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
+//upload pfp
+router.patch('/pfp/:id', async (req, res) => {
+  const { pfp } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      {pfp},
+      {new: true, useFindandModify: false}
+    );
+    res.status(200).json({msg: "new pfp saved to database"})
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 function generateCode() {
   return Math.floor(10000 + Math.random() * 90000); // Generates a random 5-digit number
 }
@@ -41,9 +57,9 @@ router.get("/:id", async (req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  const { username, email, password, households, preferences } = req.body;
+  const { username, email, password, households, preferences, pfp, bio } = req.body;
 
-  const newUser = new User({ username, email, password, households, preferences });
+  const newUser = new User({ username, email, password, households, preferences, pfp, bio });
 
   try {
     await newUser.save();
@@ -55,10 +71,10 @@ router.post("/", async (req, res) => {
 
 //update by id
 router.patch("/:id", async (req, res) => {
-  const { username, email, password, households, preferences } = req.body;
+  const { username, email, password, households, preferences, bio } = req.body;
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { username, email, password, households, preferences }, { new: true });
+    const user = await User.findByIdAndUpdate(req.params.id, { username, email, password, households, preferences, bio }, { new: true });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
