@@ -4,8 +4,14 @@ import logo from "../assets/chip-in-logo1.png"
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { useUserContext } from '../UserContext';
+
 export default function Navbar() {
   const { householdId/*, userId*/ } = useParams();
+
+  const { user } = useUserContext();
+  console.log("user.userid: " + user?.id);
+  console.log("user.username: " + user?.username)
 
   // User data fields
   const [userId, setUserId] = useState("");
@@ -36,35 +42,6 @@ export default function Navbar() {
       navigate("/signup");
     });
   }
-
-  useEffect(() => {
-    //localStorage.removeItem("token");
-    let token = localStorage.getItem("token");
-    console.log("token: " + token);
-    if (!token) {
-      //throw new Error("no token supplied");
-      console.log("no token supplied");
-      return;
-    }
-
-    // Redirect to profile if user is signed in
-    fetch(`${SERVER_URL}/auth/getUserData`, {
-      headers: {
-        "x-access-token": token,
-      },
-    })
-    .then(res => res.json())
-    .then(data => {
-      const { isLoggedIn, id, username, email/*, households, preferences*/ } = data;
-      setUserId(id);
-      setUsername(username);
-      setEmail(email);
-
-      console.log("logged in: " + isLoggedIn);
-      console.log("username: " + data.username)
-      //data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
-    });
-  }, []);
 
   return (
     <div>
