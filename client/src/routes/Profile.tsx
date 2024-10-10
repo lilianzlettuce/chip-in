@@ -1,8 +1,10 @@
 import React, { useState, useEffect} from 'react';
+import { useNavigate } from "react-router-dom";
 
 //import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
 
+import { useUserContext } from '../UserContext';
 
 // Get server url
 const PORT = process.env.REACT_APP_PORT || 5050;
@@ -237,24 +239,25 @@ const profileProps = {
 
  // ---------- UI Function for Profile Setting --------------------------
  interface ProfileSettingsProps {
-  name: string;
-  username: string;
-  password: string;
+  id: string | undefined;
+  username: string | undefined;
+  email: string | undefined;
+  password: string | undefined;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
-  name,
+  id,
   username,
+  email,
   password
-
-  
 }) => {
+  const navigate = useNavigate();
   
-  const [displayName, setDisplayName] = useState(name);
+  const [displayName, setDisplayName] = useState(email);
   const [displayUsername, setDisplayUsername] = useState(username);
   const [displayPassword, setDisplayPassword] = useState(password);
 
-  const [tempName, setTempName] = useState(name);
+  const [tempName, setTempName] = useState(email);
   const [tempUsername, setTempUsername] = useState(username);
   const [tempPassword, setTempPassword] = useState(password);
   // state variable to track whether input fields are editable
@@ -283,7 +286,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const handleChangePasswordClick = () => {
     // Password validation
     if (isEditing) {
-      if (!isValidPassword(tempPassword)) {
+      if (!isValidPassword(tempPassword? tempPassword : "")) {
         alert("Password must be at least 12 characters long and contain at least one letter and one number.");
         return;
       }
@@ -319,13 +322,23 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     }
   }
 
+  const deleteAccount = () => {
+    fetch(`${SERVER_URL}/user/${id}`, {
+      method: "DELETE",
+    })
+    .then(() => {
+      localStorage.removeItem("token");
+      navigate("/signup");
+    });
+  }
+
   return (
     <div className="profile-settings-container">
       {/* Header Section */}
       <div className="profile-header">
         <h2>Profile</h2>
         <div className="profile-actions">
-          <button className="delete-account">DELETE ACCOUNT</button>
+          <button className="delete-account" onClick={deleteAccount}>DELETE ACCOUNT</button>
           <button className="edit-profile" onClick={handleEditClick}> 
             {isEditing ? "DISPLAY PROFILE" : "EDIT PROFILE"}</button>
         </div>
@@ -375,13 +388,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     </div>
   );
 };
-
-const settingsProps = {
-  name: "Lettuce the Great",
-  username: "@lettuce",
-  password: "*************"
-};
-
 
 // ---------- UI Function for Notification Settings --------------------------
 const Settings: React.FC = () => {
@@ -439,10 +445,19 @@ const Settings: React.FC = () => {
 };
 
 const Profile: React.FC = () => {
+  const { user } = useUserContext();
+
+  if (!user) return <div>Loading...</div>;
+
+  const profileSettingsProps = {
+    ...user,
+    password: "*************"
+  }
+  
   return (
     <div>
       <ProfileSummary {...profileProps} />
-      <ProfileSettings {...settingsProps} />
+      <ProfileSettings {...profileSettingsProps} />
       <Settings/>
     </div>
   );

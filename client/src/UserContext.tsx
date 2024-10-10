@@ -19,24 +19,14 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [user, setUser] = useState<UserType | null>(null);
-    /*let initialUser: UserType = {
-        id: '1',
-        username: 'yo mama',
-        email: 'lechuga.doe@example.com',
-        households: [{ id: 'h1', name: 'Main Household' }],
-        preferences: [{ theme: 'dark', notificationsEnabled: true }]
-    };*/
 
     // Get server url
     const PORT = process.env.REACT_APP_PORT || 5050;
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
     useEffect(() => {
-        console.log("in user context")
         let token = localStorage.getItem("token");
-        console.log("token: " + token);
         if (!token) {
-            //throw new Error("no token supplied");
             console.log("no token supplied");
             return;
         }
@@ -49,17 +39,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         })
         .then(res => res.json())
         .then(data => {
-            //const { isLoggedIn, id, username, email, households, preferences } = data;
-            //initialUser = data;
             setUser({
                 ...data
             });
-
-            /*setUserId(id);
-            setUsername(username);
-            setEmail(email);*/
-
-            //data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
         });
     }, []);
 
