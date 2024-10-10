@@ -52,7 +52,22 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />
+      },
+      {
+        path: "/households",
+        element: <Home />
       }
+    ],
+  },
+  {
+    path: "/profile/:userId",
+    element: <App message="OYYYYYYYY" />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "",
+        element: <Profile />
+      },
     ],
   },
   {
@@ -80,14 +95,6 @@ const router = createBrowserRouter([
         path: "recipes",
         element: <Recipes />
       },
-    ],
-  },
-  {
-    path: "/profile/:userId",
-    element: <Profile />,
-    errorElement: <ErrorPage />,
-    children: [
-      {},
     ],
   },
   {

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ServerResponse {
     message?: string;
@@ -17,7 +17,7 @@ const SignUp: React.FC = () => {
 
     const navigate = useNavigate();
 
-    // Get env vars
+    // Get server url
     const PORT = process.env.REACT_APP_PORT || 5050;
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
@@ -39,23 +39,37 @@ const SignUp: React.FC = () => {
             },
             body: JSON.stringify(user)
         });
-
-        // Check if the response is successful
-        if (!res.ok) {
-            throw new Error('Internal server error');
-        }
     
         // Get JSON response from server and display message
         const data: ServerResponse = await res.json();
         if (data.message) {
-            console.log('Success:', data.message);
+            alert("Success! Log in now.");
             navigate("/login");
             //setMsg(data.message);
         } else if (data.error) {
-            console.log('Error:', data.error);
             setMsg(data.error);
         }
     };
+
+    useEffect(() => {
+        // Check if token exists
+        let token = localStorage.getItem("token");
+        if (!token) {
+            console.log("no token supplied");
+            return;
+        }
+    
+        // Redirect to profile if user is signed in
+        fetch(`${SERVER_URL}/auth/getUserData`, {
+            headers: {
+                "x-access-token": token,
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
+        });
+    }, []);
 
     return (
         <div className="h-screen flex justify-center items-center">
@@ -95,7 +109,7 @@ const SignUp: React.FC = () => {
                     <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">Sign up</button>
                 </form>
                 <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
-                        Already have an account? Sign in here.
+                    Already have an account? Sign in here.
                 </Link>
             </div>
         </div>

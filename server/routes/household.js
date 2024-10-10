@@ -110,9 +110,9 @@ router.get("/members/:id", async(req, res) => {
 
 //create
 router.post("/", async (req, res) => {
-  const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
+  const { name, members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
 
-  const newHousehold = new Household({ members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory });
+  const newHousehold = new Household({ name, members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory });
 
   try {
     await newHousehold.save();
@@ -124,10 +124,10 @@ router.post("/", async (req, res) => {
 
 //update by id
 router.patch("/:id", async (req, res) => {
-  const { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
+  const { name, members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory } = req.body;
 
   try {
-    const household = await Household.findByIdAndUpdate(req.params.id, { members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
+    const household = await Household.findByIdAndUpdate(req.params.id, { name, members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory }, { new: true });
     if (!household) {
       return res.status(404).json({ message: "Household not found" });
     }
@@ -232,7 +232,7 @@ router.get("/:id/purchasedlist", async (req, res) => {
               select: 'username'
           }
       ]
-  });
+    });
 
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
