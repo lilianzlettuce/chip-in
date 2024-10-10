@@ -3,6 +3,11 @@ import React, { useState, useEffect} from 'react';
 //import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
 
+
+// Get server url
+const PORT = process.env.REACT_APP_PORT || 5050;
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
 // Define a TypeScript interface for the component props
 // ---------- UI Function for Profile Summary Card --------------------------
 interface ProfileSummaryProps {
@@ -29,6 +34,9 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
 
   // START UPLOAD PICTURE
   //const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
+  const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState<string>('');
+  const [bio, setBio] = useState<String>(' ');
   const [profileImage, setProfileImage] = useState<string>(imageUrl); // State to handle profile image
 
   //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
@@ -43,12 +51,46 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   //effect to retrieve user profile from backend
   useEffect(() => {
     const fetchUserProfile = async () => {
+      let token = localStorage.getItem("token");
+      console.log("token: " + token);
+      if (!token) {
+        //throw new Error("no token supplied");
+        console.log("no token supplied");
+        return;
+      }
+      
       try {
-        const response = await fetch(`http://localhost:6969/user/6702f13dee75c86e8e01f9bd`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.pfp) {
-            setProfileImage(data.pfp);
+        const userResponse = await fetch(`${SERVER_URL}/auth/getUserData`, {
+          headers: {
+            "x-access-token": token,
+          },
+        })
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          const { id } = userData;
+
+          setUserId(id);
+          
+          // Fetch user profile details based on the user ID
+          const profileResponse = await fetch(`http://localhost:6969/user/${id}`);
+
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            console.log(profileData);
+            if (profileData.pfp) {
+              setProfileImage(profileData.pfp);
+            }
+
+            if (profileData.username) {
+              setUsername(profileData.username);
+            }
+
+            if (profileData.bio) {
+              setBio(profileData.bio);
+            }
+          } else {
+            console.error("Failed to fetch user profile");
           }
         } else {
           console.error('failed to fetch user profile')
@@ -81,8 +123,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
 
   //send image to server
   const handleSubmit = async (base64String: string) => {
-    const userId = '6702f13dee75c86e8e01f9bd'; // Hardcoded user ID for now
-    const url = `http://localhost:6969/user/pfp/${userId}`;
+    const url = `http://localhost:${PORT}/user/pfp/${userId}`;
   
     try {
       const response = await fetch(url, {
@@ -139,7 +180,8 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
         {/*<img className="profile-image" src={lettuce} alt="logo"  />*/}
         <img className="profile-image" src={profileImage} alt="Profile"  />
         <div className="profile-info">
-          <h2 className="profile-name">{name}</h2>
+          <h2 className="profile-name">{username}</h2>
+          <h2 className="profile-bio">{bio}</h2>
           <p className="profile-joined">Joined {joinedDate}</p>
           {/* UPLOAD IMAGE HERE */}
           {/* Update Picture Button and Hidden File Input */}
@@ -190,7 +232,7 @@ const profileProps = {
    paidBack: 200,
    itemsBought: 15,
    amountOwed: 3000000,
- };
+};
 
 
  // ---------- UI Function for Profile Setting --------------------------
