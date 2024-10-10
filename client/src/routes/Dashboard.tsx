@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -6,36 +7,38 @@ export default function Dashboard() {
     const [originalItems, setOriginalItems] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [selectedRoommate, setSelectedRoommate] = useState<string>('');
-    const [categories, setCategories] = useState(['Groceries', 'Cleaning', 'Pet']); // Sample categories
+    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet']); // Sample categories
     const [roommates, setRoommates] = useState([]); 
     const [sortAscending, setSortAscending] = useState(true);
+    //const { householdId } = useParams();
+    const householdId = '66f8ef8de4baffd9b5f41762';
 
     useEffect(() => {
-        // Fetch items and roommates from API
-        const fetchItemsAndRoommates = async () => {
-            try {
-                const response = await fetch('http://localhost:6969/item/');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                setItems(data);
-                setOriginalItems(data);
-
-                // Fetch roommates (users) from your API
-                const roommatesResponse = await fetch('http://localhost:6969/user/');
-                if (!roommatesResponse.ok) {
-                    throw new Error(`HTTP error! status: ${roommatesResponse.status}`);
-                }
-                const roommatesData = await roommatesResponse.json();
-                setRoommates(roommatesData);  // Assumes the data contains an array of users
-            } catch (error) {
-                console.error('Error fetching items and roommates:', error);
-            }
-        };
-
         fetchItemsAndRoommates();
     }, []);
+
+    const fetchItemsAndRoommates = async () => {
+        try {
+            // Fetch items using the new backend route
+            const response = await fetch(`http://localhost:6969/filter/sortby/${householdId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setItems(data);
+            setOriginalItems(data);
+
+            // Fetch roommates (users) from your API
+            const roommatesResponse = await fetch('http://localhost:6969/user/');
+            if (!roommatesResponse.ok) {
+                throw new Error(`HTTP error! status: ${roommatesResponse.status}`);
+            }
+            const roommatesData = await roommatesResponse.json();
+            setRoommates(roommatesData);  // Assumes the data contains an array of users
+        } catch (error) {
+            console.error('Error fetching items and roommates:', error);
+        }
+    };
 
     // Handle Category Selection
     const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,16 +50,22 @@ export default function Dashboard() {
         setSelectedRoommate(event.target.value);
     };
 
-    // Filter items based on selected categories and roommates
-    const filterItems = () => {
-        const filteredItems = originalItems.filter(item => {
-            const matchesCategory = selectedCategory === '' || item['category'] === selectedCategory;
-            
-            const matchesRoommate = selectedRoommate === '' || (item['sharedBetween'] as string[] || []).includes(selectedRoommate);
-    
-            return matchesCategory && matchesRoommate;
-        });
-        setItems(filteredItems);
+    // Apply filters based on the selected criteria
+    const filterItems = async () => {
+        try {
+            const queryParams = new URLSearchParams();
+            if (selectedCategory) queryParams.append('category', selectedCategory);
+            if (selectedRoommate) queryParams.append('sharedBetween', selectedRoommate);
+
+            const response = await fetch(`http://localhost:6969/filter/filterby/${householdId}?${queryParams}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const filteredData = await response.json();
+            setItems(filteredData);
+        } catch (error) {
+            console.error('Error filtering items:', error);
+        }
     };
 
     const clearFilters = () => {
@@ -66,15 +75,19 @@ export default function Dashboard() {
     };
 
     // Sorting function for inventory items based on expiration date
-    const sortByExpirationDate = () => {
-        const sortedItems = [...inventoryItems].sort((a, b) => {
-            const dateA = a['expirationDate'] ? new Date(a['expirationDate']).getTime() : Infinity;
-            const dateB = b['expirationDate'] ? new Date(b['expirationDate']).getTime() : Infinity;
-
-            return sortAscending ? dateA - dateB : dateB - dateA;
-        });
-        setItems([...sortedItems, ...groceryItems]);
-        setSortAscending(!sortAscending);  // Toggle the sort direction
+    const sortByExpirationDate = async () => {
+        try {
+            const sortParam = sortAscending ? 'expirationDate' : 'purchaseDate';
+            const response = await fetch(`http://localhost:6969/filter/sortby/${householdId}?sortby=${sortParam}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const sortedData = await response.json();
+            setItems(sortedData);
+            setSortAscending(!sortAscending);
+        } catch (error) {
+            console.error('Error sorting items:', error);
+        }
     };
 
     // Separate items into Inventory and Grocery List
