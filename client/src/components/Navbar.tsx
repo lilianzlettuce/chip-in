@@ -11,6 +11,7 @@ export default function Navbar() {
 
   const { user } = useUserContext();
   console.log("user.userid: " + user?.id);
+  console.log("householdID: " + user?.households);
   console.log("user.username: " + user?.username)
 
   // User data fields

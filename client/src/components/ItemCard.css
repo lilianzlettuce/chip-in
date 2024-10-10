@@ -1,6 +1,6 @@
 /* Card container */
 .card-container {
-  background-color: #333;
+  background-color: #0f0f0f;
   padding: 20px;
   border-radius: 10px;
   color: #fff;
@@ -12,7 +12,7 @@
 
 /* Category badge */
 .category-badge {
-  background-color: #f0f5ea;
+  background-color: #aac884;
   padding: 5px 10px;
   border-radius: 20px;
   display: inline-block;
@@ -30,7 +30,7 @@
 }
 
 .price {
-  background-color: #f4cacd;
+  background-color: #e59398;
   padding: 5px 10px;
   border-radius: 10px;
   font-weight: bold;
@@ -79,4 +79,9 @@
 
 .action-button:hover{
   background-color: #de6161;
+}
+
+.expiring-soon {
+  border: 2px solid rgb(64, 11, 11);
+  background-color: rgb(81, 7, 7);
 }

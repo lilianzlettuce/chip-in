@@ -1,130 +1,82 @@
-.dashboard-container {
-  padding: 40px;
-  background-color: #faf3e0;
-  font-family: 'Helvetica', sans-serif;
-  color: #212020;
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #333;
+  letter-spacing: 1.5px;
+  color: #333;
 }
 
-.dashboard-title {
-  text-align: center;
-  font-size: 2.5em;
-  font-weight: bold;
-  margin-bottom: 30px;
-  color: #2d261d;
+.dashboard-section {
+  margin: 30px 0;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #d3b7aafc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #333;
 }
 
 .dashboard-controls {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-.filter-section {
+.filter-section, .dashboard-button {
+  margin: 10px 0;
+}
+
+.filter-categories, .filter-roommates {
   display: flex;
   flex-direction: column;
-  margin-right: 20px;
 }
 
 .dashboard-button {
-  padding: 10px 20px;
-  font-size: 1em;
   background-color: #333;
   color: white;
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.dashboard-button:hover {
-  background-color: #444;
-}
-
-.filter-dropdown {
-  width: 200px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
-  font-size: 1em;
-  margin-top: 5px;
-}
-
-.filter-dropdown:hover, .filter-dropdown:focus {
-  border-color: #5e503f;
-}
-
-.dashboard-button {
-  padding: 12px 25px;
-  background-color: #1d1913;
-  color: white;
-  font-size: 1em;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .dashboard-button:hover {
-  background-color: #19130f;
-}
-
-.dashboard-section {
-  margin-top: 40px;
-}
-
-.section-title {
-  font-size: 1.8em;
-  font-weight: bold;
-  color: #241f19;
-  margin-bottom: 15px;
+  background-color: #555;
 }
 
 .dashboard-item-list {
-  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   padding: 0;
+  list-style-type: none;
+  margin: 0;
 }
 
 .dashboard-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 15px 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  transition: box-shadow 0.3s ease;
-}
-
-.dashboard-item:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.item-name {
-  font-weight: bold;
-  font-size: 1.3em;
-  color: #333;
-}
-
-.item-category, .item-roommates {
-  font-size: 1em;
-  color: #777;
+  flex: 1 1 calc(33.333% - 20px);
+  box-sizing: border-box;
+  margin: 10px 0;
 }
 
 @media (max-width: 768px) {
-  .dashboard-controls {
-      flex-direction: column;
-      align-items: flex-start;
+  .dashboard-item {
+      flex: 1 1 calc(50% - 20px);
   }
+}
 
-  .filter-section {
-      margin-bottom: 15px;
-  }
-
-  .dashboard-button {
-      margin-top: 10px;
+@media (max-width: 480px) {
+  .dashboard-item {
+      flex: 1 1 100%;
   }
 }
