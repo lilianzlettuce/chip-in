@@ -222,11 +222,17 @@ router.get("/:id/purchasedlist", async (req, res) => {
   try {
     const household = await Household.findById(id).populate({
       path: 'purchasedList',
-      populate: {
-        path: 'purchasedBy',  
-        select: 'username'    
-      }
-    });
+      populate: [
+          {
+              path: 'purchasedBy',  
+              select: 'username'    
+          },
+          {
+              path: 'sharedBetween',
+              select: 'username'
+          }
+      ]
+  });
 
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
