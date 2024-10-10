@@ -13,6 +13,7 @@ const alertSchema = new mongoose.Schema({
 
 
 const householdSchema = new mongoose.Schema({
+    name: {type: String, required: true},
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
     groceryList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: false }],
     purchasedList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: false }],
