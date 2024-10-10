@@ -8,6 +8,7 @@
   width: 300px;
   font-family: Arial, sans-serif;
   text-align: left;
+  transition: background-color 0.3s ease, border 0.3s ease;
 }
 
 /* Category badge */
@@ -19,7 +20,7 @@
   font-size: 12px;
   color: #000;
 }
- 
+
 /* Item info: name and price */
 .item-info {
   display: flex;
@@ -73,15 +74,15 @@
   border: none;
   color: white;
   padding: 5px 10px;
-  cursor: hand;
+  cursor: pointer;
   border-radius: 5px;
 }
 
-.action-button:hover{
+.action-button:hover {
   background-color: #de6161;
 }
 
-.expiring-soon {
-  border: 2px solid rgb(64, 11, 11);
-  background-color: rgb(81, 7, 7);
+.highlight-expiring {
+  border: 2px solid #220b0b; /* Red border */
+  background-color: rgb(80, 22, 22); /* Light red background */
 }
