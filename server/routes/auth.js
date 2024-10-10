@@ -6,7 +6,7 @@ import PasswordValidator from 'password-validator';
 
 // Create pw schema and add properties
 let pwSchema = new PasswordValidator();
-pwSchema
+pwSchema // uncomment for deployment
 /*.is().min(6)                                    // Minimum length
 .is().max(25)                                  // Maximum length
 .has().uppercase()                              // Must have uppercase letters
@@ -63,7 +63,7 @@ router.post("/login", (req, res) => {
         if (!dbUser) {
             return res.json({ error: "User does not exist."});
         }
-        
+        console.log("user", dbUser);
         // Compare matched user passwords
         bcrypt.compare(user.password, dbUser.password)
         .then(pwCorrect => {
@@ -81,6 +81,7 @@ router.post("/login", (req, res) => {
                 console.log(payload);
 
                 // Create token and send to frontend
+                console.log("jwt secret", process.env.JWT_SECRET)
                 jwt.sign(
                     payload,
                     process.env.JWT_SECRET,

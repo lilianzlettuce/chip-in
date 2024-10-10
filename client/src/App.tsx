@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import chipInLogo from './assets/chip-in-logo1.png'
 import './global.css'
 
 import Layout from './Layout';
 import { Outlet, useNavigate } from "react-router-dom";
+
+import { UserProvider } from './UserContext';
+import { UserType, UserContextType } from './types';
 
 type AppProps = {
   message: string;
@@ -11,6 +14,14 @@ type AppProps = {
 
 export default function App({ message }: AppProps) {
   const [count, setCount] = useState<number>(0);
+
+  let initialUser: UserType = {
+    id: '1',
+    username: 'yo mama',
+    email: 'lechuga.doe@example.com',
+    households: [{ id: 'h1', name: 'Main Household' }],
+    preferences: [{ theme: 'dark', notificationsEnabled: true }]
+  };
 
   const navigate = useNavigate();
 
@@ -37,25 +48,28 @@ export default function App({ message }: AppProps) {
     .then(data => {
       data.isLoggedIn ? null: navigate("/login");;
     });
+    
   }, []);
 
   return (
-    <Layout>
-      <Outlet />
-      <div>
-        <a target="_blank">
-          <img src={chipInLogo} className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <p>
-          <code>src/App.tsx</code>
-      </p>
-      <div>Message: {message}</div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </Layout>
+    <UserProvider>
+      <Layout>
+          <Outlet />
+          <div>
+            <a target="_blank">
+              <img src={chipInLogo} className="logo" alt="Vite logo" />
+            </a>
+          </div>
+          <p>
+              <code>src/App.tsx</code>
+          </p>
+          <div>Message: {message}</div>
+          <div className="card">
+            <button onClick={() => setCount((count) => count + 1)}>
+              count is {count}
+            </button>
+          </div>
+      </Layout>
+    </UserProvider>
   );
 };
