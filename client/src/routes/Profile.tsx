@@ -2,7 +2,6 @@ import React, { useState, useEffect} from 'react';
 
 //import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
-import Layout from "../Layout";
 
 // Define a TypeScript interface for the component props
 // ---------- UI Function for Profile Summary Card --------------------------
@@ -399,14 +398,11 @@ const Settings: React.FC = () => {
 
 const Profile: React.FC = () => {
   return (
-    <Layout>
-      <div>
-        <ProfileSummary {...profileProps} />
-        <ProfileSettings {...settingsProps} />
-        <Settings/>
-      </div>
-    </Layout>
-    
+    <div>
+      <ProfileSummary {...profileProps} />
+      <ProfileSettings {...settingsProps} />
+      <Settings/>
+    </div>
   );
 };
 
