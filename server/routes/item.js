@@ -4,6 +4,28 @@ import Household from '../models/Household.js';
 
 const router = express.Router();
 
+// Delete item by ID from either grocery or purchased list
+router.delete('/:listType/:id', async (req, res) => {
+  const { listType, id } = req.params;
+  const { householdId } = req.query;
+
+  try {
+    const item = await Item.findByIdAndDelete(id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // Remove item reference from the corresponding household list
+    const update = listType === 'grocery' ? { $pull: { groceryList: id } } : { $pull: { purchasedList: id } };
+
+    await Household.findByIdAndUpdate(householdId, update);
+
+    res.status(200).json({ message: "Item deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 //create item and add to grocery list
 router.post('/addtogrocery', async (req, res) => {
   const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;

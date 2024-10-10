@@ -42,7 +42,7 @@ router.get('/filterby/:id', async (req, res) => {
                 },
                 {
                     path: 'sharedBetween',
-                    select: 'username'
+                    select: '_id username' // Make sure to select the _id here for comparison
                 }
             ]
         });
@@ -70,12 +70,12 @@ router.get('/filterby/:id', async (req, res) => {
             filteredItems = filteredItems.filter(item => (item.cost / 100) <= parseFloat(maxPrice));
         }
 
-        const selectedUsernames = sharedBetween ? sharedBetween.split(',') : [];
-
-        if (selectedUsernames.length > 0) {
+        // Update: Now split the sharedBetween IDs and filter by matching IDs
+        if (sharedBetween) {
+            const selectedIds = sharedBetween.split(',');
             filteredItems = filteredItems.filter(item => {
-                const sharedUsernames = item.sharedBetween.map(user => user.username);
-                return selectedUsernames.every(username => sharedUsernames.includes(username));
+                const sharedIds = item.sharedBetween.map(user => user._id.toString());
+                return selectedIds.every(id => sharedIds.includes(id));
             });
         }
   
