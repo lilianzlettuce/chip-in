@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import nodemailer from 'nodemailer';
 
 const router = express.Router();
+const resetCodes = new Map();
 
 //upload pfp
 router.patch('/pfp/:id', async (req, res) => {
@@ -32,7 +33,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-//get all
 router.get('/', async (req, res) => {
   try {
     const users = await User.find();
@@ -42,7 +42,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-//get by id
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -55,7 +54,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-//create
 router.post("/", async (req, res) => {
   const { username, email, password, households, preferences, pfp, bio } = req.body;
 
@@ -69,7 +67,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-//update by id
 router.patch("/:id", async (req, res) => {
   const { username, email, password, households, preferences, bio } = req.body;
 
@@ -84,7 +81,6 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-//delete by id
 router.delete("/:id", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -104,20 +100,18 @@ router.post("/resetpass", async (req, res) => {
     return res.status(400).send({ message: 'Email is required' });
   }
 
-  console.log(process.env.EMAIL_USER);
-  console.log(process.env.EMAIL_PASS);
-
   try {
-    // Check if the user exists
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).send({ message: 'User not found' });
     }
 
-    // Generate unique 5-digit code
     const resetCode = generateCode();
+    const expiresAt = Date.now() + 3600000;
 
-    // Email options
+    resetCodes.set(email, { resetCode, expiresAt });
+    console.log(resetCode + " ");
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -125,7 +119,6 @@ router.post("/resetpass", async (req, res) => {
       text: `Your password reset code is: ${resetCode}`,
     };
 
-    // Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email: " + error);
@@ -133,12 +126,41 @@ router.post("/resetpass", async (req, res) => {
       }
 
       console.log('Email sent: ' + info.response);
-      return res.status(200).send({ message: 'Password reset code sent', code: resetCode });
+      return res.status(200).send({ message: 'Password reset code sent' });
     });
 
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'An error occurred' });
+  }
+});
+
+router.post("/resetcode", async (req, res) => {
+  const { email, code, newPassword } = req.body;
+
+  console.log("reset code is : " + code);
+  try {
+    const resetData = resetCodes.get(email);
+
+    if (!resetData || resetData.resetCode !== Number(code) || Date.now() > resetData.expiresAt) {
+      return res.status(400).send({ message: 'Invalid or expired reset code' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    user.password = newPassword;
+
+    await user.save();
+
+    resetCodes.delete(email);
+
+    res.status(200).send({ message: 'Password successfully reset' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'An error occurred' });
   }
 });
 

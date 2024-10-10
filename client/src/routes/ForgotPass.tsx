@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ForgotPass.css';
 
 const ForgotPass: React.FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Use the useNavigate hook
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -22,6 +24,9 @@ const ForgotPass: React.FC = () => {
 
       if (response.ok) {
         setMessage('Password reset code sent to your email');
+        setTimeout(() => {
+          navigate('/verifycode', { state: { email } }); // Navigate to VerifyCode with email state
+        }, 2000); // Add a delay if you want to show the message before redirecting
       } else {
         const result = await response.json();
         setMessage(result.message || 'Failed to send password reset code');
