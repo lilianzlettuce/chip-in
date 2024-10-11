@@ -44,7 +44,7 @@ export default function Dashboard() {
         const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
         const householdId = householdID;
         const userId = user?.id;
-
+    
         const requestBody = {
             householdId,
             name: itemData.name,
@@ -55,8 +55,9 @@ export default function Dashboard() {
             expirationDate: targetList === 'purchased' ? itemData.expirationDate : null,
             cost: targetList === 'purchased' ? itemData.cost : 0,
         };
-
+    
         try {
+            // Add the item to the target list (purchased or grocery)
             const response = await fetch(`http://localhost:6969/item${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -64,19 +65,44 @@ export default function Dashboard() {
                 },
                 body: JSON.stringify(requestBody),
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error('Error details:', errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            if (targetList === 'purchased') {
-                setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
-            } else {
+    
+            // If moving to the grocery list, delete the item from the purchased list in the backend
+            if (targetList === 'grocery') {
+                const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+    
+                // Update frontend state to remove item from the purchased list
                 setPurchasedItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
+            } else {
+                // If moving to the purchased list, delete the item from the grocery list
+                const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+    
+                // Update frontend state to remove item from the grocery list
+                setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
             }
-
+    
+            // Refresh both lists after moving the item
             await fetchPurchasedItems();
             await fetchGroceryItems();
         } catch (error) {
@@ -84,7 +110,7 @@ export default function Dashboard() {
         } finally {
             setIsLoading(false);
         }
-    };
+    };    
 
     const handleModalSave = async (updatedItem: any) => {
         setIsLoading(true);
@@ -421,7 +447,7 @@ export default function Dashboard() {
                                     name={item['name']}
                                     price={item['cost'] || 0}
                                     sharedBy={[]}
-                                    purchasedBy={'Unknown'}
+                                    purchasedBy={'N/A'}
                                     expiryDate={
                                         item['expirationDate']
                                             ? new Date(item['expirationDate']).toLocaleDateString()
