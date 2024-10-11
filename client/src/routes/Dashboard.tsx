@@ -20,6 +20,12 @@ export default function Dashboard() {
     const [targetList, setTargetList] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
 
+
+    // Collapsing feature
+    // hi
+    const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isCollapsed2, setIsCollapsed2] = useState(false)
+
     useEffect(() => {
         if (householdID) {
             fetchRoommates();
@@ -306,6 +312,14 @@ export default function Dashboard() {
         }
     };
 
+    const toggleCollapse = () => {
+      setIsCollapsed(!isCollapsed);
+    };
+
+    const toggleCollapse2 = () => {
+        setIsCollapsed2(!isCollapsed2);
+      };
+
     return (
         <div className="dashboard-container">
             <h1 className="dashboard-title">Dashboard</h1>
@@ -364,82 +378,94 @@ export default function Dashboard() {
             {/* Purchased Items Section */}
             <div className="dashboard-section">
                 <h2 className="section-title">Inventory</h2>
-                <ul className="dashboard-item-list">
-                    {purchasedItems.length === 0 ? (
-                        <li className="dashboard-item">No purchased items</li>
-                    ) : (
-                        purchasedItems.map((item: any) => (
-                            <li key={item['_id']}>
-                                <ItemCard
-                                    id={item['_id']}
-                                    category={item['category'] || 'Unknown'}
-                                    name={item['name'] || 'Unnamed'}
-                                    price={item['cost'] ?? 0}
-                                    sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
-                                        (user) => user.username || 'Unknown'
-                                    )}
-                                    addedBy={item['purchasedBy']?.username || 'Unknown'}
-                                    expiryDate={
-                                        item['expirationDate']
-                                            ? new Date(item['expirationDate']).toLocaleDateString()
-                                            : 'N/A'
-                                    }
-                                    isExpiringSoon={
-                                        item['expirationDate'] && isExpiringSoon(item['expirationDate'])
-                                    }
-                                    onDelete={() => handleDelete(item['_id'], 'purchased')}
-                                    onMove={() => {
-                                        moveItem(
-                                            {
-                                                ...item,
-                                                cost: 0, // Clear cost
-                                                expirationDate: '', // Clear expiration date
-                                            },
-                                            'grocery'
-                                        );
-                                    }}
-                                    listType="purchased"
-                                />
-                            </li>
-                        ))
-                    )}
-                </ul>
+                {/* hi Collapse Button */}
+                <button onClick={toggleCollapse} className="collapse-button">
+                    {isCollapsed ? 'More' : 'Less'}
+                </button>
+                { !isCollapsed && (
+                    <ul className="dashboard-item-list">
+                        {purchasedItems.length === 0 ? (
+                            <li className="dashboard-item">No purchased items</li>
+                        ) : (
+                            purchasedItems.map((item: any) => (
+                                <li key={item['_id']}>
+                                    <ItemCard
+                                        id={item['_id']}
+                                        category={item['category'] || 'Unknown'}
+                                        name={item['name'] || 'Unnamed'}
+                                        price={item['cost'] ?? 0}
+                                        sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
+                                            (user) => user.username || 'Unknown'
+                                        )}
+                                        addedBy={item['purchasedBy']?.username || 'Unknown'}
+                                        expiryDate={
+                                            item['expirationDate']
+                                                ? new Date(item['expirationDate']).toLocaleDateString()
+                                                : 'N/A'
+                                        }
+                                        isExpiringSoon={
+                                            item['expirationDate'] && isExpiringSoon(item['expirationDate'])
+                                        }
+                                        onDelete={() => handleDelete(item['_id'], 'purchased')}
+                                        onMove={() => {
+                                            moveItem(
+                                                {
+                                                    ...item,
+                                                    cost: 0, // Clear cost
+                                                    expirationDate: '', // Clear expiration date
+                                                },
+                                                'grocery'
+                                            );
+                                        }}
+                                        listType="purchased"
+                                    />
+                                </li>
+                            ))
+                        )}
+                    </ul>
+                )}
             </div>
 
             {/* Grocery List Section */}
             <div className="dashboard-section">
                 <h2 className="section-title">Grocery List</h2>
-                <ul className="dashboard-item-list">
-                    {groceryItems.length === 0 ? (
-                        <li className="dashboard-item">No items to purchase</li>
-                    ) : (
-                        groceryItems.map((item: any) => (
-                            <li key={item['_id']}>
-                                <ItemCard
-                                    id={item['_id']}
-                                    category={item['category']}
-                                    name={item['name']}
-                                    price={item['cost'] || 0}
-                                    sharedBy={[]}
-                                    addedBy={item['addedBy'] || 'Unknown'}
-                                    expiryDate={
-                                        item['expirationDate']
-                                            ? new Date(item['expirationDate']).toLocaleDateString()
-                                            : 'N/A'
-                                    }
-                                    isExpiringSoon={false}
-                                    onDelete={() => handleDelete(item['_id'], 'grocery')}
-                                    onMove={() => {
-                                        setSelectedItem(item);
-                                        setTargetList('purchased');
-                                        setModalOpen(true);
-                                    }}
-                                    listType="grocery"
-                                />
-                            </li>
-                        ))
-                    )}
-                </ul>
+                {/* hi Collapse Button */}
+                <button onClick={toggleCollapse2} className="collapse-button">
+                    {isCollapsed2 ? 'More' : 'Less'}
+                </button>
+                { !isCollapsed2 && (
+                        <ul className="dashboard-item-list">
+                            {groceryItems.length === 0 ? (
+                                <li className="dashboard-item">No items to purchase</li>
+                            ) : (
+                                groceryItems.map((item: any) => (
+                                    <li key={item['_id']}>
+                                        <ItemCard
+                                            id={item['_id']}
+                                            category={item['category']}
+                                            name={item['name']}
+                                            price={item['cost'] || 0}
+                                            sharedBy={[]}
+                                            addedBy={item['addedBy'] || 'Unknown'}
+                                            expiryDate={
+                                                item['expirationDate']
+                                                    ? new Date(item['expirationDate']).toLocaleDateString()
+                                                    : 'N/A'
+                                            }
+                                            isExpiringSoon={false}
+                                            onDelete={() => handleDelete(item['_id'], 'grocery')}
+                                            onMove={() => {
+                                                setSelectedItem(item);
+                                                setTargetList('purchased');
+                                                setModalOpen(true);
+                                            }}
+                                            listType="grocery"
+                                        />
+                                    </li>
+                                ))
+                            )}
+                        </ul>
+                )}
             </div>
             {/* Modal for entering details when moving from grocery to purchased */}
             {modalOpen && selectedItem && (

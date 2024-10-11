@@ -114,6 +114,10 @@ router.post("/", async (req, res) => {
 
   const newHousehold = new Household({ name, members, groceryList, purchasedList, debts, alerts, notes, recipes, purchaseHistory });
 
+  for (const memberId of members) {
+    await User.findByIdAndUpdate(memberId, { $push: { households: newHousehold._id } });
+  }
+
   try {
     await newHousehold.save();
     res.status(201).json(newHousehold);
