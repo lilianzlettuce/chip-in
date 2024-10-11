@@ -5,6 +5,25 @@ import Item from '../models/Item.js'
 
 const router = express.Router();
 
+// POST route to update household members
+router.patch('/updateMembers/:id', async (req, res) => {
+    const { userId } = req.body; // Expect _id of household and userId to add
+    try {
+  
+    // Find the household and update members
+    const household = await Household.findByIdAndUpdate(
+    req.params.id,
+    {$addToSet: { members: userId }},
+    { new: true, useFindAndModify: false } // Return the updated document
+      );
+  
+    res.status(200).json({msg: "new user added to household"})
+    } catch (err) {
+    res.status(500).json({ error: err.message })
+    }
+  
+  });
+
 //move from purchased to grocery
 router.patch('/repurchase', async (req, res) => {
   const { householdId, itemId} = req.body;
