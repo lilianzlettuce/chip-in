@@ -47,7 +47,7 @@ type HouseholdFormProps = {
 
 export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
   const [householdName, setHouseholdName] = useState("");
-  const { user, setUser} = useUserContext();
+  const { user, setUser, updateUser} = useUserContext();
   // const navigate = useNavigate();
 
   // Get server url
@@ -62,9 +62,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
       return; // Stop execution if user.id is not set
     }
 
-    console.log("in submit:")
-    console.log(user);
-    console.log(user?.id)
     const newHouseholdData = {
       name: householdName,
       members: [user?.id], // like a global variable
@@ -94,19 +91,8 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
         console.error("Failed to create household:", data.error);
       }
 
-      // Update global user variable based on the user ID
-      const userResponse = await fetch(`${SERVER_URL}/user/${user?.id}`);
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-
-        if (userData.households) {
-          setUser((prevUser) => ({
-            ...prevUser,
-            ...userData,
-            id: user.id // _id to id
-          }));
-        }
-      }
+      // Update global user variable from database
+      updateUser();
     } catch (error) {
       console.error("Error occurred while creating household:", error);
     }

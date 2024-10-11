@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import './CreateHousehold.css'; // Import your modal CSS styles
+import './CreateHousehold.css'; 
+
+import { useUserContext } from '../UserContext';
 
 // Modal component
 type ModalProps = {
@@ -31,6 +33,9 @@ type JoinHouseholdProps = {
 
 export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId }) => {
   const [householdName, setHouseholdName] = useState("");
+
+  const { updateUser } = useUserContext();
+
   // Get env vars
   const PORT = process.env.REACT_APP_PORT || 5050;
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
@@ -42,7 +47,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
     async function handleJoin() {
       try {
         // Step 1: Fetch all households from `http://localhost:6969/household`
-        const response = await fetch('http://localhost:6969/household', {
+        const response = await fetch(`${SERVER_URL}/household`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -86,6 +91,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
 
         const updatedHousehold = await updateResponse.json();
         console.log('Household updated successfully:', updatedHousehold);
+        updateUser();
         alert(`User ${userId} has been added to the household: ${updatedHousehold.name}`);
       } catch (error) {
         console.error('Error updating household:', error instanceof Error ? error.message : error);
@@ -102,7 +108,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
             <button className="label-button">Household Name</button>
             <input
               type="text"
-              className="input-field"
+              className="input-field text-white"
               value={householdName}
               onChange={(e) => setHouseholdName(e.target.value)}
               placeholder="Enter household name"

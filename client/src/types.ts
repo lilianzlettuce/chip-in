@@ -19,6 +19,7 @@ export type UserContextType = {
     setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
     households: HouseholdNavType[];
     setHouseholds: React.Dispatch<React.SetStateAction<HouseholdNavType[]>>;
+    updateUser: () => Promise<void>;
 };
 
 export type UserType = {

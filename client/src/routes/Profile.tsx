@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import './Profile.css'; // Import CSS for styling
 
 import { useUserContext } from '../UserContext';
+import { Confirm } from '../components/Confirm';
 
 // Get server url
 const PORT = process.env.REACT_APP_PORT || 5050;
@@ -201,15 +202,14 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
 //    amountOwed: 3000000,
 // };
 
-
- // ---------- UI Function for Profile Setting --------------------------
- interface ProfileSettingsProps {
+// ---------- UI Function for Profile Setting --------------------------
+interface ProfileSettingsProps {
   id: string | undefined;
   username: string | undefined;
   email: string | undefined;
   password: string | undefined;
   bio: string | undefined;
-  setRefreshProfile: (value: number) => void;
+  setRefreshProfile: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
@@ -236,6 +236,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   // state variable to track whether input fields are editable
   const [isEditing, setIsEditing] = useState(false);
+
+  // Toggle confirmation modal for account deletion
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const openModal = () => setShowConfirmDelete(true);
+  const closeModal = () => setShowConfirmDelete(false);
 
   //update disply fields when props state change
   useEffect(() => {
@@ -416,7 +421,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       <div className="profile-header">
         <h2>Profile</h2>
         <div className="profile-actions">
-          <button className="delete-account" onClick={deleteAccount}>DELETE ACCOUNT</button>
+          <button className="delete-account" onClick={openModal}>DELETE ACCOUNT</button>
+          <Confirm 
+            show={showConfirmDelete} 
+            onClose={closeModal} 
+            onConfirm={deleteAccount}
+            message="Are you sure you want to delete your account?">
+          </Confirm>
           <button className="edit-profile" onClick={handleEditClick}> 
             {isEditing ? "DISPLAY PROFILE" : "EDIT PROFILE"}</button>
         </div>

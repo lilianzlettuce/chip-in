@@ -30,13 +30,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         if (userId) {
             // Fetch user profile details based on the user ID
             const userResponse = await fetch(`${SERVER_URL}/user/${userId}`);
-
             try {
                 if (userResponse.ok) {
                     const userData = await userResponse.json();
-                    console.log("in context update user")
-                    console.log(userData);
-
                     if (userData.households) {
                         setUser((prevUser) => ({
                             ...prevUser,
@@ -130,7 +126,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }, [user]);
 
     return (
-        <UserContext.Provider value={{ user, setUser, households, setHouseholds }}>
+        <UserContext.Provider value={{ user, setUser, households, setHouseholds, updateUser }}>
             {children}
         </UserContext.Provider>
     );
