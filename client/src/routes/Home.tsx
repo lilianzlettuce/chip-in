@@ -56,7 +56,7 @@ export default function Home() {
             <br></br>
             <br></br>
             {/* Leave Household */}
-          <div className="input-group">
+            <div className="input-group">
             <button className="label-button submit-button" onClick={handleLeave}>
               Leave Household
             </button>
