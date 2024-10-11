@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../UserContext';
+import { useParams, useLocation } from 'react-router-dom';
 import ItemCard from '../components/ItemCard';
 import './Dashboard.css';
 import ItemModal from '../components/ItemModal';
 
 export default function Dashboard() {
     const { user } = useUserContext();
-    const householdID = user?.households[0];
+    // const householdID = user?.households[0];
+    // get householdID from parameter
+
+    const {householdId} = useParams();
+    const householdID = householdId
+
+    //const {house} = useParams();
+    //const householdID = house
 
     const [purchasedItems, setPurchasedItems] = useState([]);
     const [groceryItems, setGroceryItems] = useState([]);
