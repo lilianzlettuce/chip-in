@@ -18,11 +18,40 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+    const [userId, setUserId] = useState<String>();
     const [user, setUser] = useState<UserType | null>(null);
 
     // Get server url
     const PORT = process.env.REACT_APP_PORT || 5050;
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
+    // Get user data
+    const updateUser = async () => {
+        if (userId) {
+            // Fetch user profile details based on the user ID
+            const userResponse = await fetch(`${SERVER_URL}/user/${userId}`);
+
+            try {
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    console.log("in context update user")
+                    console.log(userData);
+
+                    if (userData.households) {
+                        setUser((prevUser) => ({
+                            ...prevUser,
+                            ...userData,
+                            id: userId // _id to id
+                        }));
+                    }
+                } else {
+                    console.error("Failed to fetch user data");
+                }
+            } catch (err) {
+                console.error("Error fetching user:", err);
+            }
+        }
+    }
 
     // Get user data upon render
     useEffect(() => {
@@ -40,11 +69,21 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         })
         .then(res => res.json())
         .then(data => {
-            setUser({
+            /*setUser({
                 ...data
-            });
-        });
+            });*/
+            setUserId(data.id);
+            console.log("data.id: " + data.id)
+        })
+        .catch(err => console.error("Error fetching userId:", err));
     }, []);
+
+    // Update user when userId changes
+    useEffect(() => {
+        if (userId) {
+            updateUser(); // Call updateUser only when userId is available
+        }
+    }, [userId]); // This will trigger when userId changes
 
     // Get households from user's household ids
     const [ households, setHouseholds ] = useState<HouseholdNavType[]>([]);
@@ -55,10 +94,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             const newHouseholds: HouseholdNavType[] = [];
 
             // Reset households 
-            //setHouseholds([]);
-            console.log("for loop start")
             for (let i = 0; i < user.households.length; i++) {
-                console.log(user?.households[i])
                 // Fetch household name from id
                 try {
                     const householdRes = await fetch(`${SERVER_URL}/household/${user?.households[i]}`);

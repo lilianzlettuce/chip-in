@@ -13,33 +13,18 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}
 // Define a TypeScript interface for the component props
 // ---------- UI Function for Profile Summary Card --------------------------
 interface ProfileSummaryProps {
-  name: string;
-  joinedDate: string;
-  imageUrl: string;
-  spent: number;
-  paidBack: number;
-  itemsBought: number;
-  amountOwed: number;
+  refreshProfile: number
 }
 
 // const UploadImage : 
 
-const ProfileSummary: React.FC<ProfileSummaryProps> = ({
-  name,
-  joinedDate,
-  imageUrl,
-  spent,
-  paidBack,
-  itemsBought,
-  amountOwed,
-}) => {
+const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
 
   // START UPLOAD PICTURE
   //const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
-  const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState<string>('');
   const [bio, setBio] = useState<String>(' ');
-  const [profileImage, setProfileImage] = useState<string>(imageUrl); // State to handle profile image
+  const [profileImage, setProfileImage] = useState<string>(''); // State to handle profile image
 
   //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
 
@@ -51,58 +36,40 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   // }, [imageUrl]);
 
   //effect to retrieve user profile from backend
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      let token = localStorage.getItem("token");
-      if (!token) {
-        //throw new Error("no token supplied");
-        console.log("no token supplied");
-        return;
-      }
-      
-      try {
-        const userResponse = await fetch(`${SERVER_URL}/auth/getUserData`, {
-          headers: {
-            "x-access-token": token,
-          },
-        })
+  const { user } = useUserContext();
 
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          const { id } = userData;
+  const fetchUserProfile = async () => {
+    try {
+      // Fetch user profile details based on the user ID
+      const profileResponse = await fetch(`http://localhost:6969/user/${user?.id}`);
 
-          setUserId(id);
-          
-          // Fetch user profile details based on the user ID
-          const profileResponse = await fetch(`http://localhost:6969/user/${id}`);
-
-          if (profileResponse.ok) {
-            const profileData = await profileResponse.json();
-            console.log(profileData);
-            if (profileData.pfp) {
-              setProfileImage(profileData.pfp);
-            }
-
-            if (profileData.username) {
-              setUsername(profileData.username);
-            }
-
-            if (profileData.bio) {
-              setBio(profileData.bio);
-            }
-          } else {
-            console.error("Failed to fetch user profile");
-          }
-        } else {
-          console.error('failed to fetch user profile')
+      if (profileResponse.ok) {
+        const profileData = await profileResponse.json();
+        console.log(profileData);
+        if (profileData.pfp) {
+          setProfileImage(profileData.pfp);
         }
-      } catch (err) {
-        console.error('error fetching user profile:', err)
-      }
-    }
 
-    fetchUserProfile();
-  });
+        if (profileData.username) {
+          setUsername(profileData.username);
+        }
+
+        if (profileData.bio) {
+          setBio(profileData.bio);
+        } 
+      } else {
+        console.error("Failed to fetch user profile");
+      }
+    } catch (err) {
+      console.error('error fetching user profile:', err)
+    }
+  }
+  
+  useEffect(() => {
+    if (user?.id) {
+      fetchUserProfile();
+    }
+  }, [user?.id, refreshProfile]);
 
   // Handler to update the image preview when a new image is uploaded
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +91,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
 
   //send image to server
   const handleSubmit = async (base64String: string) => {
-    const url = `http://localhost:${PORT}/user/pfp/${userId}`;
+    const url = `http://localhost:${PORT}/user/pfp/${user?.id}`;
   
     try {
       const response = await fetch(url, {
@@ -183,7 +150,6 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
         <div className="profile-info">
           <h2 className="profile-name">{username}</h2>
           <h2 className="profile-bio">{bio}</h2>
-          <p className="profile-joined">Joined {joinedDate}</p>
           {/* UPLOAD IMAGE HERE */}
           {/* Update Picture Button and Hidden File Input */}
           <button
@@ -207,16 +173,16 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
         <h3 className="summary-title">Payment Summary</h3>
         <div className="summary-details">
           <p className="summary-item">
-            <span className="summary-value">${spent}</span> spent
+            <span className="summary-value">200</span> spent
           </p>
           <p className="summary-item">
-            <span className="summary-value">${paidBack}</span> paid back
+            <span className="summary-value">300</span> paid back
           </p>
           <p className="summary-item">
-            <span className="summary-value">{itemsBought}</span> items bought
+            <span className="summary-value">15</span> items bought
           </p>
           <p className="summary-item">
-            <span className="summary-value">${amountOwed}</span> owed
+            <span className="summary-value">150</span> owed
           </p>
         </div>
       </div>
@@ -225,15 +191,15 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
 };
 
 //export default ProfileSummary (hardcoded for now. comes from server later);
-const profileProps = {
-   name: "Lettuce the Great",
-   joinedDate: "9/17/2024",
-   imageUrl: "",
-   spent: 500,
-   paidBack: 200,
-   itemsBought: 15,
-   amountOwed: 3000000,
-};
+// const profileProps = {
+//    name: "Lettuce the Great",
+//    joinedDate: "9/17/2024",
+//    imageUrl: "",
+//    spent: 500,
+//    paidBack: 200,
+//    itemsBought: 15,
+//    amountOwed: 3000000,
+// };
 
 
  // ---------- UI Function for Profile Setting --------------------------
@@ -242,37 +208,108 @@ const profileProps = {
   username: string | undefined;
   email: string | undefined;
   password: string | undefined;
+  bio: string | undefined;
+  setRefreshProfile: (value: number) => void;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   id,
   username,
   email,
-  password
+  password,
+  bio,
+  setRefreshProfile
 }) => {
+  const { user } = useUserContext();
   const navigate = useNavigate();
   
   const [displayName, setDisplayName] = useState(email);
   const [displayUsername, setDisplayUsername] = useState(username);
   const [displayPassword, setDisplayPassword] = useState(password);
+  const [displayBio, setDisplayBio] = useState(bio);
+
 
   const [tempName, setTempName] = useState(email);
   const [tempUsername, setTempUsername] = useState(username);
   const [tempPassword, setTempPassword] = useState(password);
+  const [tempBio, setTempBio] = useState(bio);
+
   // state variable to track whether input fields are editable
   const [isEditing, setIsEditing] = useState(false);
 
+  //update disply fields when props state change
+  useEffect(() => {
+    setDisplayName(email || '');
+    setDisplayUsername(username || '');
+    setDisplayPassword(password || '');
+    setDisplayBio(bio || '');
+
+
+    setTempName(email || '');
+    setTempUsername(username || '');
+    setTempPassword(password || '');
+    setDisplayBio(bio || '');
+
+  }, [email, username, password, bio]);
+
   // Event handler function for the button click
-  const handleChangeNameClick = () => {
-    if (isEditing == true) {
+  const handleChangeNameClick = async () => {
       setDisplayName(tempName);
       alert(`${tempName} has been changed successfully`);
-    }
+  
+      const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+      try {
+        console.log("email", displayName)
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: tempName, 
+          }),
+        });
+    
+        if (response.ok) {
+          console.log('email updated successfully!');
+          setRefreshProfile((prev) => prev + 1);
+        } else {
+          console.error('Failed to update email.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
   };
-  const handleChangeUserNameClick = () => {
-    if (isEditing == true) {
+  const handleChangeUserNameClick = async () => {
+    console.log("temp username", tempUsername)
+    //if (isEditing == true) {
       setDisplayUsername(tempUsername);
       alert(`${tempUsername} has been changed successfully`);
+    //}
+
+    const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+    try {
+      console.log("display username", displayUsername)
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: tempUsername, 
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('Username updated successfully!');
+        setRefreshProfile((prev) => prev + 1);
+      } else {
+        console.error('Failed to update username.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
   
@@ -282,18 +319,59 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     }
   };*/
   // handles validation
-  const handleChangePasswordClick = () => {
-    // Password validation
-    if (isEditing) {
-      if (!isValidPassword(tempPassword? tempPassword : "")) {
-        alert("Password must be at least 12 characters long and contain at least one letter and one number.");
-        return;
+  const handleChangePasswordClick = async () => {
+    setDisplayPassword(tempPassword);
+    alert("Password has been changed successfully");
+      
+    const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: tempPassword, 
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('password updated successfully!');
+        setRefreshProfile((prev) => prev + 1);
+      } else {
+        console.error('Failed to update password.');
       }
-      else {
-        setDisplayPassword(tempPassword);
-        // Password meets all criteria
-        alert("Password has been changed successfully");
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleChangeBioClick = async () => {
+    setDisplayPassword(tempBio);
+    alert("Bio has been changed successfully");
+      
+    const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+    try {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bio: tempBio, 
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('bio updated successfully!');
+        setRefreshProfile((prev) => prev + 1);
+      } else {
+        console.error('Failed to update bio.');
       }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
   
@@ -318,6 +396,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       setTempName(displayName);
       setTempUsername(displayUsername);
       setTempPassword(displayPassword);
+      setTempBio(displayBio);
     }
   }
 
@@ -347,13 +426,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       <div className="profile-fields">
         {/* Display Name */}
         <div className="profile-row">
-          <label className="profile-label">Display Name</label>
+          <label className="profile-label">Email</label>
           <input type="text" className="profile-input"
               value = {isEditing ? tempName : displayName}
               readOnly = {!isEditing} // doesn't allow users to change text field
               onChange={(e) => setTempName(e.target.value)} />
            {isEditing && (
-              <button className="change-button" onClick={handleChangeNameClick}>CHANGE NAME</button>
+              <button className="change-button" onClick={handleChangeNameClick}>CHANGE EMAIL</button>
            )}
         </div>
 
@@ -381,6 +460,21 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               onChange={(e) => setTempPassword(e.target.value)} />
           {isEditing && (
           <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
+          )}
+        </div>
+
+        {/* Bio */}
+        <div className="profile-row">
+          <label className="profile-label">Bio</label>
+          {/* Change input type based on isEditing state 
+           type="password": This input type is specifically designed to hide user input, showing only a series of * */}
+          <input type={isEditing ? "text" : "bio"} // Use "password" type when not editing
+              className="profile-input"
+              value = {isEditing ? tempBio : displayBio}
+              readOnly = {!isEditing} // doesn't allow users to change text field
+              onChange={(e) => setTempBio(e.target.value)} />
+          {isEditing && (
+          <button className="change-button" onClick={handleChangeBioClick}>CHANGE BIO</button>
           )}
         </div>
       </div>
@@ -445,17 +539,59 @@ const Settings: React.FC = () => {
 
 const Profile: React.FC = () => {
   const { user } = useUserContext();
+  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [bio, setBio] = useState<string>('');
 
-  if (!user) return <div>Loading...</div>;
+
+  const [refreshProfile, setRefreshProfile] = useState<number>(0);
+
+  useEffect(() => {
+    // Fetch user profile details after the user is available
+    const fetchUserProfile = async () => {
+      if (!user) return; // Ensure user is available
+
+      try {
+        const profileResponse = await fetch(`http://localhost:6969/user/${user?.id}`);
+
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          console.log('profile data', profileData);
+
+          if (profileData.username) setUsername(profileData.username);
+          if (profileData.email) setEmail(profileData.email);
+          if (profileData.password) setPassword(profileData.password);
+          if (profileData.bio) setBio(profileData.bio); // You may want to handle password securely
+        } else {
+          console.error("Failed to fetch user profile");
+        }
+      } catch (err) {
+        console.error('error fetching user profile:', err);
+      }
+    };
+
+    // Trigger fetch when user is available
+    if (user?.id) {
+      fetchUserProfile();
+    }
+  }, [user?.id, refreshProfile]);
+
+  // if (!user) return <div>Loading...</div>;
 
   const profileSettingsProps = {
-    ...user,
-    password: "*************"
+    id: user?.id,
+    username: username,
+    email: email,
+    password: password,
+    bio: bio,
+    setRefreshProfile
   }
   
   return (
     <div>
-      <ProfileSummary {...profileProps} />
+      {/* <ProfileSummary {...profileProps} /> */}
+      <ProfileSummary refreshProfile={refreshProfile} />
       <ProfileSettings {...profileSettingsProps} />
       <Settings/>
     </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './CreateHousehold.css'; 
-import { useNavigate } from 'react-router-dom';
 import { useUserContext } from '../UserContext';
 
 // import { useNavigate } from 'react-router-dom';
@@ -48,12 +47,24 @@ type HouseholdFormProps = {
 
 export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
   const [householdName, setHouseholdName] = useState("");
-  const {user} = useUserContext();
+  const { user, setUser} = useUserContext();
   // const navigate = useNavigate();
+
+  // Get server url
+  const PORT = process.env.REACT_APP_PORT || 5050;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   // Function to handle form submission
   //const handleSubmit = () => {
   async function handleSubmit() {
+    if (!user || !user.id) {
+      console.error("User or User ID is not available.");
+      return; // Stop execution if user.id is not set
+    }
+
+    console.log("in submit:")
+    console.log(user);
+    console.log(user?.id)
     const newHouseholdData = {
       name: householdName,
       members: [user?.id], // like a global variable
@@ -66,7 +77,8 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
       purchaseHistory: []
     };
     try {
-      const response = await fetch("http://localhost:6969/household/", {
+      // Create household
+      const response = await fetch(`${SERVER_URL}/household/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,6 +92,20 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
         console.log("New household created:", data);
       } else {
         console.error("Failed to create household:", data.error);
+      }
+
+      // Update global user variable based on the user ID
+      const userResponse = await fetch(`${SERVER_URL}/user/${user?.id}`);
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+
+        if (userData.households) {
+          setUser((prevUser) => ({
+            ...prevUser,
+            ...userData,
+            id: user.id // _id to id
+          }));
+        }
       }
     } catch (error) {
       console.error("Error occurred while creating household:", error);
@@ -102,7 +128,7 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
             <button className="label-button">Household Name</button>
             <input
               type="text"
-              className="input-field"
+              className="input-field text-white"
               value={householdName}
               onChange={(e) => setHouseholdName(e.target.value)}
               placeholder="Enter household name"

@@ -26,7 +26,7 @@ export const Modal2: React.FC<ModalProps> = ({ show, onClose, children }) => {
 // Main JoinHousehold component
 type JoinHouseholdProps = {
   onClose: () => void; // Function to close the modal
-  userId: string;      // Add userId as a prop
+  userId: string | undefined;      // Add userId as a prop
 };
 
 export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId }) => {
@@ -34,6 +34,8 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
   // Get env vars
   const PORT = process.env.REACT_APP_PORT || 5050;
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
+  console.log("joinhousehold userid: ", userId)
 
   // Function to handle form submission
   
