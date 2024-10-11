@@ -51,37 +51,29 @@ export default function Navbar() {
             <div className="flex flex-col justify-between items-center">
               <NavLink to={`/households/${householdId ? householdId : households[0].id}/home`}
                   style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                  className="p-3">
+                  className="p-3 rounded-md">
                 Home
               </NavLink>
               <NavLink to={`/households/${householdId ? householdId : households[0].id}/dashboard`}
                   style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                  className="p-3">
+                  className="p-3 rounded-md">
                 Dashboard
               </NavLink>
               <NavLink to={`/households/${householdId ? householdId : households[0].id}/my-expenses`}
                   style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                  className="p-3">
+                  className="p-3 rounded-md">
                 My Expenses
               </NavLink>
               <NavLink to={`/households/${householdId ? householdId : households[0].id}/recipes`}
                   style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                  className="p-3">
+                  className="p-3 rounded-md">
                 Recipes
               </NavLink>
             </div>
           }
-          {/*<NavLink
-              to={`/households/1/`}
-              state={{ householdName: "Basement Dwellers", userId: userId }}
-                style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                className="p-3">
-              Basement Dwellers
-            </NavLink>
-          */}
         </div>
 
-        <div className="border-t-4">
+        <div className="border-t-4 overflow-scroll">
           <div className="my-2 flex justify-center items-center">
             <h1 className="mr-2">Households</h1>
             <button 
@@ -102,7 +94,7 @@ export default function Navbar() {
                   <NavLink to={`/households/${household.id}`} 
                       key={household.id}
                       style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                      className="p-3">
+                      className="p-3 rounded-md">
                     {household.name}
                   </NavLink>
                 );
