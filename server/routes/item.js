@@ -53,12 +53,13 @@ router.post('/addtogrocery', async (req, res) => {
 
 //create item and add to purchased list
 router.post('/addtopurchased', async (req, res) => {
-  const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+  let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
   if (!name || !category || !purchaseDate || cost === undefined || cost === null) {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
+  cost *= 100;
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
 
   try {

@@ -3,11 +3,11 @@ import { useUserContext } from '../UserContext';
 // Function to handle the "Leave Household" action
 
 export default function Home() {
-    const {householdId, householdName} = useParams();
+    const {householdId} = useParams();
     console.log(householdId)
 
       // Get the state passed from NavLink (householdName and userId)
-      const {user} = useUserContext();
+      const {user, households} = useUserContext();
       const userId = user?.id;
 
       const handleLeave = async () => {
@@ -47,7 +47,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1>household name : {householdName}</h1>
+            {/*<h1>household name : {householdName}</h1>*/}
             <h1>household id : {householdId}</h1>
             <h1>user id: {userId}</h1>
             <h1>Press the "Leave Household" button below if you wish</h1>

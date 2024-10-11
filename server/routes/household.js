@@ -34,11 +34,13 @@ router.patch('/repurchase', async (req, res) => {
 
 //move from grocery to purchased
 router.patch('/purchase', async (req, res) => {
-  const { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+  let { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
   if (!purchasedBy || !purchaseDate || cost == undefined || cost == null) {
     return res.status(400).json({ message: 'Fields must be filled' });
   }
+  cost *= 100;
+
   try {
     const updatedItem = await Item.findByIdAndUpdate(
       itemId,
@@ -202,8 +204,6 @@ router.post("/addUser/:id", async (req, res) => {
     }
 });
 
-// leave household
-router.patch
 // get grocery list
 router.get("/:id/grocerylist", async (req, res) => {
   const id = req.params.id;
@@ -244,7 +244,14 @@ router.get("/:id/purchasedlist", async (req, res) => {
       return res.status(404).json({ message: 'Household not found' });
     }
 
-    res.status(200).json(household.purchasedList);
+    const modifiedPurchasedList = household.purchasedList.map(item => {
+      return {
+        ...item._doc, // Spread other fields of the item
+        cost: item.cost / 100 // Divide the cost by 100
+      };
+    });
+
+    res.status(200).json(modifiedPurchasedList);
   } catch (error) {
     res.status(500).json({ error: err.message });
   }

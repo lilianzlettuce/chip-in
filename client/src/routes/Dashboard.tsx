@@ -12,7 +12,7 @@ export default function Dashboard() {
     const [groceryItems, setGroceryItems] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
-    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet']);
+    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet', 'Toiletries', 'Drink']);
     const [roommates, setRoommates] = useState([]);
     const [sortAscending, setSortAscending] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -36,21 +36,21 @@ export default function Dashboard() {
 
     const isExpiringSoon = (expirationDate: string) => {
         if (!expirationDate) return false;
-
+    
         const now = new Date();
         const expiration = new Date(expirationDate);
         const timeDiff = expiration.getTime() - now.getTime();
         const daysDiff = timeDiff / (1000 * 3600 * 24);
-
-        return daysDiff <= 5 && daysDiff <= 0;
-    };
+    
+        return daysDiff <= 5 || daysDiff <= 0;
+    };    
 
     const moveItem = async (itemData: any, targetList: string) => {
         setIsLoading(true);
         const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
         const householdId = householdID;
         const userId = user?.id;
-
+    
         const requestBody = {
             householdId,
             name: itemData.name,
@@ -61,8 +61,9 @@ export default function Dashboard() {
             expirationDate: targetList === 'purchased' ? itemData.expirationDate : null,
             cost: targetList === 'purchased' ? itemData.cost : 0,
         };
-
+    
         try {
+            // Add the item to the target list (purchased or grocery)
             const response = await fetch(`http://localhost:6969/item${endpoint}`, {
                 method: 'POST',
                 headers: {
@@ -70,19 +71,44 @@ export default function Dashboard() {
                 },
                 body: JSON.stringify(requestBody),
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error('Error details:', errorData);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            if (targetList === 'purchased') {
-                setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
-            } else {
+    
+            // If moving to the grocery list, delete the item from the purchased list in the backend
+            if (targetList === 'grocery') {
+                const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+    
+                // Update frontend state to remove item from the purchased list
                 setPurchasedItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
+            } else {
+                // If moving to the purchased list, delete the item from the grocery list
+                const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+    
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+    
+                // Update frontend state to remove item from the grocery list
+                setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
             }
-
+    
+            // Refresh both lists after moving the item
             await fetchPurchasedItems();
             await fetchGroceryItems();
         } catch (error) {
@@ -90,7 +116,7 @@ export default function Dashboard() {
         } finally {
             setIsLoading(false);
         }
-    };
+    };    
 
     const handleModalSave = async (updatedItem: any) => {
         setIsLoading(true);
@@ -383,46 +409,46 @@ export default function Dashboard() {
                     {isCollapsed ? 'More' : 'Less'}
                 </button>
                 { !isCollapsed && (
-                    <ul className="dashboard-item-list">
-                        {purchasedItems.length === 0 ? (
-                            <li className="dashboard-item">No purchased items</li>
-                        ) : (
-                            purchasedItems.map((item: any) => (
-                                <li key={item['_id']}>
-                                    <ItemCard
-                                        id={item['_id']}
-                                        category={item['category'] || 'Unknown'}
-                                        name={item['name'] || 'Unnamed'}
-                                        price={item['cost'] ?? 0}
-                                        sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
-                                            (user) => user.username || 'Unknown'
-                                        )}
-                                        addedBy={item['purchasedBy']?.username || 'Unknown'}
-                                        expiryDate={
-                                            item['expirationDate']
-                                                ? new Date(item['expirationDate']).toLocaleDateString()
-                                                : 'N/A'
-                                        }
-                                        isExpiringSoon={
-                                            item['expirationDate'] && isExpiringSoon(item['expirationDate'])
-                                        }
-                                        onDelete={() => handleDelete(item['_id'], 'purchased')}
-                                        onMove={() => {
-                                            moveItem(
-                                                {
-                                                    ...item,
-                                                    cost: 0, // Clear cost
-                                                    expirationDate: '', // Clear expiration date
-                                                },
-                                                'grocery'
-                                            );
-                                        }}
-                                        listType="purchased"
-                                    />
-                                </li>
-                            ))
-                        )}
-                    </ul>
+                        <ul className="dashboard-item-list">
+                            {purchasedItems.length === 0 ? (
+                                <li className="dashboard-item">No purchased items</li>
+                            ) : (
+                                purchasedItems.map((item: any) => (
+                                    <li key={item['_id']}>
+                                        <ItemCard
+                                            id={item['_id']}
+                                            category={item['category'] || 'Unknown'}
+                                            name={item['name'] || 'Unnamed'}
+                                            price={item['cost'] ?? 0}
+                                            sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
+                                                (user) => user.username || 'Unknown'
+                                            )}
+                                            purchasedBy={item['purchasedBy']?.username || 'Unknown'}
+                                            expiryDate={
+                                                item['expirationDate']
+                                                    ? new Date(item['expirationDate']).toLocaleDateString()
+                                                    : 'N/A'
+                                            }
+                                            isExpiringSoon={
+                                                item['expirationDate'] && isExpiringSoon(item['expirationDate'])
+                                            }
+                                            onDelete={() => handleDelete(item['_id'], 'purchased')}
+                                            onMove={() => {
+                                                moveItem(
+                                                    {
+                                                        ...item,
+                                                        cost: 0, // Clear cost
+                                                        expirationDate: '', // Clear expiration date
+                                                    },
+                                                    'grocery'
+                                                );
+                                            }}
+                                            listType="purchased"
+                                        />
+                                    </li>
+                                ))
+                            )}
+                        </ul>
                 )}
             </div>
 
@@ -434,37 +460,37 @@ export default function Dashboard() {
                     {isCollapsed2 ? 'More' : 'Less'}
                 </button>
                 { !isCollapsed2 && (
-                        <ul className="dashboard-item-list">
-                            {groceryItems.length === 0 ? (
-                                <li className="dashboard-item">No items to purchase</li>
-                            ) : (
-                                groceryItems.map((item: any) => (
-                                    <li key={item['_id']}>
-                                        <ItemCard
-                                            id={item['_id']}
-                                            category={item['category']}
-                                            name={item['name']}
-                                            price={item['cost'] || 0}
-                                            sharedBy={[]}
-                                            addedBy={item['addedBy'] || 'Unknown'}
-                                            expiryDate={
-                                                item['expirationDate']
-                                                    ? new Date(item['expirationDate']).toLocaleDateString()
-                                                    : 'N/A'
-                                            }
-                                            isExpiringSoon={false}
-                                            onDelete={() => handleDelete(item['_id'], 'grocery')}
-                                            onMove={() => {
-                                                setSelectedItem(item);
-                                                setTargetList('purchased');
-                                                setModalOpen(true);
-                                            }}
-                                            listType="grocery"
-                                        />
-                                    </li>
-                                ))
-                            )}
-                        </ul>
+                    <ul className="dashboard-item-list">
+                        {groceryItems.length === 0 ? (
+                            <li className="dashboard-item">No items to purchase</li>
+                        ) : (
+                            groceryItems.map((item: any) => (
+                                <li key={item['_id']}>
+                                    <ItemCard
+                                        id={item['_id']}
+                                        category={item['category']}
+                                        name={item['name']}
+                                        price={item['cost'] || 0}
+                                        sharedBy={[]}
+                                        purchasedBy={'N/A'}
+                                        expiryDate={
+                                            item['expirationDate']
+                                                ? new Date(item['expirationDate']).toLocaleDateString()
+                                                : 'N/A'
+                                        }
+                                        isExpiringSoon={false}
+                                        onDelete={() => handleDelete(item['_id'], 'grocery')}
+                                        onMove={() => {
+                                            setSelectedItem(item);
+                                            setTargetList('purchased');
+                                            setModalOpen(true);
+                                        }}
+                                        listType="grocery"
+                                    />
+                                </li>
+                            ))
+                        )}
+                    </ul>
                 )}
             </div>
             {/* Modal for entering details when moving from grocery to purchased */}

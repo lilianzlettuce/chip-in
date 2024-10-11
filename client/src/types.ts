@@ -3,6 +3,11 @@ export type HouseholdType = {
     id: string;
     name: string;
 };
+
+export type HouseholdNavType = {
+    id: string;
+    name: string;
+};
   
 export type PreferencesType = {
     theme: string;
@@ -11,14 +16,15 @@ export type PreferencesType = {
 
 export type UserContextType = {
     user: UserType | null;
-    //setUser: (newSession: UserType) => void;
     setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+    households: HouseholdNavType[];
+    setHouseholds: React.Dispatch<React.SetStateAction<HouseholdNavType[]>>;
 };
 
 export type UserType = {
     id: string,
     username: string,
     email: string,
-    households: HouseholdType[],
-    preferences:  PreferencesType[],
+    households: string[],
+    preferences:  boolean[],
 }

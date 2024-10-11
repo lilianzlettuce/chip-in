@@ -1,28 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import chipInLogo from './assets/chip-in-logo1.png'
-import './global.css'
+import { useEffect } from 'react';
+import chipInLogo from './assets/chip-in-logo1.png';
+import './global.css';
 
-import Layout from './Layout';
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { UserProvider } from './UserContext';
-import { UserType, UserContextType } from './types';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 type AppProps = {
   message: string;
 };
 
 export default function App({ message }: AppProps) {
-  const [count, setCount] = useState<number>(0);
-
-  let initialUser: UserType = {
-    id: '1',
-    username: 'yo mama',
-    email: 'lechuga.doe@example.com',
-    households: [{ id: 'h1', name: 'Main Household' }],
-    preferences: [{ theme: 'dark', notificationsEnabled: true }]
-  };
-
   const navigate = useNavigate();
 
   // Get server url
@@ -40,20 +30,21 @@ export default function App({ message }: AppProps) {
 
     // Redirect to profile if user is signed in
     fetch(`${SERVER_URL}/auth/getUserData`, {
-        headers: {
-            "x-access-token": token,
-        },
-    })
+      headers: {
+        "x-access-token": token,
+      },
+  })
     .then(res => res.json())
     .then(data => {
       data.isLoggedIn ? null: navigate("/login");;
     });
-    
   }, []);
 
   return (
     <UserProvider>
-      <Layout>
+      <div className="flex justify-between items-start">
+        <Navbar />
+        <div className="w-4/5 min-h-screen p-4 flex flex-col justify-between">
           <Outlet />
           <div>
             <a target="_blank">
@@ -65,11 +56,10 @@ export default function App({ message }: AppProps) {
           </p>
           <div>Message: {message}</div>
           <div className="card">
-            <button onClick={() => setCount((count) => count + 1)}>
-              count is {count}
-            </button>
           </div>
-      </Layout>
+          <Footer />
+        </div>
+      </div>
     </UserProvider>
   );
 };

@@ -54,7 +54,6 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({
   useEffect(() => {
     const fetchUserProfile = async () => {
       let token = localStorage.getItem("token");
-      console.log("token: " + token);
       if (!token) {
         //throw new Error("no token supplied");
         console.log("no token supplied");
