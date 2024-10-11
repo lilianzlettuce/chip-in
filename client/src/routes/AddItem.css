@@ -1,0 +1,120 @@
+.add-item-button {
+    background-color: #2e78f8; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Remove default border */
+    padding: 8px 12px; /* Adjust padding */
+    font-size: 14px; /* Font size */
+    border-radius: 5px; /* Slightly rounded corners */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    margin-left: 20px; /* Space between the title and the button */
+    transition: background-color 0.3s ease; /* Smooth transition effect */
+  }
+  
+  .add-item-button:hover {
+    background-color: #1a5cb8; /* Darker blue on hover */
+  }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    padding: 20px; /* Reduced padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 400px; /* Reduced max-width for smaller modal */
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px; /* Reduced font size for all text */
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 8px; /* Reduced top position */
+    right: 8px; /* Reduced right position */
+    background: transparent;
+    border: none;
+    font-size: 16px; /* Reduced size */
+    cursor: pointer;
+    z-index: 10001;
+  }
+  
+  h2 {
+    margin-bottom: 15px; /* Reduced margin */
+    text-align: center;
+    color: #333;
+    font-size: 16px; /* Smaller font size for header */
+  }
+  
+  .input-group {
+    display: flex;
+    flex-direction: column; /* Stack the label and input vertically */
+    margin-bottom: 10px; /* Reduced space between fields */
+  }
+  
+  .input-group label {
+    margin-bottom: 4px; /* Reduced space between label and input */
+    font-weight: bold;
+    font-size: 13px; /* Smaller font size for labels */
+  }
+  
+  .input-group input[type="text"],
+  .input-group input[type="date"],
+  .input-group input[type="number"] {
+    padding: 6px; /* Reduced padding inside input fields */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 13px; /* Reduced font size for input text */
+    box-sizing: border-box;
+  }
+  
+  .input-group input[type="checkbox"] {
+    margin-right: 6px; /* Reduced margin */
+    transform: scale(0.9); /* Slightly smaller checkbox */
+  }
+  
+  .input-group div {
+    display: flex;
+    align-items: center; /* Align checkbox and label */
+    margin-bottom: 5px; /* Space between each checkbox item */
+  }
+  
+  .input-group div label {
+    margin: 0;
+  }
+  
+  .checkbox-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Reduced space between checkboxes */
+    font-size: 13px; /* Smaller font size for checkbox labels */
+  }
+  
+  .submit-button {
+    background-color: #2e78f8;
+    color: white;
+    border: none;
+    padding: 8px 16px; /* Reduced padding for button */
+    cursor: pointer;
+    border-radius: 5px;
+    align-self: center; /* Center the submit button */
+    font-size: 14px; /* Smaller font size for button text */
+  }
+  
+  .submit-button:hover {
+    background-color: #1a5cb8;
+  }
+  
