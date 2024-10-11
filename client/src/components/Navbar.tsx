@@ -47,26 +47,30 @@ export default function Navbar() {
         </div>
 
         <div className="flex flex-col justify-between items-center">
-          <NavLink to={`/households/${householdId ? householdId : 1}/home`}
-              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-              className="p-3">
-            Home
-          </NavLink>
-          <NavLink to={`/households/${householdId ? householdId : 1}/dashboard`}
-              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-              className="p-3">
-            Dashboard
-          </NavLink>
-          <NavLink to={`/households/${householdId ? householdId : 1}/my-expenses`}
-              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-              className="p-3">
-            My Expenses
-          </NavLink>
-          <NavLink to={`/households/${householdId ? householdId : 1}/recipes`}
-              style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-              className="p-3">
-            Recipes
-          </NavLink>
+          {households.length > 0 &&
+            <div className="flex flex-col justify-between items-center">
+              <NavLink to={`/households/${householdId ? householdId : households[0].id}/home`}
+                  style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                  className="p-3">
+                Home
+              </NavLink>
+              <NavLink to={`/households/${householdId ? householdId : households[0].id}/dashboard`}
+                  style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                  className="p-3">
+                Dashboard
+              </NavLink>
+              <NavLink to={`/households/${householdId ? householdId : households[0].id}/my-expenses`}
+                  style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                  className="p-3">
+                My Expenses
+              </NavLink>
+              <NavLink to={`/households/${householdId ? householdId : households[0].id}/recipes`}
+                  style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                  className="p-3">
+                Recipes
+              </NavLink>
+            </div>
+          }
           {/*<NavLink
               to={`/households/1/`}
               state={{ householdName: "Basement Dwellers", userId: userId }}

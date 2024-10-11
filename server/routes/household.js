@@ -216,7 +216,7 @@ router.get("/:id/grocerylist", async (req, res) => {
     }
 
     res.status(200).json(household.groceryList);
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
