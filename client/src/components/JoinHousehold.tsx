@@ -68,8 +68,8 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
         const updatedMembers = [...matchingHousehold.members, userId]; // Add the user to the existing members
     
         // Step 4: Send a PATCH request to update the household's members list using the `householdId`
-        const updateResponse = await fetch(`http://localhost:6969/household/updateMembers/${householdId}`, {
-          method: 'PATCH',
+        const updateResponse = await fetch(`http://localhost:6969/household/addUser/${householdId}`, {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
