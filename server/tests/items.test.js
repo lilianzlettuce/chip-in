@@ -130,6 +130,47 @@ describe('items in lists', () => {
         
         assert.strictEqual(response.body.message, "Fields must be populated");
     })
+
+    test('move item from grocery to purchased list', async () => {
+        const chicken = await Item.findOne({name: "chicken"});
+        const payload = {
+            "sharedBetween": [user1Id, user2Id],
+            "purchasedBy": user1Id,
+            "purchaseDate": "2024-10-12T10:00:00.000+00:00",
+            "expirationDate": "2024-11-28T10:00:00.000+00:00",
+            "cost": "1299",
+            "householdId": householdId,
+            "itemId": chicken._id
+        }
+        let response = await api
+            .patch(`/household/purchase`)
+            .send(payload)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const household = await Household.findById(householdId)
+        assert.strictEqual(household.purchasedList.length, 2);
+        assert.strictEqual(household.groceryList.length, 0);
+
+    })
+
+    test('move item from purchased to grocery list', async () => {
+        const chicken = await Item.findOne({name: "chicken"});
+        const payload = {
+            "householdId": householdId,
+            "itemId": chicken._id
+        }
+        let response = await api
+            .patch(`/household/repurchase`)
+            .send(payload)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const household = await Household.findById(householdId)
+        assert.strictEqual(household.purchasedList.length, 2);
+        assert.strictEqual(household.groceryList.length, 1);
+
+    })
 })
 
 after(async () => {
