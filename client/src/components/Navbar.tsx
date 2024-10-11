@@ -2,15 +2,26 @@ import { NavLink, useNavigate } from "react-router-dom";
 //import logo from "../assets/chip-in-logo1.png"
 import logo from "../assets/chipinlogo.png"
 
-//import { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useUserContext } from '../UserContext';
+
+import {HouseholdForm , Modal}  from './CreateHousehold'
 
 export default function Navbar() {
   const { householdId } = useParams();
   const { user, households } = useUserContext();
   const navigate = useNavigate();
+
+  // Implementing Modal for Creating a household
+  const [showHouseholdForm, setShowHouseholdForm] = useState(false);
+  // Function to open the modal
+  const openModal = () => setShowHouseholdForm(true);
+  // Function to close the modal
+  const closeModal = () => setShowHouseholdForm(false);
+
+
 
   // User sign out, redirect to login page
   const signOut = () => {
@@ -56,6 +67,14 @@ export default function Navbar() {
               className="p-3">
             Recipes
           </NavLink>
+          {/*<NavLink
+              to={`/households/1/`}
+              state={{ householdName: "Basement Dwellers", userId: userId }}
+                style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
+                className="p-3">
+              Basement Dwellers
+            </NavLink>
+          */}
         </div>
 
         <div className="border-t-4">
@@ -64,9 +83,13 @@ export default function Navbar() {
             <button 
               className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background 
                 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
-                disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" >
+                disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" 
+                onClick={openModal} >
               +
             </button>
+            <Modal show={showHouseholdForm} onClose={closeModal}>
+              <HouseholdForm onClose={closeModal} /> {/* Render HouseholdForm inside the Modal */}
+            </Modal>
           </div>
           <div className="flex flex-col justify-between items-center h-1/3">
             {
