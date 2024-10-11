@@ -30,14 +30,14 @@ export default function Dashboard() {
 
     const isExpiringSoon = (expirationDate: string) => {
         if (!expirationDate) return false;
-
+    
         const now = new Date();
         const expiration = new Date(expirationDate);
         const timeDiff = expiration.getTime() - now.getTime();
         const daysDiff = timeDiff / (1000 * 3600 * 24);
-
-        return daysDiff <= 5 && daysDiff <= 0;
-    };
+    
+        return daysDiff <= 5 || daysDiff <= 0;
+    };    
 
     const moveItem = async (itemData: any, targetList: string) => {
         setIsLoading(true);
