@@ -5,8 +5,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --env-file=config.env server.js"
+    "test": "NODE_ENV=test node --env-file=config.env --test",
+    "start": "NODE_ENV=dev node --env-file=config.env server.js"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +19,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.6.4",
-    "password-validator": "^5.3.0",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "password-validator": "^5.3.0"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
   }
 }
