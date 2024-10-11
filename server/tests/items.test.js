@@ -173,6 +173,38 @@ describe('items in lists', () => {
     })
 })
 
+describe('leaving household', () => {
+    test('user 1 leaving', async () => {
+        const payload = {
+            "userId" : user1Id
+        }
+        const response = await api
+            .post(`/household/leave/${householdId}`)
+            .send(payload)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
+        assert.strictEqual(response.body.message, 'User successfully removed from household')
+        const household = await Household.findById(householdId)
+        assert.strictEqual(household.members.length, 1)
+    })
+
+    test('last user leaving', async () => {
+        const payload = {
+            "userId" : user2Id
+        }
+        let response = await api
+            .post(`/household/leave/${householdId}`)
+            .send(payload)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
+        assert.strictEqual(response.body.message, 'Household deleted as the last member left')
+        response = await api
+            .get(`/household/${householdId}`)
+            .expect(404)
+    })
+})
 after(async () => {
     await mongoose.connection.close()
 })
