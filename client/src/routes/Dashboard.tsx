@@ -12,7 +12,7 @@ export default function Dashboard() {
     const [groceryItems, setGroceryItems] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
-    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet']);
+    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet', 'Toiletries', 'Drink']);
     const [roommates, setRoommates] = useState([]);
     const [sortAscending, setSortAscending] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -378,7 +378,7 @@ export default function Dashboard() {
                                     sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
                                         (user) => user.username || 'Unknown'
                                     )}
-                                    addedBy={item['purchasedBy']?.username || 'Unknown'}
+                                    purchasedBy={item['purchasedBy']?.username || 'Unknown'}
                                     expiryDate={
                                         item['expirationDate']
                                             ? new Date(item['expirationDate']).toLocaleDateString()
@@ -421,7 +421,7 @@ export default function Dashboard() {
                                     name={item['name']}
                                     price={item['cost'] || 0}
                                     sharedBy={[]}
-                                    addedBy={item['addedBy'] || 'Unknown'}
+                                    purchasedBy={'Unknown'}
                                     expiryDate={
                                         item['expirationDate']
                                             ? new Date(item['expirationDate']).toLocaleDateString()

@@ -7,7 +7,7 @@ interface ItemCardProps {
     name: string;
     price: number;
     sharedBy: string[];
-    addedBy: string;
+    purchasedBy: string;
     expiryDate: string;
     isExpiringSoon: boolean;
     onDelete: () => void;
@@ -16,12 +16,11 @@ interface ItemCardProps {
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
-    id,
     category,
     name,
     price,
     sharedBy,
-    addedBy,
+    purchasedBy,
     expiryDate,
     isExpiringSoon,
     onDelete,
@@ -39,7 +38,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
                 Shared by {sharedBy.length > 0 ? sharedBy.join(', ') : 'No one'}
             </div>
             <div className="footer">
-                <div>Added by {addedBy}</div>
+                <div>Purchased by {purchasedBy}</div>
                 <div className="expiry">Expires {expiryDate}</div>
             </div>
             <div className="actions">
