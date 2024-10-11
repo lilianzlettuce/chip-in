@@ -42,7 +42,7 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
       householdId: householdId,
       name: name,
       category: category,
-      purchasedBy: sharedIdsArray, // Send as strings
+      purchasedBy: sharedIdsArray[0], // Send as strings
       sharedBetween: sharedIdsArray, // Send as strings
       purchaseDate: '',
       expirationDate: '',
