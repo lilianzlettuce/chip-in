@@ -1,19 +1,21 @@
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../UserContext';
+import Profile from './Profile';
+
 // Function to handle the "Leave Household" action
 
 export default function Home() {
     const {householdId} = useParams();
-    console.log(householdId)
+    const navigate = useNavigate();
 
       // Get the state passed from NavLink (householdName and userId)
-      const {user, households} = useUserContext();
+      const {user} = useUserContext();
       const userId = user?.id;
 
       const handleLeave = async () => {
         try {
           // Define the URL with householdId as a path parameter
-          const url = `http://localhost:6969/leave/${householdId}`;
+          const url = `http://localhost:6969/household/leave/${householdId}`;
       
           // Create the POST request with userId in the body
           const response = await fetch(url, {
@@ -27,9 +29,10 @@ export default function Home() {
           const data = await response.json();
       
           if (response.ok) {
-            console.log('User ${userId} left household successfully:', data);
+            alert(`User ${userId} left household successfully`)
+            navigate('/profile');
           } else {
-            console.error('Failed to leave household:', data);
+            alert(`Failed to leave household`)
           }
         } catch (error) {
           console.error('Error making request:', error);
@@ -56,7 +59,7 @@ export default function Home() {
             <br></br>
             <br></br>
             {/* Leave Household */}
-          <div className="input-group">
+            <div className="input-group">
             <button className="label-button submit-button" onClick={handleLeave}>
               Leave Household
             </button>
