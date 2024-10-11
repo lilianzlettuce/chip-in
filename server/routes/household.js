@@ -36,8 +36,8 @@ router.patch('/repurchase', async (req, res) => {
 router.patch('/purchase', async (req, res) => {
   const { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
-  if (!purchasedBy || !purchaseDate || cost == undefined || cost == null) {
-    return res.status(400).json({ message: 'Fields must be filled' });
+  if (!purchasedBy || !purchaseDate || !purchasedBy || cost == undefined || cost == null) {
+    return res.status(400).json({ message: 'Fields must be populated' });
   }
   try {
     const updatedItem = await Item.findByIdAndUpdate(
