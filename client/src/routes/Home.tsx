@@ -10,7 +10,7 @@ export default function Home() {
     const navigate = useNavigate();
 
     // Get the state passed from NavLink (householdName and userId)
-    const {user} = useUserContext();
+    const { user, updateUser } = useUserContext();
     const userId = user?.id;
 
     // Toggle confirmation modal for account deletion
@@ -36,6 +36,7 @@ export default function Home() {
     
         if (response.ok) {
           alert(`User ${userId} left household successfully`)
+          updateUser();
           navigate('/profile');
         } else {
           alert(`Failed to leave household`)
