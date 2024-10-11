@@ -55,7 +55,7 @@ router.post('/addtogrocery', async (req, res) => {
 router.post('/addtopurchased', async (req, res) => {
   let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
-  if (!name || !category || !purchaseDate || cost === undefined || cost === null) {
+  if (!name || !category || !purchasedBy || !purchaseDate || cost === undefined || cost === null) {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
