@@ -22,15 +22,18 @@ app.use("/user", users);
 app.use("/household", households);
 app.use("/filter", filter);
 
+// Auth route
+app.use("/auth", auth);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-// start the Express server
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+export default app;
 
-// Auth route
-app.use("/auth", auth);
+// start the Express server if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+}

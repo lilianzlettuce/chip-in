@@ -198,8 +198,6 @@ router.post("/addUser/:id", async (req, res) => {
     }
 });
 
-// leave household
-router.patch
 // get grocery list
 router.get("/:id/grocerylist", async (req, res) => {
   const id = req.params.id;
