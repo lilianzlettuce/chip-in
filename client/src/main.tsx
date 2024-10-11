@@ -82,7 +82,7 @@ const router = createBrowserRouter([
         element: <Dashboard />
       },
       {
-        path: "my-expenses/:userId",
+        path: "my-expenses",
         element: <MyExpenses />
       },
       {
