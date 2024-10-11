@@ -9,10 +9,14 @@ import { useUserContext } from '../UserContext';
 
 import {HouseholdForm , Modal}  from './CreateHousehold'
 
+import {JoinHousehold , Modal2}  from './JoinHousehold'
+
+
 export default function Navbar() {
   const { householdId } = useParams();
   const { user, households } = useUserContext();
   const navigate = useNavigate();
+  const userId = user?.id;
 
   // Implementing Modal for Creating a household
   const [showHouseholdForm, setShowHouseholdForm] = useState(false);
@@ -21,6 +25,11 @@ export default function Navbar() {
   // Function to close the modal
   const closeModal = () => setShowHouseholdForm(false);
 
+  const [showJoinHousehold, setJoinHousehold] = useState(false);
+  // Function to open the modal
+  const openModal2 = () => setJoinHousehold(true);
+  // Function to close the modal
+  const closeModal2 = () => setJoinHousehold(false);
 
 
   // User sign out, redirect to login page
@@ -87,6 +96,22 @@ export default function Navbar() {
               <HouseholdForm onClose={closeModal} /> {/* Render HouseholdForm inside the Modal */}
             </Modal>
           </div>
+          
+          <div>
+            <button 
+              className="inline-flex items-center justify-center whitespace-nowrap text-md font-medium ring-offset-background 
+                transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+                disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3" 
+                onClick={openModal2}>
+              Join Household
+            </button>
+            <Modal2 show={showJoinHousehold} onClose={closeModal2}>
+              <JoinHousehold onClose={closeModal2} userId={userId}/> {/* Render HouseholdForm inside the Modal */}
+            </Modal2>
+            <br></br>
+            <br></br>
+          </div>
+
           <div className="flex flex-col justify-between items-center h-1/3">
             {
               households.map((household) => {
