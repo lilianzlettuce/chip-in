@@ -62,9 +62,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
       return; // Stop execution if user.id is not set
     }
 
-    console.log("in submit:")
-    console.log(user);
-    console.log(user?.id)
     const newHouseholdData = {
       name: householdName,
       members: [user?.id], // like a global variable
