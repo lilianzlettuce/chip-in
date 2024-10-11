@@ -1,0 +1,92 @@
+.verify-code-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #faf7f2;
+    padding: 20px;
+  }
+  
+  .verify-code-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .verify-code-card h2 {
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #dce4e9;
+    background-color: #f7fafd;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .form-input:focus {
+    border-color: #b2becd;
+  }
+  
+  .verify-code-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #6b8f71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .verify-code-button:disabled {
+    background-color: #a8b4a2;
+    cursor: not-allowed;
+  }
+  
+  .verify-code-button:hover:not(:disabled) {
+    background-color: #557a5e;
+  }
+  
+  .message {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .verify-code-card a {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #517387;
+    text-decoration: none;
+  }
+  
+  .verify-code-card a:hover {
+    text-decoration: underline;
+  }  

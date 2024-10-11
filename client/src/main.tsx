@@ -17,6 +17,7 @@ import Login from "./routes/Login";
 import SignUp from "./routes/SignUp";
 import ForgotPass from "./routes/ForgotPass";
 import ErrorPage from "./error-page";
+import VerifyCode from "./routes/VerifyCode";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,11 @@ const router = createBrowserRouter([
   {
     path: "/forgotpass",
     element: <ForgotPass />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path:"/verifycode",
+    element: <VerifyCode />,
     errorElement: <ErrorPage />,
   },
   {

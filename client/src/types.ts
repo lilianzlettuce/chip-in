@@ -1,3 +1,9 @@
+export type HouseholdType = {
+    [x: string]: any;
+    id: string;
+    name: string;
+};
+
 export type HouseholdNavType = {
     id: string;
     name: string;

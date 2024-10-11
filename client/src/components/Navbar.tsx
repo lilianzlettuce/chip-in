@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../assets/chip-in-logo1.png"
+//import logo from "../assets/chip-in-logo1.png"
+import logo from "../assets/chipinlogo.png"
 
 //import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -24,7 +25,7 @@ export default function Navbar() {
     <div>
       <nav className="fixed min-w-48 h-screen mr-4 border-r-4 border-black flex flex-col justify-between items-center">
         <NavLink to="/">
-          <img alt="ChipIn logo" className="h-20 inline" src={logo}></img>
+          <img alt="ChipIn logo" className="inline" src={logo} style={{ height: '8rem', width: 'auto' }}></img>
         </NavLink>
 
         <div onClick={signOut}

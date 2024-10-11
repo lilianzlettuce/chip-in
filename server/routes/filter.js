@@ -42,7 +42,7 @@ router.get('/filterby/:id', async (req, res) => {
                 },
                 {
                     path: 'sharedBetween',
-                    select: 'username'
+                    select: '_id username' // Make sure to select the _id here for comparison
                 }
             ]
         });
@@ -53,9 +53,9 @@ router.get('/filterby/:id', async (req, res) => {
   
         let filteredItems = household.purchasedList;
     
-        // Apply filters if they are provided in the request
         if (category) {
-            filteredItems = filteredItems.filter(item => item.category === category);
+            const categories = Array.isArray(category) ? category : [category];
+            filteredItems = filteredItems.filter(item => categories.includes(item.category));
         }
     
         if (purchasedBy) {
@@ -63,19 +63,19 @@ router.get('/filterby/:id', async (req, res) => {
         }
     
         if (minPrice) {
-            filteredItems = filteredItems.filter(item => (item.cost/100) >= parseFloat(minPrice));
+            filteredItems = filteredItems.filter(item => (item.cost / 100) >= parseFloat(minPrice));
         }
     
         if (maxPrice) {
-            filteredItems = filteredItems.filter(item => (item.cost/100) <= parseFloat(maxPrice));
+            filteredItems = filteredItems.filter(item => (item.cost / 100) <= parseFloat(maxPrice));
         }
 
-        const selectedUsernames = sharedBetween ? sharedBetween.split(',') : [];
-
-        if (selectedUsernames.length > 0) {
+        // Update: Now split the sharedBetween IDs and filter by matching IDs
+        if (sharedBetween) {
+            const selectedIds = sharedBetween.split(',');
             filteredItems = filteredItems.filter(item => {
-                const sharedUsernames = item.sharedBetween.map(user => user.username);
-                return selectedUsernames.every(username => sharedUsernames.includes(username));
+                const sharedIds = item.sharedBetween.map(user => user._id.toString());
+                return selectedIds.every(id => sharedIds.includes(id));
             });
         }
   

@@ -1,6 +1,6 @@
 /* Card container */
 .card-container {
-  background-color: #333;
+  background-color: #0f0f0f;
   padding: 20px;
   border-radius: 10px;
   color: #fff;
@@ -8,18 +8,19 @@
   width: 300px;
   font-family: Arial, sans-serif;
   text-align: left;
+  transition: background-color 0.3s ease, border 0.3s ease;
 }
 
 /* Category badge */
 .category-badge {
-  background-color: #f0f5ea;
+  background-color: #aac884;
   padding: 5px 10px;
   border-radius: 20px;
   display: inline-block;
   font-size: 12px;
   color: #000;
 }
- 
+
 /* Item info: name and price */
 .item-info {
   display: flex;
@@ -30,7 +31,7 @@
 }
 
 .price {
-  background-color: #f4cacd;
+  background-color: #e59398;
   padding: 5px 10px;
   border-radius: 10px;
   font-weight: bold;
@@ -73,10 +74,15 @@
   border: none;
   color: white;
   padding: 5px 10px;
-  cursor: hand;
+  cursor: pointer;
   border-radius: 5px;
 }
 
-.action-button:hover{
+.action-button:hover {
   background-color: #de6161;
+}
+
+.highlight-expiring {
+  border: 2px solid #220b0b; /* Red border */
+  background-color: rgb(80, 22, 22); /* Light red background */
 }
