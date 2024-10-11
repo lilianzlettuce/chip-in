@@ -36,36 +36,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   // Function to handle form submission
-  //const handleJoin = () => {
-  {/*
-  async function handleJoin() {
-    try {
-      console.log(householdName, userId)
-      const response = await fetch('http://localhost:6969/household/join', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, householdName }), // Pass userId and householdName in the request body
-      });
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Error: ${errorData.message}`);
-      }
-  
-      const data = await response.json();
-      console.log('Household joined successfully:', data);
-      alert(`User ${userId} has joined the household: ${data.household.name}`);
-    } catch (error) {
-      console.error('Error joining household:', (error as Error).message);
-      alert(`Failed to join household: ${(error as Error).message}`);
-    }
-    
-    onClose(); // Close the modal after submission
-    }
-    */}
-
     async function handleJoin() {
       try {
         // Step 1: Fetch all households from `http://localhost:6969/household`
@@ -92,13 +63,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
         console.log("found matching household ID", matchingHousehold._id);
         // Extract the `_id` of the matched household
         const householdId = matchingHousehold._id;
-        const trypoop = await fetch('http://localhost:6969/household/poop' , {
-          method: 'PATCH',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({userId,}),
-
-        });
-        console.log("PopoPoop");
+        
         // Step 3: Prepare updated members array
         const updatedMembers = [...matchingHousehold.members, userId]; // Add the user to the existing members
     
@@ -111,14 +76,11 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
           body: JSON.stringify({ userId }), // Send the userId in the request body
         });
     
-        console.log("Step 4 completed");
-
         if (!updateResponse.ok) {
           const errorData = await updateResponse.json();
           throw new Error(`Failed to update household: ${errorData.message}`);
         }
     
-        console.log("Step 4 completed");
 
         const updatedHousehold = await updateResponse.json();
         console.log('Household updated successfully:', updatedHousehold);
