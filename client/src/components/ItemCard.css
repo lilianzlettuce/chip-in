@@ -1,9 +1,7 @@
 /* Card container */
 .card-container {
-  background-color: #0f0f0f;
   padding: 20px;
   border-radius: 10px;
-  color: #fff;
   position: relative;
   width: 300px;
   font-family: Arial, sans-serif;
@@ -40,7 +38,6 @@
 
 /* Shared by section */
 .shared-by-text {
-  display: flex;
   align-items: center;
   margin-top: 10px;
 }
@@ -83,6 +80,5 @@
 }
 
 .highlight-expiring {
-  border: 2px solid #220b0b; /* Red border */
-  background-color: rgb(80, 22, 22); /* Light red background */
+  background-color: rgb(155, 75, 75); /* Light red background */
 }

@@ -22,6 +22,9 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
     setSharedBetween((prev) =>
       checked ? [...prev, value] : prev.filter((roommate) => roommate !== value)
     );
+    setPurchasedBy((prev) =>
+      checked ? [...prev, value] : prev.filter((roommate) => roommate !== value)
+    );
   };
 
   // Function to handle form submission
@@ -42,7 +45,7 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
       householdId: householdId,
       name: name,
       category: category,
-      purchasedBy: sharedIdsArray[0], // Send as strings
+      purchasedBy: purchasedIdsArray[0], // Send as strings
       sharedBetween: sharedIdsArray, // Send as strings
       purchaseDate: '',
       expirationDate: '',
@@ -72,11 +75,8 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
     onSave(requestBody); // Call onSave prop with new item data
     onClose(); // Close the modal
   };
-  
 
- 
-
- return (
+  return (
    <div className="modal-overlay">
      <div className="modal-content">
        <button className="close-button" onClick={onClose}>X</button>
@@ -90,6 +90,20 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
        <div className="input-group">
          <label>Category:</label>
          <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} />
+       </div>
+       <div className="input-group">
+         <label>Assign Purchaser:</label>
+         {roommates.map((roommate) => (
+           <div key={roommate._id}>
+             <input
+               type="radio"
+               value={roommate.name}
+               checked={purchasedBy.includes(roommate.name)}
+               onChange={handleCheckboxChange}
+             />
+             <label>{roommate.name}</label>
+           </div>
+         ))}
        </div>
        <div className="input-group">
          <label>Shared Between:</label>
