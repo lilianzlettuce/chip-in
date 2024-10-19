@@ -7,6 +7,7 @@ import users from "./routes/user.js";
 import households from "./routes/household.js";
 import auth from "./routes/auth.js";
 import filter from "./routes/filter.js"
+import notes from "./routes/alert.js"
 
 const PORT = process.env.PORT || 5050;
 const app = express();
