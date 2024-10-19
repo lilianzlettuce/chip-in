@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useUserContext } from '../UserContext';
+
 import './ItemCard.css';
 
 interface ItemCardProps {
@@ -27,8 +29,13 @@ const ItemCard: React.FC<ItemCardProps> = ({
     onMove,
     listType
 }) => {
+    const { user } = useUserContext();
+    if (!user) return;
+
+    const [isShared] = useState(sharedBy.includes(user.username));
+
     return (
-        <div className={`card-container ${isExpiringSoon ? 'highlight-expiring' : ''}`}>
+        <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>
             <div className="category-badge">{category}</div>
             <div className="item-info">
                 <span>{name}</span>
@@ -46,8 +53,12 @@ const ItemCard: React.FC<ItemCardProps> = ({
                 }  
             </div>
             <div className="actions">
-                <button className="px-4 py-2 bg-gray-600 rounded-md hover:bg-red-400" onClick={onDelete}>Delete</button>
-                <button className="px-4 py-2 bg-gray-600 rounded-md hover:bg-green-400" onClick={onMove}>
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
+                        onClick={sharedBy.includes(user.username) ? onDelete : () => {}}>   
+                    Delete
+                </button>
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`} 
+                        onClick={sharedBy.includes(user.username) ? onMove : () => {}}> 
                     {listType === 'grocery' ? 'Purchase' : 'Repurchase'}
                 </button>
             </div>

@@ -1,9 +1,7 @@
 /* Card container */
 .card-container {
-  background-color: #0f0f0f;
   padding: 20px;
   border-radius: 10px;
-  color: #fff;
   position: relative;
   width: 300px;
   font-family: Arial, sans-serif;
