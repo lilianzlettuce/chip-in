@@ -82,6 +82,5 @@
 }
 
 .highlight-expiring {
-  border: 2px solid #220b0b; /* Red border */
-  background-color: rgb(80, 22, 22); /* Light red background */
+  background-color: rgb(155, 75, 75); /* Light red background */
 }

@@ -229,8 +229,7 @@ export default function Dashboard() {
 
 
     const fetchPurchasedItems = async () => {
-       if (!householdID) return;
-
+        if (!householdID) return;
 
         try {
             const response = await fetch(`http://localhost:6969/household/${householdID}/purchasedlist`);
@@ -242,6 +241,7 @@ export default function Dashboard() {
                 ...item,
                 sharedBetween: item.sharedBetween ?? [],
             }));
+
             setPurchasedItems(normalizedData);
         } catch (error) {
             console.error('Error fetching purchased items:', error);
@@ -250,19 +250,23 @@ export default function Dashboard() {
 
 
     const fetchGroceryItems = async () => {
-       if (!householdID) return;
+        if (!householdID) return;
 
+        try {
+            const response = await fetch(`http://localhost:6969/household/${householdID}/grocerylist`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const normalizedData = data.map((item: any) => ({
+                ...item,
+                sharedBetween: item.sharedBetween ?? [],
+            }));
 
-       try {
-           const response = await fetch(`http://localhost:6969/household/${householdID}/grocerylist`);
-           if (!response.ok) {
-               throw new Error(`HTTP error! status: ${response.status}`);
-           }
-           const data = await response.json();
-           setGroceryItems(data);
-       } catch (error) {
-           console.error('Error fetching grocery items:', error);
-       }
+            setGroceryItems(normalizedData);
+        } catch (error) {
+            console.error('Error fetching grocery items:', error);
+        }
     };
 
 
@@ -551,9 +555,9 @@ export default function Dashboard() {
                     className="add-item-button"
                     onClick={() => setModalOpen3(true)} // Open the modal when clicked
                 >
-                Add Item
+                    Add Item
                 </button>
-                {/* hi Collapse Button */}
+                {/* Collapse Button */}
                 <button onClick={toggleCollapse2} className="collapse-button">
                     {isCollapsed2 ? 'More' : 'Less'}
                 </button>
@@ -569,8 +573,10 @@ export default function Dashboard() {
                                         category={item['category']}
                                         name={item['name']}
                                         price={item['cost'] || 0}
-                                        sharedBy={[]}
-                                        purchasedBy={'N/A'}
+                                        sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
+                                            (user) => user.username || 'Unknown'
+                                        )}
+                                        purchasedBy={item['purchasedBy']?.username || 'Unknown'}
                                         expiryDate={
                                             item['expirationDate']
                                                 ? new Date(item['expirationDate']).toLocaleDateString()

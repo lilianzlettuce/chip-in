@@ -41,7 +41,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
             </div>
             <div className="footer">
                 <div>{listType == 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{purchasedBy}</b></div>
-                <div className="expiry">Expires {expiryDate}</div>
+                {listType == 'purchased' &&
+                    <div className="expiry">Expires {expiryDate}</div>
+                }  
             </div>
             <div className="actions">
                 <button className="px-4 py-2 bg-gray-600 rounded-md hover:bg-red-400" onClick={onDelete}>Delete</button>

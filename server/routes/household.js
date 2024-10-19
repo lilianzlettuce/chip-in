@@ -228,7 +228,19 @@ router.get("/:id/grocerylist", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const household = await Household.findById(id).populate('groceryList');
+    const household = await Household.findById(id).populate({
+      path: 'groceryList',
+      populate: [
+        {
+          path: 'purchasedBy',  
+          select: 'username'    
+        },
+        {
+          path: 'sharedBetween',
+          select: 'username'
+        }
+      ]
+    });
 
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
@@ -248,14 +260,14 @@ router.get("/:id/purchasedlist", async (req, res) => {
     const household = await Household.findById(id).populate({
       path: 'purchasedList',
       populate: [
-          {
-              path: 'purchasedBy',  
-              select: 'username'    
-          },
-          {
-              path: 'sharedBetween',
-              select: 'username'
-          }
+        {
+          path: 'purchasedBy',  
+          select: 'username'    
+        },
+        {
+          path: 'sharedBetween',
+          select: 'username'
+        }
       ]
     });
 

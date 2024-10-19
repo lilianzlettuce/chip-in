@@ -78,9 +78,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
     onSave(requestBody); // Call onSave prop with new item data
     onClose(); // Close the modal
   };
-  
-
- 
 
  return (
    <div className="modal-overlay">
