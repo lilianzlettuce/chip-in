@@ -5,7 +5,15 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true },
     password: { type: String, required: true },
     households: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Household', required: false }],
-    preferences: { type: [Boolean], required: false},
+    preferences: {
+        type: Map,
+        of: {type: String, enum: ['all', 'relevant', 'none']},
+        required: false,
+        default: {
+            expirationNotif: 'all',
+            paymentNotif: 'all',
+        }
+    },
     pfp: {type: String, required: false},
     bio: {type: String, reqired: false}
 });
