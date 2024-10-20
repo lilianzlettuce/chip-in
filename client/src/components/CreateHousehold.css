@@ -71,10 +71,14 @@
   }
   
   .input-field {
+    all: unset;
+    background-color: white !important;
     flex: 1; /* Take remaining space */
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
+    color: black !important;
+    display: block !important;
   }
   
   .file-input {
