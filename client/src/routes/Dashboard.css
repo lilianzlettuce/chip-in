@@ -13,14 +13,36 @@
   margin: 30px 0;
   padding: 20px;
   border-radius: 8px;
-  background-color: #d3b7aafc;
+  background-color: #d9ccc6fc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
+  display: flex;
+  align-items: center;
   font-size: 1.8rem;
-  margin-bottom: 15px;
   color: #333;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.collapse-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #333;
+  transition: transform 0.3s;
+}
+
+.collapse-icon:hover {
+  color: #000;
 }
 
 .dashboard-controls {
@@ -124,16 +146,16 @@
 }
 
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
 }
 
 .modal {

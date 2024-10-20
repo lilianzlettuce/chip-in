@@ -33,15 +33,13 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
     if (!user) return <div>No User</div>;
 
-    // Debugging: log to verify props
     console.log("ItemCard Props:", {
         category, name, price, sharedBy, purchasedBy, expiryDate
     });
 
-    // Use defaults if some data is missing
     const displayPurchasedBy = purchasedBy ? purchasedBy : 'Unknown';
     const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
-    const displayPrice = price ? `$${(price / 100).toFixed(2)}` : 'N/A';
+    const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
     const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
 
     return (

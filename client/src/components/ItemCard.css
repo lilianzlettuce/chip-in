@@ -57,22 +57,22 @@
   font-size: 12px;
 }
 
-/* Actions: edit and delete buttons */
 .actions {
   position: absolute;
   top: 10px;
   right: 10px;
   display: flex;
-  gap: 10px;
+  gap: 5px;
 }
 
 .action-button {
   background-color: #555;
   border: none;
   color: white;
-  padding: 5px 10px;
+  padding: 3px 8px;
   cursor: pointer;
   border-radius: 5px;
+  font-size: 12px;
 }
 
 .action-button:hover {
@@ -80,5 +80,5 @@
 }
 
 .highlight-expiring {
-  background-color: rgb(155, 75, 75); /* Light red background */
+  background-color: rgb(82, 26, 26);
 }

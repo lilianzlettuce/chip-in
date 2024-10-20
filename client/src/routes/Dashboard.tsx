@@ -12,17 +12,8 @@ import './AddItem.css';
 
 export default function Dashboard() {
     const { user } = useUserContext();
-    // const householdID = user?.households[0];
-    // get householdID from parameter
-
-
     const { householdId } = useParams();
     const householdID = householdId
-
-
-    //const {house} = useParams();
-    //const householdID = house
-
 
     const [purchasedItems, setPurchasedItems] = useState([]);
     const [groceryItems, setGroceryItems] = useState([]);
@@ -76,15 +67,8 @@ export default function Dashboard() {
             }
             const results = await response.json();
 
-            console.log("Search results:", results);
-
-            results.forEach((item: { listType: any; }) => console.log("Item listType:", item.listType));
-
             const purchased = results.filter((item: { listType: string; }) => item.listType === 'purchased');
             const grocery = results.filter((item: { listType: string; }) => item.listType === 'grocery');
-
-            console.log("Purchased Items:", purchased);
-            console.log("Grocery Items:", grocery);
 
             setPurchasedItems(purchased);
             setGroceryItems(grocery);
@@ -152,8 +136,9 @@ export default function Dashboard() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // If moving to the grocery list, delete the item from the purchased list in the backend
+            // If moving to the grocery list, keep the item in purchased list in the backend
             if (targetList === 'grocery') {
+                /*
                 const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
                     method: 'DELETE',
                 });
@@ -166,6 +151,7 @@ export default function Dashboard() {
 
                 // Update frontend state to remove item from the purchased list
                 setPurchasedItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
+                */
             } else {
                 // If moving to the purchased list, delete the item from the grocery list
                 const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
@@ -545,18 +531,21 @@ export default function Dashboard() {
 
             {/* Purchased Items Section */}
             <div className="dashboard-section">
-                <h2 className="section-title">Inventory</h2>
-                {/* Add Item Button*/}
-                <button
-                    className="add-item-button"
-                    onClick={() => setModalOpen2(true)} // Open the modal when clicked
-                >
-                    Add Item
-                </button>
-                {/* hi Collapse Button */}
-                <button onClick={toggleCollapse} className="collapse-button">
-                    {isCollapsed ? 'view more' : 'view less'}
-                </button>
+                <div className="section-header">
+                    <h2 className="section-title">
+                        Inventory
+                        <button onClick={toggleCollapse} className="collapse-icon">
+                            {isCollapsed ? '▲' : '▼'}
+                        </button>
+                    </h2>
+                    {/* Add Item Button*/}
+                    <button
+                        className="add-item-button"
+                        onClick={() => setModalOpen2(true)} // Open the modal when clicked
+                    >
+                        ADD ITEM +
+                    </button>
+                </div>
                 {!isCollapsed && (
                     <ul className="dashboard-item-list">
                         {purchasedItems.length === 0 ? (
@@ -616,18 +605,21 @@ export default function Dashboard() {
 
             {/* Grocery List Section */}
             <div className="dashboard-section">
-                <h2 className="section-title">Grocery List</h2>
-                {/* Add Item Button*/}
-                <button
-                    className="add-item-button"
-                    onClick={() => setModalOpen3(true)} // Open the modal when clicked
-                >
-                    Add Item
-                </button>
-                {/* Collapse Button */}
-                <button onClick={toggleCollapse2} className="collapse-button">
-                    {isCollapsed2 ? 'More' : 'Less'}
-                </button>
+                <div className="section-header">
+                    <h2 className="section-title">
+                        Grocery List
+                        <button onClick={toggleCollapse2} className="collapse-icon">
+                            {isCollapsed2 ? '▲' : '▼'}
+                        </button>
+                    </h2>
+                    {/* Add Item Button*/}
+                    <button
+                        className="add-item-button"
+                        onClick={() => setModalOpen3(true)} // Open the modal when clicked
+                    >
+                        ADD ITEM +
+                    </button>
+                </div>
                 {!isCollapsed2 && (
                     <ul className="dashboard-item-list">
                         {groceryItems.length === 0 ? (
