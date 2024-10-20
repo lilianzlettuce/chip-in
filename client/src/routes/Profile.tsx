@@ -29,6 +29,9 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
   const [bio, setBio] = useState<String>(' ');
   const [profileImage, setProfileImage] = useState<string>(defaultPFP); // State to handle profile image
 
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
   //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
 
   // Effect to set the initial image if imageUrl is not provided
@@ -108,9 +111,14 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
       });
   
       if (response.ok) {
+        setAlertMessage("Profile picture updated successfully!");
+        setIsAlertOpen(true);
         console.log('Profile picture updated successfully!');
       } else {
+        setAlertMessage("Failed to update profile picture. Please recheck image size.");
+        setIsAlertOpen(true);
         console.error('Failed to update profile picture.');
+        
       }
     } catch (error) {
       console.error('Error:', error);
@@ -118,31 +126,8 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
   };
   
 
-  // send to server
-  // const handleSubmit = async (file: File | null) => {
-  //   if (file) {
-  //     const formData = new FormData();
-  //     formData.append('file', file); // Attach the file to the form data
-  
-  //     try {
-  //       const response = await fetch('your-server-endpoint/upload', {
-  //         method: 'POST',
-  //         body: formData,
-  //       });
-  //       if (response.ok) {
-  //         console.log('Image uploaded successfully!');
-  //       } else {
-  //         console.error('Failed to upload image.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error uploading image:', error);
-  //     }
-  //   } else {
-  //     console.warn('No image file selected.');
-  //   }
-  // };
-
   // END UPLOAD PICTURE
+
 
   return (
     <div className="profile-summary-card">
@@ -170,6 +155,16 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
           />
         </div>
       </div>
+
+      {/* Confirmation popup */}
+      {isAlertOpen && (
+        <div className="alert-modal">
+          <div className="alert-modal-content">
+            <p>{alertMessage}</p>
+            <button onClick={() => setIsAlertOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
 
       {/* Payment Summary Section */}
       <div className="payment-summary">
@@ -244,6 +239,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const openModal = () => setShowConfirmDelete(true);
   const closeModal = () => setShowConfirmDelete(false);
 
+  // Alert modal
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  // Success modal
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
   //update disply fields when props state change
   useEffect(() => {
     setDisplayName(email || '');
@@ -262,7 +265,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   // Event handler function for the button click
   const handleChangeNameClick = async () => {
       setDisplayName(tempName);
-      alert(`${tempName} has been changed successfully`);
+      // alert(`${tempName} has been changed successfully`);
+      setIsSuccessOpen(true);
+      setSuccessMessage(`${tempName} has been changed successfully`);
   
       const url = `http://localhost:${PORT}/user/${user?.id}`;
 
@@ -288,12 +293,41 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         console.error('Error:', error);
       }
   };
+  
   const handleChangeUserNameClick = async () => {
     console.log("temp username", tempUsername)
     //if (isEditing == true) {
-      setDisplayUsername(tempUsername);
-      alert(`${tempUsername} has been changed successfully`);
+    //  setDisplayUsername(tempUsername);
+    //  alert(`${tempUsername} has been changed successfully`);
     //}
+
+    try {
+      console.log("display username", displayUsername)
+      const uniqueChkresponse = await fetch(`http://localhost:${PORT}/user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (uniqueChkresponse.ok) {
+        const AllUsersData = await uniqueChkresponse.json();
+        console.log('All users data', AllUsersData);
+
+        const userexists = AllUsersData.find((user: { username: string }) => user.username === tempUsername);
+        if (userexists) {
+          console.log('error, ${tempUsername} exists');
+          // alert(`Error: ${tempUsername} username already exists, please choose a different username`);
+          setIsAlertOpen(true);
+          setAlertMessage(`${tempUsername} username already exists, please choose a different username`);
+          return;
+        }
+      } else {
+        console.error("Failed to fetch user profile");
+      }
+    } catch (err) {
+      console.error('error fetching user profile:', err);
+    }
 
     const url = `http://localhost:${PORT}/user/${user?.id}`;
 
@@ -310,7 +344,11 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       });
   
       if (response.ok) {
-        console.log('Username updated successfully!');
+        console.log('Username ${tempUsername} updated successfully!');
+        // alert(`Username ${tempUsername} updated successfully!`);
+        setIsSuccessOpen(true);
+        setSuccessMessage(`Username ${tempUsername} updated successfully!`);
+        setDisplayUsername(tempUsername);
         setRefreshProfile((prev) => prev + 1);
       } else {
         console.error('Failed to update username.');
@@ -327,8 +365,27 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   };*/
   // handles validation
   const handleChangePasswordClick = async () => {
+    // current client webpack is not setup to use password-validator
+    //const passwordValid = pwSchema.validate(tempPassword? tempPassword : "");
+
+    if (!isValidPassword(tempPassword? tempPassword : "")) {
+    //if (!passwordValid) {
+      // alert("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no space.");
+      setIsAlertOpen(true);
+      setAlertMessage("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no spaces.")
+      return;
+    }
+
+    //else {
+    //  setDisplayPassword(tempPassword);
+      // Password meets all criteria
+    //  alert("Password has been changed successfully");
+    //} 
+
     setDisplayPassword(tempPassword);
-    alert("Password has been changed successfully");
+    // alert("Password has been changed successfully");
+    setIsSuccessOpen(true);
+    setSuccessMessage("Password has been changed.");
       
     const url = `http://localhost:${PORT}/user/${user?.id}`;
 
@@ -354,9 +411,23 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     }
   };
 
+  // handle closing alerts
+  const closeAlert = () => {
+    setIsAlertOpen(false);
+    setAlertMessage('');
+  };
+
+  // handle closing successful edits
+  const closeSuccess = () => {
+    setIsSuccessOpen(false);
+    setSuccessMessage('');
+  };
+
   const handleChangeBioClick = async () => {
     setDisplayPassword(tempBio);
-    alert("Bio has been changed successfully");
+    // alert("Bio has been changed successfully");
+    setIsSuccessOpen(true);
+    setSuccessMessage("Bio has been changed successfully")
       
     const url = `http://localhost:${PORT}/user/${user?.id}`;
 
@@ -381,8 +452,26 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       console.error('Error:', error);
     }
   };
+
+  const isValidPassword = (password: string): boolean => {
+    // Check for minimum length of 12 characters
+    const isLongEnough = password.length >= 6 && password.length <= 25;
   
-  // Helper function to validate password
+    // Check for at least one Upper case alphabet 
+    const hasUpperAlphabet = /[A-Z]/.test(password);
+
+    // Check for at least one Lower case alphabet 
+    const hasLowerAlphabet = /[a-z]/.test(password);
+
+    // Check for at least one number
+    const hasNumber = /[0-9]/.test(password);
+
+    const hasNoSpaces = !password.includes(' ');
+
+    return isLongEnough && hasUpperAlphabet && hasLowerAlphabet && hasNumber && hasNoSpaces;
+  };
+  
+  /*// Helper function to validate password
   const isValidPassword = (password: string): boolean => {
     // Check for minimum length of 12 characters
     const isLongEnough = password.length >= 12;
@@ -394,7 +483,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     const hasNumber = /[0-9]/.test(password);
 
     return isLongEnough && hasAlphabet && hasNumber;
-  };
+  };*/
 
   // Event handler to toggle edit mode or display mode
   const handleEditClick = () => {
@@ -447,6 +536,17 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
            {isEditing && (
               <button className="change-button" onClick={handleChangeNameClick}>CHANGE EMAIL</button>
            )}
+
+           {/* confirmation popup */}
+          {isSuccessOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Success!</h3>
+                    <p>{successMessage}</p>
+                    <button onClick={closeSuccess}>Close</button>
+                </div>
+            </div>
+          )}
         </div>
 
         {/* Username */}
@@ -459,6 +559,29 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           {isEditing && (
           <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
           )}
+
+          {/* confirmation popup */}
+          {isAlertOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Error!</h3>
+                    <p>{alertMessage}</p>
+                    <button onClick={closeAlert}>Close</button>
+                </div>
+            </div>
+          )}
+
+          {/* confirmation popup */}
+          {isSuccessOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Success!</h3>
+                    <p>{successMessage}</p>
+                    <button onClick={closeSuccess}>Close</button>
+                </div>
+            </div>
+          )}
+
         </div>
 
         {/* Password */}
@@ -474,6 +597,28 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           {isEditing && (
           <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
           )}
+
+          {/* confirmation popup */}
+          {isAlertOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Error!</h3>
+                    <p>{alertMessage}</p>
+                    <button onClick={closeAlert}>Close</button>
+                </div>
+            </div>
+          )}
+
+          {/* confirmation popup */}
+          {isSuccessOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Success!</h3>
+                    <p>{successMessage}</p>
+                    <button onClick={closeSuccess}>Close</button>
+                </div>
+            </div>
+          )}
         </div>
 
         {/* Bio */}
@@ -488,6 +633,17 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
               onChange={(e) => setTempBio(e.target.value)} />
           {isEditing && (
           <button className="change-button" onClick={handleChangeBioClick}>CHANGE BIO</button>
+          )}
+
+          {/* confirmation popup */}
+          {isSuccessOpen && (
+            <div className="alert-modal">
+                <div className="alert-modal-content">
+                    <h3>Success!</h3>
+                    <p>{successMessage}</p>
+                    <button onClick={closeSuccess}>Close</button>
+                </div>
+            </div>
           )}
         </div>
       </div>
