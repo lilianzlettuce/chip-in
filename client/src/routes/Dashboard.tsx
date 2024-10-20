@@ -44,7 +44,6 @@ export default function Dashboard() {
 
 
     // Collapsing feature
-    // hi
     const [isCollapsed, setIsCollapsed] = useState(false)
     const [isCollapsed2, setIsCollapsed2] = useState(false)
 
@@ -76,6 +75,10 @@ export default function Dashboard() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const results = await response.json();
+
+            console.log("Search results:", results);
+
+            results.forEach((item: { listType: any; }) => console.log("Item listType:", item.listType));
 
             const purchased = results.filter((item: { listType: string; }) => item.listType === 'purchased');
             const grocery = results.filter((item: { listType: string; }) => item.listType === 'grocery');
@@ -542,7 +545,6 @@ export default function Dashboard() {
 
             {/* Purchased Items Section */}
             <div className="dashboard-section">
-
                 <h2 className="section-title">Inventory</h2>
                 {/* Add Item Button*/}
                 <button
@@ -558,7 +560,11 @@ export default function Dashboard() {
                 {!isCollapsed && (
                     <ul className="dashboard-item-list">
                         {purchasedItems.length === 0 ? (
-                            <li className="dashboard-item">No purchased items</li>
+                            isSearching ? (
+                                <li className="dashboard-item">No purchased items</li>
+                            ) : (
+                                <li className="dashboard-item">No matching items</li>
+                            )
                         ) : (
                             purchasedItems.map((item: any) => (
                                 <li key={item['_id']}>
@@ -625,7 +631,11 @@ export default function Dashboard() {
                 {!isCollapsed2 && (
                     <ul className="dashboard-item-list">
                         {groceryItems.length === 0 ? (
-                            <li className="dashboard-item">No items to purchase</li>
+                            isSearching ? (
+                                <li className="dashboard-item">No items to purchase</li>
+                            ) : (
+                                <li className="dashboard-item">No matching items</li>
+                            )
                         ) : (
                             groceryItems.map((item: any) => (
                                 <li key={item['_id']}>
