@@ -7,6 +7,9 @@ import users from "./routes/user.js";
 import households from "./routes/household.js";
 import auth from "./routes/auth.js";
 import filter from "./routes/filter.js"
+import alerts from "./routes/alert.js"
+
+import "./cronjobs/cronjobs.js"
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -21,6 +24,7 @@ app.use("/item", items);
 app.use("/user", users);
 app.use("/household", households);
 app.use("/filter", filter);
+app.use("/alert", alerts)
 
 // Auth route
 app.use("/auth", auth);

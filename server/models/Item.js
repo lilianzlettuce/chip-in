@@ -2,7 +2,10 @@ import mongoose, { mongo }  from "mongoose";
 
 const itemSchema = new mongoose.Schema({
     name: { type: String, required: true},
-    category: { type: String, required: true },
+    category: { 
+        type: String,
+        enum: ['Food', 'Cleaning', 'Toiletries', 'Pet'],
+        required: true },
     purchasedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     sharedBetween: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false }],
     purchaseDate: { type: Date, required: false},

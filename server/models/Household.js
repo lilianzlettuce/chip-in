@@ -7,9 +7,20 @@ const debtSchema = new mongoose.Schema({
 }, { _id: false });
 
 const alertSchema = new mongoose.Schema({
+    category: {
+        type: String,
+        enum: ['Payment', 'Nudge', 'Expiration'],
+        required: true},
+    content: { type: String, required: true},
+    recipients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+    date: {type: Date, required: true}
+});
+
+const noteSchema = new mongoose.Schema({
     category: { type: String, required: true},
-    content: { type: String, required: true}
-}, { _id: false });
+    content: { type: String, required: true},
+    urgent: { type: Boolean, required: false, default: false}
+});
 
 
 const householdSchema = new mongoose.Schema({
@@ -19,6 +30,7 @@ const householdSchema = new mongoose.Schema({
     purchasedList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: false }],
     debts: [debtSchema],
     alerts: [alertSchema],
+    notes: [noteSchema],
     notes: { type: [String], required: false},
     recipes: { type: [String], required: false},
     purchaseHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: false }],
