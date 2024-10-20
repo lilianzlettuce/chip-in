@@ -22,11 +22,6 @@
     color: #222324;
     font-weight: 900;
 }
-
-h4 {
-    margin: 0; 
-    font-weight: 900;
-}
     
 .expense-status {
     display: flex;
@@ -92,7 +87,7 @@ h4 {
     margin: 10px 0;
 }*/
 
-button {
+.expense-card button {
     margin: 10px;
     padding: 10px 15px;
     background-color: #333;
@@ -102,11 +97,11 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+.expense-card button:hover {
     background-color: #555;
 }
 
-input[type="number"] {
+.expense-card input[type="number"] {
     padding: 10px;
     margin: 10px;
     border: 1px solid #ccc;
