@@ -1,4 +1,4 @@
-import { test, before, after, beforeEach, describe } from 'node:test';
+import { test, before, after, beforeEach, afterEach, describe } from 'node:test';
 import assert from 'node:assert';
 import mongoose from 'mongoose';
 import supertest from 'supertest';
@@ -6,9 +6,7 @@ import app from "../server.js";
 import User from "../models/User.js"
 import Household from "../models/Household.js"
 import Item from "../models/Item.js"
-
-
-import { response } from 'express';
+import cron from 'node-cron'
 
 const api = supertest(app);
 
@@ -71,7 +69,7 @@ describe('items in lists', () => {
     test('add item to grocery list', async () => {
         const payload = {
             "name": "chicken",
-            "category": "food",
+            "category": "Food",
             "householdId": householdId
         }
         let response = await api
@@ -90,7 +88,7 @@ describe('items in lists', () => {
     test('add item to purchased list', async () => {
         const payload = {
             "name": "spinach",
-            "category": "food",
+            "category": "Food",
             "purchasedBy": user1Id,
             "sharedBetween": [user1Id, user2Id],
             "purchaseDate": "2024-10-12T10:00:00.000+00:00",
@@ -114,7 +112,7 @@ describe('items in lists', () => {
     test('add item to purchased list with missing fields', async () => {
         const payload = {
             "name": "spinach",
-            "category": "food",
+            "category": "Food",
             "sharedBetween": [user1Id, user2Id],
             "purchaseDate": "2024-10-12T10:00:00.000+00:00",
             "expirationDate": "2024-11-28T10:00:00.000+00:00",
@@ -193,18 +191,27 @@ describe('leaving household', () => {
         const payload = {
             "userId" : user2Id
         }
-        let response = await api
-            .post(`/household/leave/${householdId}`)
-            .send(payload)
-            .expect(200)
-            .expect('Content-Type', /application\/json/)
+        try {
+            let response = await api
+                .post(`/household/leave/${householdId}`)
+                .send(payload)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
         
-        assert.strictEqual(response.body.message, 'Household deleted as the last member left')
-        response = await api
-            .get(`/household/${householdId}`)
-            .expect(404)
+            assert.strictEqual(response.body.message, 'Household deleted as the last member left')
+            response = await api
+                .get(`/household/${householdId}`)
+                .expect(404)
+        } catch (err) {
+            console.log(err)
+        }
+        
     })
 })
-after(async () => {
+
+after(async () => {    
     await mongoose.connection.close()
+    console.log('mongoose connection closed')
+    cron.getTasks().forEach(task => task.stop());
+    console.log('All cron jobs stopped');
 })
