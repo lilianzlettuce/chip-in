@@ -12,7 +12,8 @@ const alertSchema = new mongoose.Schema({
         enum: ['Payment', 'Nudge', 'Expiration'],
         required: true},
     content: { type: String, required: true},
-    recipient: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }]
+    recipients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+    date: {type: Date, required: true}
 });
 
 const noteSchema = new mongoose.Schema({
