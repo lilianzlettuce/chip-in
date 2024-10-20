@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useUserContext } from '../UserContext';
-
 import './ItemCard.css';
 
 interface ItemCardProps {
@@ -30,7 +29,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
     listType
 }) => {
     const { user } = useUserContext();
-    if (!user) return;
+
+    if (!user) return null;
 
     const [isShared] = useState(sharedBy.includes(user.username));
 
@@ -39,7 +39,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
             <div className="category-badge">{category}</div>
             <div className="item-info">
                 <span>{name}</span>
-                {listType == 'purchased' &&
+                {listType === 'purchased' &&
                     <span className="price">${price.toFixed(2)}</span>
                 }
             </div>
@@ -47,18 +47,18 @@ const ItemCard: React.FC<ItemCardProps> = ({
                 Shared by <b>{sharedBy.length > 0 ? sharedBy.join(', ') : 'No one'}</b>
             </div>
             <div className="footer">
-                <div>{listType == 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{purchasedBy}</b></div>
-                {listType == 'purchased' &&
+                <div>{listType === 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{purchasedBy}</b></div>
+                {listType === 'purchased' &&
                     <div className="expiry">Expires {expiryDate}</div>
-                }  
+                }
             </div>
             <div className="actions">
                 <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
-                        onClick={sharedBy.includes(user.username) ? onDelete : () => {}}>   
+                    onClick={isShared ? onDelete : () => { }}>
                     Delete
                 </button>
-                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`} 
-                        onClick={sharedBy.includes(user.username) ? onMove : () => {}}> 
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onMove : () => { }}>
                     {listType === 'grocery' ? 'Purchase' : 'Repurchase'}
                 </button>
             </div>
