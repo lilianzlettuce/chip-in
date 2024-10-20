@@ -3,13 +3,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #87a69d; /* Use a similar color to match the screenshot */
+  background-color: #87a69d;
+  /* Use a similar color to match the screenshot */
   border-radius: 15px;
   padding: 20px;
-  width: 1000px; /* Width of the entire card */
+  width: 1000px;
+  /* Width of the entire card */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 20px auto;
-  color: #ffffff; /* White text color */
+  color: #ffffff;
+  /* White text color */
 }
 
 .profile-section {
@@ -18,11 +21,13 @@
 }
 
 .profile-image {
-  width: 80px; /* Set the width and height for the profile image */
+  width: 80px;
+  /* Set the width and height for the profile image */
   height: 80px;
   border-radius: 50%;
   margin-right: 20px;
-  border: 2px solid #ffffff; /* White border for the image */
+  border: 2px solid #ffffff;
+  /* White border for the image */
 }
 
 .change-image {
@@ -64,7 +69,8 @@
 .summary-details {
   display: grid;
   grid-template-columns: repeat(2, auto);
-  gap: 10px 20px; /* Gap between the items */
+  gap: 10px 20px;
+  /* Gap between the items */
 }
 
 .summary-item {
@@ -177,7 +183,8 @@
 
 /* ----------------- CSS for uploading image --------------*/
 .upload-button {
-  background-color: #325374; /* Green background */
+  background-color: #325374;
+  /* Green background */
   color: white;
   border: none;
   padding: 8px 12px;
@@ -329,15 +336,23 @@
 
 .alert-modal-content button {
   padding: 10px 20px;
-  background-color: #007BFF; /* Blue background */
-  color: white; /* White text */
-  border: 2px solid #0056b3; /* Solid border with darker blue color */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer on hover */
-  font-size: 1em; /* Adjust font size */
+  background-color: #007BFF;
+  /* Blue background */
+  color: white;
+  /* White text */
+  border: 2px solid #0056b3;
+  /* Solid border with darker blue color */
+  border-radius: 5px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer on hover */
+  font-size: 1em;
+  /* Adjust font size */
 }
 
 .alert-modal-content button:hover {
-  background-color: #0056b3; /* Darken background on hover */
-  border-color: #003d80; /* Darken the border on hover */
+  background-color: #0056b3;
+  /* Darken background on hover */
+  border-color: #003d80;
+  /* Darken the border on hover */
 }

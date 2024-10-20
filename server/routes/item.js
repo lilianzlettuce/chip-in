@@ -4,7 +4,7 @@ import Household from '../models/Household.js';
 
 const router = express.Router();
 
-// Delete item by ID from either grocery or purchased list
+//delete item by ID from either grocery or purchased list
 router.delete('/:listType/:id', async (req, res) => {
   const { listType, id } = req.params;
   const { householdId } = req.query;
@@ -37,14 +37,14 @@ router.post('/addtogrocery', async (req, res) => {
 
     const household = await Household.findByIdAndUpdate(
       householdId,
-      {$push: {groceryList: item._id}},
-      {new: true, useFindandModify: false}
+      { $push: { groceryList: item._id } },
+      { new: true, useFindandModify: false }
     );
-    
+
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-    
+
     res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -67,16 +67,42 @@ router.post('/addtopurchased', async (req, res) => {
 
     const household = await Household.findByIdAndUpdate(
       householdId,
-      {$push: {purchasedList: item._id}},
-      {new: true, useFindandModify: false}
+      { $push: { purchasedList: item._id } },
+      { new: true, useFindandModify: false }
     );
-    
+
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-    
+
     res.status(201).json(item);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//get based on searched name
+router.get('/search', async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    const items = await Item.find({ name: new RegExp(name, 'i') })
+      .populate('purchasedBy', 'username')
+      .populate('sharedBetween', 'username');
+
+    const itemsWithListType = await Promise.all(items.map(async (item) => {
+      try {
+        const isPurchased = await Household.exists({ purchasedList: item._id });
+        const listType = isPurchased ? 'purchased' : 'grocery';
+        return { ...item.toObject(), listType };
+      } catch (error) {
+        console.error(`Error determining list type for item ${item._id}:`, error);
+        return { ...item.toObject(), listType: 'unknown' };
+      }
+    }));
+    res.status(200).json(itemsWithListType);
+  } catch (err) {
+    console.error('Error searching items:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -87,7 +113,7 @@ router.get('/', async (req, res) => {
     const items = await Item.find();
     res.status(200).send(items);
   } catch (err) {
-    res.status(500).send({err})
+    res.status(500).send({ err })
   }
 });
 
