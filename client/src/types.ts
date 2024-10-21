@@ -8,6 +8,14 @@ export type HouseholdNavType = {
     id: string;
     name: string;
 };
+
+export type AlertType = {
+    _id: string;
+    date: string;
+    category: "Payment" | "Nudge" | "Expiration";
+    content: string;
+    recipients: string[];
+}
   
 export type PreferencesType = {
     theme: string;

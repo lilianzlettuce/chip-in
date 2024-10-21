@@ -58,11 +58,6 @@ export default function Navbar() {
         <div className="flex flex-col justify-between items-center">
           {households.length > 0 &&
             <div className="flex flex-col justify-between items-center">
-              <NavLink to={`/households/${householdId ? householdId : households[0].id}/home`}
-                  style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
-                  className="p-3 rounded-md">
-                Home
-              </NavLink>
               <NavLink to={`/households/${householdId ? householdId : households[0].id}/dashboard`}
                   style={({ isActive }) => ({ color: isActive ? 'white' : 'black', backgroundColor: isActive ? 'black' : 'transparent' })}
                   className="p-3 rounded-md">
