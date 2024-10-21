@@ -1,0 +1,100 @@
+/* Modal Styles */
+/* Prevent background scrolling */
+.body-no-scroll {
+    overflow: hidden;
+}
+
+.modal-overlay {
+    position: fixed; /* Fix the modal to the screen */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999999999999999; /* Ensure it's on top */
+    padding-top: 0;
+  }
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 1600px; /* Increase maximum width for larger modal */
+    width: 90%; /* Take up 90% of the viewport width */
+    max-height: 90vh; /* Ensure the modal doesn’t exceed 90% of the viewport height */
+    overflow-y: auto; /* Allow scrolling if content exceeds height */
+    position: relative;
+    align-items: center;
+    z-index: 10000;
+  }
+
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10001;
+  }
+  
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px; /* Space between input groups */
+  }
+  
+  .input-group {
+    /*display: flex;*/
+    width: 100%;
+    margin-bottom: 15px;
+    /* align-items: center; */
+  }
+  
+  .label-button {
+    background-color: #2e78f8; /* Button background color */
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 15px; /* Space between label and input field */
+    white-space: nowrap;        /* Prevent text from wrapping */
+    width: 100%;                /* Set width to take up the full available width */
+    max-width: 300px;           /* Or set a specific width to control how wide the button should be */
+    text-align: center;
+  }
+  
+  .input-field {
+    all: unset;
+    background-color: white !important;
+    flex: 1; /* Take remaining space */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    color: black !important;
+    display: block !important;
+  }
+  
+  /* Button styles for submit */
+  .submit-button {
+    background-color: #2e78f8;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #1a5cb8;
+  }
+  

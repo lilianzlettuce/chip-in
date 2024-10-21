@@ -2,6 +2,7 @@ import express from 'express';
 import Household from '../models/Household.js';
 import User from '../models/User.js'
 import Item from '../models/Item.js'
+import mongoose from 'mongoose'; 
 
 const router = express.Router();
 
@@ -191,6 +192,12 @@ router.post("/addUser/:id", async (req, res) => {
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
+        }
+
+        // check to make sure that user is not in household
+        if (user.households.some(household => household.equals(new mongoose.Types.ObjectId(householdId)))) {
+          console.log("User is already in the household");
+          return res.status(400).json({ message: 'User is already in the household' });
         }
         
         // add household to user
