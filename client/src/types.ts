@@ -35,5 +35,9 @@ export type UserType = {
     username: string,
     email: string,
     households: string[],
-    preferences:  boolean[],
+    preferences:  {
+        expirationNotif: "all" | "relevant" | "none",
+        paymentNotif:  "all" | "relevant" | "none",
+    },
+    //preferences:  boolean[],
 }
