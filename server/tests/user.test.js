@@ -1,10 +1,11 @@
 import { test, before, after, beforeEach, describe } from 'node:test';
 import assert from 'node:assert';
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 import supertest from 'supertest';
 import app from "../server.js";
 import User from "../models/User.js"
 import { response } from 'express';
+import cron from 'node-cron'
 
 const api = supertest(app);
 
@@ -36,6 +37,7 @@ describe('signup/login', () => {
             .send(user)
             .expect(200)
             .expect('Content-Type', /application\/json/)
+            
 
         assert.strictEqual(response.body.error, "Invalid Password")
     })
@@ -58,4 +60,7 @@ describe('signup/login', () => {
 
 after(async () => {
     await mongoose.connection.close()
+    console.log('mongoose connection closed')
+    cron.getTasks().forEach(task => task.stop());
+    console.log('All cron jobs stopped');
 })
