@@ -10,8 +10,19 @@ router.get('/:id', async (req, res) => {
     const householdId = req.params.id;
     try {
         const household = await Household.findById(householdId);
-        console.log("in alerts route:")
-        console.log(household);
+        
+        res.status(200).send(household.alerts);
+    } catch (err) {
+        res.status(500).send({err})
+    }
+});
+
+//get user relevant alerts for a household
+router.get('/:householdID/:userID', async (req, res) => {
+    const householdId = req.params.householdID;
+    const userId = req.params.userID;
+    try {
+        const household = await Household.findById(householdId);
         
         res.status(200).send(household.alerts);
     } catch (err) {

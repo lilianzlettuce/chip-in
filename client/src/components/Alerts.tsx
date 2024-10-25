@@ -22,15 +22,9 @@ export default function Alerts() {
   const userPrefs = user?.preferences;
 
   const [allAlerts, setAllAlerts] = useState<AlertType[]>([]);
+  const [unreadAlerts, setUnreadAlerts] = useState<AlertType[]>([]);
+  const [readAlerts, setReadAlerts] = useState<AlertType[]>([]);
   const [showAlerts, setShowAlerts] = useState(false);
-
-  // Colors associated with each alert category
-  const alertColors = {
-    "Nudge": "amber",
-    "Expiration": "red",
-    "Payment": "green"
-  };
-  console.log(alertColors["Nudge"])
 
   const fetchAlerts = async () => {
     try {
@@ -51,7 +45,6 @@ export default function Alerts() {
         let preference: string = "all";
         if (alert.category == "Payment" && userPrefs?.paymentNotif) {
           preference = userPrefs?.paymentNotif;
-          console.log("in payment: " + preference)
         } else if (alert.category == "Expiration" && userPrefs?.paymentNotif) {
           preference = userPrefs?.expirationNotif;
         }
@@ -61,13 +54,35 @@ export default function Alerts() {
           userAlerts.push(alert);
         } else if (preference == "relevant") {
           // Add alert if relevant
+          // TODO
         }
       }
 
-      console.log(data)
+      // Separate alerts into unread and read lists
+      let newUnreadAlerts: AlertType[] = [];
+      let newReadAlerts: AlertType[] = [];
+      for (const alert of userAlerts) {
+        // Check if alert has been read by this user
+        let isRead: boolean = false;
+        for (const recipient of alert.recipients) {
+          if (recipient == userId) {
+            // Add to read list
+            newReadAlerts.push(alert);
+            isRead = true;
+            break;
+          }
+        }
+
+        // If user not found in alert recipients list, add it to unread list
+        if (!isRead) {
+          newUnreadAlerts.push(alert);
+        }
+      }
 
       // Update alerts in state
       setAllAlerts(userAlerts);
+      setUnreadAlerts(newUnreadAlerts);
+      setReadAlerts(newReadAlerts);
     } catch (error) {
       console.error('Error making request:', error);
     }
@@ -90,20 +105,27 @@ export default function Alerts() {
 
   return (
     <div className="fixed left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end">
-      <button className="bg-gray-900 text-white w-10 h-10 rounded-full" 
+      <button className="relative bg-gray-900 text-white w-10 h-10 rounded-full" 
           onClick={() => {
             fetchAlerts();
             setShowAlerts(showAlerts ? false : true);
           }}
       >
+        {unreadAlerts.length != 0 &&
+          <span className="absolute top-[0px] left-[-8px] flex">
+            <span className="relative text-sm rounded-full h-5 w-5 bg-red-500">
+              {unreadAlerts.length}
+            </span>
+          </span>
+        }
         <FontAwesomeIcon icon={faBell} className="fa-regular text-lg" />
       </button>
       {showAlerts &&
-        <div className="bg-gray-900 text-white w-72 rounded-md shadow-auth-card">
-          {allAlerts.length == 0 &&
+        <div className="bg-gray-900 text-white w-72 max-h-[calc(100vh-100px)] overflow-y-scroll rounded-md shadow-auth-card">
+          {(unreadAlerts.length == 0 && readAlerts.length == 0) &&
             <div className="p-6">No Alertications</div>
           }
-          {allAlerts.map((alert, i) => (
+          {unreadAlerts.map((alert, i) => (
             <div className="flex flex-col gap-2 items-start p-4 py-3 border-solid border-gray-300 border-b-2"
                 key={i}>
               <div className={`text-sm font-bold ${alert.category == "Payment" ? "text-teal-400" : alert.category == "Nudge" ? "text-amber-400" : "text-red-400"}`}>
@@ -115,8 +137,19 @@ export default function Alerts() {
               <div className="text-sm">
                 {alert.date}
               </div>
+            </div>
+          ))}
+          {readAlerts.map((alert, i) => (
+            <div className="bg-gray-600 text-gray-200 flex flex-col gap-2 items-start p-4 py-3 border-solid border-gray-300 border-b-2"
+                key={i}>
+              <div className={`text-sm font-bold ${alert.category == "Payment" ? "text-teal-400" : alert.category == "Nudge" ? "text-amber-400" : "text-red-400"}`}>
+                — {alert.category} —
+              </div>
+              <div className="text-start">
+                {alert.content}
+              </div>
               <div className="text-sm">
-                {alert.recipients}
+                {alert.date}
               </div>
             </div>
           ))}
