@@ -12,20 +12,13 @@ import './AddItem.css';
 
 export default function Dashboard() {
     const { user } = useUserContext();
-    // const householdID = user?.households[0];
-    // get householdID from parameter
-
-
-    const {householdId} = useParams();
+    const { householdId } = useParams();
     const householdID = householdId
-
-
-    //const {house} = useParams();
-    //const householdID = house
-
 
     const [purchasedItems, setPurchasedItems] = useState([]);
     const [groceryItems, setGroceryItems] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
     const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet', 'Toiletries', 'Drink']);
@@ -42,7 +35,6 @@ export default function Dashboard() {
 
 
     // Collapsing feature
-    // hi
     const [isCollapsed, setIsCollapsed] = useState(false)
     const [isCollapsed2, setIsCollapsed2] = useState(false)
 
@@ -55,176 +47,219 @@ export default function Dashboard() {
         }
     }, [householdID]);
 
+    const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+
+        if (value.trim() === '') {
+            setIsSearching(false);
+            fetchPurchasedItems();
+            fetchGroceryItems();
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            const response = await fetch(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
+            console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const results = await response.json();
+
+            const purchased = results.filter((item: { listType: string; }) => item.listType === 'purchased');
+            const grocery = results.filter((item: { listType: string; }) => item.listType === 'grocery');
+
+            setPurchasedItems(purchased);
+            setGroceryItems(grocery);
+        } catch (error) {
+            console.error('Error searching items:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        fetchPurchasedItems();
+        fetchGroceryItems();
+    };
+
+    const filterBySearchTerm = (items: any[]) => {
+        return items.filter((item) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
 
     const isExpiringSoon = (expirationDate: string) => {
-       if (!expirationDate) return false;
-  
-       const now = new Date();
-       const expiration = new Date(expirationDate);
-       const timeDiff = expiration.getTime() - now.getTime();
-       const daysDiff = timeDiff / (1000 * 3600 * 24);
-  
-       return daysDiff <= 5 || daysDiff <= 0;
-    };   
+        if (!expirationDate) return false;
+
+        const now = new Date();
+        const expiration = new Date(expirationDate);
+        const timeDiff = expiration.getTime() - now.getTime();
+        const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+        return daysDiff <= 5 || daysDiff <= 0;
+    };
 
 
     const moveItem = async (itemData: any, targetList: string) => {
-       setIsLoading(true);
-       const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
-       const householdId = householdID;
-       const userId = user?.id;
-  
-       const requestBody = {
-           householdId,
-           name: itemData.name,
-           category: itemData.category,
-           purchasedBy: userId,
-           sharedBetween: itemData.sharedBetween || [],
-           purchaseDate: targetList === 'purchased' ? new Date().toISOString() : null,
-           expirationDate: targetList === 'purchased' ? itemData.expirationDate : null,
-           cost: targetList === 'purchased' ? itemData.cost : 0,
-       };
-  
-       try {
-           // Add the item to the target list (purchased or grocery)
-           const response = await fetch(`http://localhost:6969/item${endpoint}`, {
+        setIsLoading(true);
+        const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
+        const householdId = householdID;
+        const userId = user?.id;
+
+        const requestBody = {
+            householdId,
+            name: itemData.name,
+            category: itemData.category,
+            purchasedBy: userId,
+            sharedBetween: itemData.sharedBetween || [],
+            purchaseDate: targetList === 'purchased' ? new Date().toISOString() : null,
+            expirationDate: targetList === 'purchased' ? itemData.expirationDate : null,
+            cost: targetList === 'purchased' ? itemData.cost : 0,
+        };
+
+        try {
+            // Add the item to the target list (purchased or grocery)
+            const response = await fetch(`http://localhost:6969/item${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(requestBody),
-           });
-  
-           if (!response.ok) {
-               const errorData = await response.json();
-               console.error('Error details:', errorData);
-               throw new Error(`HTTP error! status: ${response.status}`);
-           }
-  
-           // If moving to the grocery list, delete the item from the purchased list in the backend
-           if (targetList === 'grocery') {
-               const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
-                   method: 'DELETE',
-               });
-  
-               if (!deleteResponse.ok) {
-                   const errorData = await deleteResponse.json();
-                   console.error('Error details:', errorData);
-                   throw new Error(`HTTP error! status: ${deleteResponse.status}`);
-               }
-  
-               // Update frontend state to remove item from the purchased list
-               setPurchasedItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
-           } else {
-               // If moving to the purchased list, delete the item from the grocery list
-               const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
-                   method: 'DELETE',
-               });
-  
-               if (!deleteResponse.ok) {
-                   const errorData = await deleteResponse.json();
-                   console.error('Error details:', errorData);
-                   throw new Error(`HTTP error! status: ${deleteResponse.status}`);
-               }
-  
-               // Update frontend state to remove item from the grocery list
-               setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
-           }
-  
-           // Refresh both lists after moving the item
-           await fetchPurchasedItems();
-           await fetchGroceryItems();
-       } catch (error) {
-           console.error('Error moving item:', error);
-       } finally {
-           setIsLoading(false);
-       }
-    };   
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // If moving to the grocery list, keep the item in purchased list in the backend
+            if (targetList === 'grocery') {
+                /*
+                const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+
+                // Update frontend state to remove item from the purchased list
+                setPurchasedItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
+                */
+            } else {
+                // If moving to the purchased list, delete the item from the grocery list
+                const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
+                    method: 'DELETE',
+                });
+
+                if (!deleteResponse.ok) {
+                    const errorData = await deleteResponse.json();
+                    console.error('Error details:', errorData);
+                    throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+                }
+
+                // Update frontend state to remove item from the grocery list
+                setGroceryItems((prev) => prev.filter((item) => item['_id'] !== itemData._id));
+            }
+
+            // Refresh both lists after moving the item
+            await fetchPurchasedItems();
+            await fetchGroceryItems();
+        } catch (error) {
+            console.error('Error moving item:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     const handleModalSave = async (updatedItem: any) => {
-       setIsLoading(true);
-  
-       // Ensure the current user is added to the shared list by default
-       const sharedUsers = updatedItem.sharedBetween.includes(user?.id)
-           ? updatedItem.sharedBetween
-           : [...updatedItem.sharedBetween, user?.id];
-  
-       const requestBody = {
-           householdId: householdID,
-           name: updatedItem.name,
-           category: updatedItem.category,
-           purchasedBy: user?.id,
-           sharedBetween: sharedUsers,
-           purchaseDate: new Date().toISOString(),
-           expirationDate: updatedItem.expirationDate,
-           cost: updatedItem.price,
-       };
-  
-       try {
-           // Add the item to the purchased list
-           const response = await fetch(`http://localhost:6969/item/addtopurchased`, {
-               method: 'POST',
-               headers: {
-                   'Content-Type': 'application/json',
-               },
-               body: JSON.stringify(requestBody),
-           });
-  
-           if (!response.ok) {
-               const errorData = await response.json();
-               console.error('Error details:', errorData);
-               throw new Error(`HTTP error! status: ${response.status}`);
-           }
-  
-           // Remove the item from the grocery list in the backend
-           const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${updatedItem._id}?householdId=${householdID}`, {
-               method: 'DELETE',
-           });
-  
-           if (!deleteResponse.ok) {
-               const errorData = await deleteResponse.json();
-               console.error('Error details:', errorData);
-               throw new Error(`HTTP error! status: ${deleteResponse.status}`);
-           }
-  
-           // Update the frontend state to remove the item from the grocery list
-           setGroceryItems((prev) => prev.filter((item) => item['_id'] !== updatedItem._id));
-  
-           // Refresh the purchased items list
-           await fetchPurchasedItems();
-       } catch (error) {
-           console.error('Error moving item:', error);
-       } finally {
-           setIsLoading(false);
-           setModalOpen(false);
-           setSelectedItem(null);
-       }
-    };    
+        setIsLoading(true);
 
+        // Ensure the current user is added to the shared list by default
+        const sharedUsers = updatedItem.sharedBetween.includes(user?.id)
+            ? updatedItem.sharedBetween
+            : [...updatedItem.sharedBetween, user?.id];
 
+        const requestBody = {
+            householdId: householdID,
+            name: updatedItem.name,
+            category: updatedItem.category,
+            purchasedBy: user?.id,
+            sharedBetween: sharedUsers,
+            purchaseDate: new Date().toISOString(),
+            expirationDate: updatedItem.expirationDate,
+            cost: updatedItem.price,
+        };
+
+        try {
+            // Add the item to the purchased list
+            const response = await fetch(`http://localhost:6969/item/addtopurchased`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Remove the item from the grocery list in the backend
+            const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${updatedItem._id}?householdId=${householdID}`, {
+                method: 'DELETE',
+            });
+
+            if (!deleteResponse.ok) {
+                const errorData = await deleteResponse.json();
+                console.error('Error details:', errorData);
+                throw new Error(`HTTP error! status: ${deleteResponse.status}`);
+            }
+
+            // Update the frontend state to remove the item from the grocery list
+            setGroceryItems((prev) => prev.filter((item) => item['_id'] !== updatedItem._id));
+
+            // Refresh the purchased items list
+            await fetchPurchasedItems();
+        } catch (error) {
+            console.error('Error moving item:', error);
+        } finally {
+            setIsLoading(false);
+            setModalOpen(false);
+            setSelectedItem(null);
+        }
+    };
 
 
     const handleAddItem = async () => {
-       /*setIsLoading(true);
-  
-       // Ensure the current user is added to the shared list by default
-       const sharedUsers = updatedItem.sharedBetween.includes(user?.id)
-           ? updatedItem.sharedBetween
-           : [...updatedItem.sharedBetween, user?.id];
-  
-       const requestBody = {
-           householdId: householdID,
-           name: updatedItem.name,
-           category: updatedItem.category,
-           purchasedBy: user?.id,
-           sharedBetween: sharedUsers,
-           purchaseDate: new Date().toISOString(),
-           expirationDate: updatedItem.expirationDate,
-           cost: updatedItem.price,
-       };
-       console.log(`POO ${name}`);*/
-       
+        /*setIsLoading(true);
+   
+        // Ensure the current user is added to the shared list by default
+        const sharedUsers = updatedItem.sharedBetween.includes(user?.id)
+            ? updatedItem.sharedBetween
+            : [...updatedItem.sharedBetween, user?.id];
+   
+        const requestBody = {
+            householdId: householdID,
+            name: updatedItem.name,
+            category: updatedItem.category,
+            purchasedBy: user?.id,
+            sharedBetween: sharedUsers,
+            purchaseDate: new Date().toISOString(),
+            expirationDate: updatedItem.expirationDate,
+            cost: updatedItem.price,
+        };
+        console.log(`POO ${name}`);*/
+
     };
 
 
@@ -271,22 +306,21 @@ export default function Dashboard() {
 
 
     const fetchRoommates = async () => {
-       if (!householdID) return;
+        if (!householdID) return;
 
-
-       try {
-           const roommatesResponse = await fetch(`http://localhost:6969/household/members/${householdID}`);
-           if (!roommatesResponse.ok) {
-               throw new Error(`HTTP error! status: ${roommatesResponse.status}`);
-           }
-           const roommatesData = await roommatesResponse.json();
-           setRoommates(roommatesData.map((roommate: any) => ({
-               _id: roommate._id,
-               name: roommate.username,
-           })));
-       } catch (error) {
-           console.error('Error fetching roommates:', error);
-       }
+        try {
+            const roommatesResponse = await fetch(`http://localhost:6969/household/members/${householdID}`);
+            if (!roommatesResponse.ok) {
+                throw new Error(`HTTP error! status: ${roommatesResponse.status}`);
+            }
+            const roommatesData = await roommatesResponse.json();
+            setRoommates(roommatesData.map((roommate: any) => ({
+                _id: roommate._id,
+                name: roommate.username,
+            })));
+        } catch (error) {
+            console.error('Error fetching roommates:', error);
+        }
     };
 
 
@@ -308,21 +342,21 @@ export default function Dashboard() {
 
     const filterItems = async () => {
         if (!householdID) return;
-  
+
         try {
             const queryParams = new URLSearchParams();
             if (selectedCategories.length > 0) {
                 selectedCategories.forEach((category) => queryParams.append('category', category));
             }
-    
+
             // If selectedRoommates has entries, join them into a comma-separated string
             if (selectedRoommates.length > 0) {
                 const roommatesString = selectedRoommates.join(',');
                 queryParams.append('sharedBetween', roommatesString);
             }
-    
+
             console.log(queryParams.toString());
-    
+
             // Fetch purchased items filtered by selected categories and roommates
             const purchasedResponse = await fetch(`http://localhost:6969/filter/filterby/${householdID}?${queryParams.toString()}`);
             if (!purchasedResponse.ok) {
@@ -330,7 +364,7 @@ export default function Dashboard() {
             }
             const filteredPurchasedData = await purchasedResponse.json();
             setPurchasedItems(filteredPurchasedData);
-    
+
             // Fetch grocery items without roommates filtering (only filter by categories)
             const groceryResponse = await fetch(`http://localhost:6969/household/${householdID}/grocerylist`);
             if (!groceryResponse.ok) {
@@ -344,7 +378,7 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Error filtering items:', error);
         }
-    };   
+    };
 
 
     const clearFilters = () => {
@@ -424,6 +458,22 @@ export default function Dashboard() {
         <div className="dashboard-container">
             <h1 className="dashboard-title">Dashboard</h1>
 
+            {/* Search Bar */}
+            <div className="search-bar-wrapper">
+                <input
+                    type="text"
+                    placeholder="Search items..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="search-bar"
+                />
+                {searchTerm && (
+                    <button className="clear-button" onClick={clearSearch}>
+                        &times;
+                    </button>
+                )}
+            </div>
+
             {/* Multiselect for filtering by category and roommates */}
             <div className="dashboard-controls">
                 <div className="filter-section">
@@ -481,60 +531,66 @@ export default function Dashboard() {
 
             {/* Purchased Items Section */}
             <div className="dashboard-section">
-                
-                <h2 className="section-title">Inventory</h2>
-                {/* Add Item Button*/}
-                <button
-                className="add-item-button"
-                onClick={() => setModalOpen2(true)} // Open the modal when clicked
-                >
-                Add Item
-                </button>
-                {/* hi Collapse Button */}
-                <button onClick={toggleCollapse} className="collapse-button">
-                    {isCollapsed ? 'More' : 'Less'}
-                </button>
-                { !isCollapsed && (
-                        <ul className="dashboard-item-list">
-                            {purchasedItems.length === 0 ? (
+                <div className="section-header">
+                    <h2 className="section-title">
+                        Inventory
+                        <button onClick={toggleCollapse} className="collapse-icon">
+                            {isCollapsed ? '▲' : '▼'}
+                        </button>
+                    </h2>
+                    {/* Add Item Button*/}
+                    <button
+                        className="add-item-button"
+                        onClick={() => setModalOpen2(true)} // Open the modal when clicked
+                    >
+                        ADD ITEM +
+                    </button>
+                </div>
+                {!isCollapsed && (
+                    <ul className="dashboard-item-list">
+                        {purchasedItems.length === 0 ? (
+                            isSearching ? (
                                 <li className="dashboard-item">No purchased items</li>
                             ) : (
-                                purchasedItems.map((item: any) => (
-                                    <li key={item['_id']}>
-                                        <ItemCard
-                                            id={item['_id']}
-                                            category={item['category'] || 'Unknown'}
-                                            name={item['name'] || 'Unnamed'}
-                                            price={item['cost'] ?? 0}
-                                            sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
-                                                (user) => user.username || 'Unknown'
-                                            )}
-                                            purchasedBy={item['purchasedBy']?.username || 'Unknown'}
-                                            expiryDate={
-                                                item['expirationDate']
-                                                    ? new Date(item['expirationDate']).toLocaleDateString()
-                                                    : 'N/A'
-                                            }
-                                            isExpiringSoon={
-                                                item['expirationDate'] && isExpiringSoon(item['expirationDate'])
-                                            }
-                                            onDelete={() => handleDelete(item['_id'], 'purchased')}
-                                            onMove={() => {
-                                                moveItem(
-                                                    {
-                                                        ...item,
-                                                        cost: 0, // Clear cost
-                                                        expirationDate: '', // Clear expiration date
-                                                    },
-                                                    'grocery'
-                                                );
-                                            }}
-                                            listType="purchased"
-                                        />
-                                    </li>
-                                ))
-                            )}
-                        </ul>
+                                <li className="dashboard-item">No matching items</li>
+                            )
+                        ) : (
+                            purchasedItems.map((item: any) => (
+                                <li key={item['_id']}>
+                                    <ItemCard
+                                        id={item['_id']}
+                                        category={item['category'] || 'Unknown'}
+                                        name={item['name'] || 'Unnamed'}
+                                        price={item['cost'] ?? 0}
+                                        sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
+                                            (user) => user.username || 'Unknown'
+                                        )}
+                                        purchasedBy={item['purchasedBy']?.username || 'Unknown'}
+                                        expiryDate={
+                                            item['expirationDate']
+                                                ? new Date(item['expirationDate']).toLocaleDateString()
+                                                : 'N/A'
+                                        }
+                                        isExpiringSoon={
+                                            item['expirationDate'] && isExpiringSoon(item['expirationDate'])
+                                        }
+                                        onDelete={() => handleDelete(item['_id'], 'purchased')}
+                                        onMove={() => {
+                                            moveItem(
+                                                {
+                                                    ...item,
+                                                    cost: 0, // Clear cost
+                                                    expirationDate: '', // Clear expiration date
+                                                },
+                                                'grocery'
+                                            );
+                                        }}
+                                        listType="purchased"
+                                    />
+                                </li>
+                            ))
+                        )}
+                    </ul>
                 )}
                 {/* Modal for adding new item */}
                 {modalOpen2 && (
@@ -549,22 +605,29 @@ export default function Dashboard() {
 
             {/* Grocery List Section */}
             <div className="dashboard-section">
-                <h2 className="section-title">Grocery List</h2>
-                {/* Add Item Button*/}
-                <button
-                    className="add-item-button"
-                    onClick={() => setModalOpen3(true)} // Open the modal when clicked
-                >
-                    Add Item
-                </button>
-                {/* Collapse Button */}
-                <button onClick={toggleCollapse2} className="collapse-button">
-                    {isCollapsed2 ? 'More' : 'Less'}
-                </button>
-                { !isCollapsed2 && (
+                <div className="section-header">
+                    <h2 className="section-title">
+                        Grocery List
+                        <button onClick={toggleCollapse2} className="collapse-icon">
+                            {isCollapsed2 ? '▲' : '▼'}
+                        </button>
+                    </h2>
+                    {/* Add Item Button*/}
+                    <button
+                        className="add-item-button"
+                        onClick={() => setModalOpen3(true)} // Open the modal when clicked
+                    >
+                        ADD ITEM +
+                    </button>
+                </div>
+                {!isCollapsed2 && (
                     <ul className="dashboard-item-list">
                         {groceryItems.length === 0 ? (
-                            <li className="dashboard-item">No items to purchase</li>
+                            isSearching ? (
+                                <li className="dashboard-item">No items to purchase</li>
+                            ) : (
+                                <li className="dashboard-item">No matching items</li>
+                            )
                         ) : (
                             groceryItems.map((item: any) => (
                                 <li key={item['_id']}>

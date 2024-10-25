@@ -55,8 +55,8 @@ const ForgotPass: React.FC = () => {
               className="form-input"
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="forgot-password-button"
             disabled={loading}
           >

@@ -24,7 +24,7 @@ const SignUp: React.FC = () => {
     // Handle user sign in
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        
+
         const user = {
             email: email,
             username: username,
@@ -39,7 +39,7 @@ const SignUp: React.FC = () => {
             },
             body: JSON.stringify(user)
         });
-    
+
         // Get JSON response from server and display message
         const data: ServerResponse = await res.json();
         if (data.message) {
@@ -58,17 +58,17 @@ const SignUp: React.FC = () => {
             console.log("no token supplied");
             return;
         }
-    
+
         // Redirect to profile if user is signed in
         fetch(`${SERVER_URL}/auth/getUserData`, {
             headers: {
                 "x-access-token": token,
             },
         })
-        .then(res => res.json())
-        .then(data => {
-            data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
-        });
+            .then(res => res.json())
+            .then(data => {
+                data.isLoggedIn ? navigate(`/profile/${data.id}`) : null;
+            });
     }, []);
 
     return (

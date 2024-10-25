@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 //import lettuce from '../assets/lettuce.png'
@@ -21,7 +21,7 @@ interface ProfileSummaryProps {
 
 // const UploadImage : 
 
-const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
+const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
 
   // START UPLOAD PICTURE
   //const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
@@ -62,7 +62,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
 
         if (profileData.bio) {
           setBio(profileData.bio);
-        } 
+        }
       } else {
         console.error("Failed to fetch user profile");
       }
@@ -70,7 +70,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
       console.error('error fetching user profile:', err)
     }
   }
-  
+
   useEffect(() => {
     if (user?.id) {
       fetchUserProfile();
@@ -91,14 +91,14 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
 
       //setImageFile(file); // Store the actual file in state
       // TBD:  Set the ImageFile for now, send the updated image to the server
-       // Pass the file object to handleSubmit directly
+      // Pass the file object to handleSubmit directly
     }
   };
 
   //send image to server
   const handleSubmit = async (base64String: string) => {
     const url = `http://localhost:${PORT}/user/pfp/${user?.id}`;
-  
+
     try {
       const response = await fetch(url, {
         method: 'PATCH',
@@ -106,10 +106,10 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          pfp: base64String, 
+          pfp: base64String,
         }),
       });
-  
+
       if (response.ok) {
         setAlertMessage("Profile picture updated successfully!");
         setIsAlertOpen(true);
@@ -118,13 +118,13 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
         setAlertMessage("Failed to update profile picture. Please recheck image size.");
         setIsAlertOpen(true);
         console.error('Failed to update profile picture.');
-        
+
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  
+
 
   // END UPLOAD PICTURE
 
@@ -134,7 +134,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({refreshProfile}) => {
       {/* Profile Image and Information Section */}
       <div className="profile-section">
         {/*<img className="profile-image" src={lettuce} alt="logo"  />*/}
-        <img className="profile-image" src={profileImage} alt="Profile"  />
+        <img className="profile-image" src={profileImage} alt="Profile" />
         <div className="profile-info">
           <h2 className="profile-name">{username}</h2>
           <h2 className="profile-bio">{bio}</h2>
@@ -219,7 +219,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 }) => {
   const { user } = useUserContext();
   const navigate = useNavigate();
-  
+
   const [displayName, setDisplayName] = useState(email);
   const [displayUsername, setDisplayUsername] = useState(username);
   const [displayPassword, setDisplayPassword] = useState(password);
@@ -264,36 +264,36 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   // Event handler function for the button click
   const handleChangeNameClick = async () => {
-      setDisplayName(tempName);
-      // alert(`${tempName} has been changed successfully`);
-      setIsSuccessOpen(true);
-      setSuccessMessage(`${tempName} has been changed successfully`);
-  
-      const url = `http://localhost:${PORT}/user/${user?.id}`;
+    setDisplayName(tempName);
+    // alert(`${tempName} has been changed successfully`);
+    setIsSuccessOpen(true);
+    setSuccessMessage(`${tempName} has been changed successfully`);
 
-      try {
-        console.log("email", displayName)
-        const response = await fetch(url, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: tempName, 
-          }),
-        });
-    
-        if (response.ok) {
-          console.log('email updated successfully!');
-          setRefreshProfile((prev) => prev + 1);
-        } else {
-          console.error('Failed to update email.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
+    const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+    try {
+      console.log("email", displayName)
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: tempName,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('email updated successfully!');
+        setRefreshProfile((prev) => prev + 1);
+      } else {
+        console.error('Failed to update email.');
       }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
-  
+
   const handleChangeUserNameClick = async () => {
     console.log("temp username", tempUsername)
     //if (isEditing == true) {
@@ -339,10 +339,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: tempUsername, 
+          username: tempUsername,
         }),
       });
-  
+
       if (response.ok) {
         console.log('Username ${tempUsername} updated successfully!');
         // alert(`Username ${tempUsername} updated successfully!`);
@@ -357,7 +357,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       console.error('Error:', error);
     }
   };
-  
+
   /*const handleChangePasswordClick = () => {
     if (isEditing == true) {
       alert(`${displayPassword} has been changed successfully`);
@@ -368,8 +368,8 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     // current client webpack is not setup to use password-validator
     //const passwordValid = pwSchema.validate(tempPassword? tempPassword : "");
 
-    if (!isValidPassword(tempPassword? tempPassword : "")) {
-    //if (!passwordValid) {
+    if (!isValidPassword(tempPassword ? tempPassword : "")) {
+      //if (!passwordValid) {
       // alert("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no space.");
       setIsAlertOpen(true);
       setAlertMessage("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no spaces.")
@@ -378,7 +378,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
     //else {
     //  setDisplayPassword(tempPassword);
-      // Password meets all criteria
+    // Password meets all criteria
     //  alert("Password has been changed successfully");
     //} 
 
@@ -386,7 +386,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     // alert("Password has been changed successfully");
     setIsSuccessOpen(true);
     setSuccessMessage("Password has been changed.");
-      
+
     const url = `http://localhost:${PORT}/user/${user?.id}`;
 
     try {
@@ -396,10 +396,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          password: tempPassword, 
+          password: tempPassword,
         }),
       });
-  
+
       if (response.ok) {
         console.log('password updated successfully!');
         setRefreshProfile((prev) => prev + 1);
@@ -428,7 +428,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     // alert("Bio has been changed successfully");
     setIsSuccessOpen(true);
     setSuccessMessage("Bio has been changed successfully")
-      
+
     const url = `http://localhost:${PORT}/user/${user?.id}`;
 
     try {
@@ -438,10 +438,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          bio: tempBio, 
+          bio: tempBio,
         }),
       });
-  
+
       if (response.ok) {
         console.log('bio updated successfully!');
         setRefreshProfile((prev) => prev + 1);
@@ -456,7 +456,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const isValidPassword = (password: string): boolean => {
     // Check for minimum length of 12 characters
     const isLongEnough = password.length >= 6 && password.length <= 25;
-  
+
     // Check for at least one Upper case alphabet 
     const hasUpperAlphabet = /[A-Z]/.test(password);
 
@@ -470,7 +470,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
     return isLongEnough && hasUpperAlphabet && hasLowerAlphabet && hasNumber && hasNoSpaces;
   };
-  
+
   /*// Helper function to validate password
   const isValidPassword = (password: string): boolean => {
     // Check for minimum length of 12 characters
@@ -500,10 +500,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     fetch(`${SERVER_URL}/user/${id}`, {
       method: "DELETE",
     })
-    .then(() => {
-      localStorage.removeItem("token");
-      navigate("/signup");
-    });
+      .then(() => {
+        localStorage.removeItem("token");
+        navigate("/signup");
+      });
   }
 
   return (
@@ -513,13 +513,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <h2>Profile</h2>
         <div className="profile-actions">
           <button className="delete-account" onClick={openModal}>DELETE ACCOUNT</button>
-          <Confirm 
-            show={showConfirmDelete} 
-            onClose={closeModal} 
+          <Confirm
+            show={showConfirmDelete}
+            onClose={closeModal}
             onConfirm={deleteAccount}
             message="Are you sure you want to delete your account?">
           </Confirm>
-          <button className="edit-profile" onClick={handleEditClick}> 
+          <button className="edit-profile" onClick={handleEditClick}>
             {isEditing ? "DISPLAY PROFILE" : "EDIT PROFILE"}</button>
         </div>
       </div>
@@ -530,21 +530,21 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className="profile-row">
           <label className="profile-label">Email</label>
           <input type="text" className="profile-input"
-              value = {isEditing ? tempName : displayName}
-              readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setTempName(e.target.value)} />
-           {isEditing && (
-              <button className="change-button" onClick={handleChangeNameClick}>CHANGE EMAIL</button>
-           )}
+            value={isEditing ? tempName : displayName}
+            readOnly={!isEditing} // doesn't allow users to change text field
+            onChange={(e) => setTempName(e.target.value)} />
+          {isEditing && (
+            <button className="change-button" onClick={handleChangeNameClick}>CHANGE EMAIL</button>
+          )}
 
-           {/* confirmation popup */}
+          {/* confirmation popup */}
           {isSuccessOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Success!</h3>
-                    <p>{successMessage}</p>
-                    <button onClick={closeSuccess}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Success!</h3>
+                <p>{successMessage}</p>
+                <button onClick={closeSuccess}>Close</button>
+              </div>
             </div>
           )}
         </div>
@@ -553,32 +553,32 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
         <div className="profile-row">
           <label className="profile-label">Username</label>
           <input type="text" className="profile-input"
-              value = {isEditing ? tempUsername : displayUsername}
-              readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setTempUsername(e.target.value)} />
+            value={isEditing ? tempUsername : displayUsername}
+            readOnly={!isEditing} // doesn't allow users to change text field
+            onChange={(e) => setTempUsername(e.target.value)} />
           {isEditing && (
-          <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
+            <button className="change-button" onClick={handleChangeUserNameClick}>CHANGE USERNAME</button>
           )}
 
           {/* confirmation popup */}
           {isAlertOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Error!</h3>
-                    <p>{alertMessage}</p>
-                    <button onClick={closeAlert}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Error!</h3>
+                <p>{alertMessage}</p>
+                <button onClick={closeAlert}>Close</button>
+              </div>
             </div>
           )}
 
           {/* confirmation popup */}
           {isSuccessOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Success!</h3>
-                    <p>{successMessage}</p>
-                    <button onClick={closeSuccess}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Success!</h3>
+                <p>{successMessage}</p>
+                <button onClick={closeSuccess}>Close</button>
+              </div>
             </div>
           )}
 
@@ -590,33 +590,33 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           {/* Change input type based on isEditing state 
            type="password": This input type is specifically designed to hide user input, showing only a series of * */}
           <input type={isEditing ? "text" : "password"} // Use "password" type when not editing
-              className="profile-input"
-              value = {isEditing ? tempPassword : displayPassword}
-              readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setTempPassword(e.target.value)} />
+            className="profile-input"
+            value={isEditing ? tempPassword : displayPassword}
+            readOnly={!isEditing} // doesn't allow users to change text field
+            onChange={(e) => setTempPassword(e.target.value)} />
           {isEditing && (
-          <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
+            <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
           )}
 
           {/* confirmation popup */}
           {isAlertOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Error!</h3>
-                    <p>{alertMessage}</p>
-                    <button onClick={closeAlert}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Error!</h3>
+                <p>{alertMessage}</p>
+                <button onClick={closeAlert}>Close</button>
+              </div>
             </div>
           )}
 
           {/* confirmation popup */}
           {isSuccessOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Success!</h3>
-                    <p>{successMessage}</p>
-                    <button onClick={closeSuccess}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Success!</h3>
+                <p>{successMessage}</p>
+                <button onClick={closeSuccess}>Close</button>
+              </div>
             </div>
           )}
         </div>
@@ -627,22 +627,22 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           {/* Change input type based on isEditing state 
            type="password": This input type is specifically designed to hide user input, showing only a series of * */}
           <input type={isEditing ? "text" : "bio"} // Use "password" type when not editing
-              className="profile-input"
-              value = {isEditing ? tempBio : displayBio}
-              readOnly = {!isEditing} // doesn't allow users to change text field
-              onChange={(e) => setTempBio(e.target.value)} />
+            className="profile-input"
+            value={isEditing ? tempBio : displayBio}
+            readOnly={!isEditing} // doesn't allow users to change text field
+            onChange={(e) => setTempBio(e.target.value)} />
           {isEditing && (
-          <button className="change-button" onClick={handleChangeBioClick}>CHANGE BIO</button>
+            <button className="change-button" onClick={handleChangeBioClick}>CHANGE BIO</button>
           )}
 
           {/* confirmation popup */}
           {isSuccessOpen && (
             <div className="alert-modal">
-                <div className="alert-modal-content">
-                    <h3>Success!</h3>
-                    <p>{successMessage}</p>
-                    <button onClick={closeSuccess}>Close</button>
-                </div>
+              <div className="alert-modal-content">
+                <h3>Success!</h3>
+                <p>{successMessage}</p>
+                <button onClick={closeSuccess}>Close</button>
+              </div>
             </div>
           )}
         </div>
@@ -667,7 +667,7 @@ const Settings: React.FC = () => {
       {/* Settings Header */}
       <div className="settings-header">
         <h2>Settings</h2>
- 
+
       </div>
 
       {/* Notifications Section */}
@@ -756,16 +756,15 @@ const Profile: React.FC = () => {
     bio: bio,
     setRefreshProfile
   }
-  
+
   return (
     <div>
       {/* <ProfileSummary {...profileProps} /> */}
       <ProfileSummary refreshProfile={refreshProfile} />
       <ProfileSettings {...profileSettingsProps} />
-      <Settings/>
+      <Settings />
     </div>
   );
 };
 
 export default Profile
-

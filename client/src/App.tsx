@@ -33,11 +33,11 @@ export default function App({ message }: AppProps) {
       headers: {
         "x-access-token": token,
       },
-  })
-    .then(res => res.json())
-    .then(data => {
-      data.isLoggedIn ? null: navigate("/login");;
-    });
+    })
+      .then(res => res.json())
+      .then(data => {
+        data.isLoggedIn ? null : navigate("/login");;
+      });
   }, []);
 
   return (
@@ -52,7 +52,7 @@ export default function App({ message }: AppProps) {
             </a>
           </div>
           <p>
-              <code>src/App.tsx</code>
+            <code>src/App.tsx</code>
           </p>
           <div>Message: {message}</div>
           <div className="card">

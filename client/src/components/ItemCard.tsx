@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useUserContext } from '../UserContext';
-
 import './ItemCard.css';
 
 interface ItemCardProps {
@@ -30,35 +29,44 @@ const ItemCard: React.FC<ItemCardProps> = ({
     listType
 }) => {
     const { user } = useUserContext();
-    if (!user) return;
+    const isShared = user ? sharedBy.includes(user.username) : false;
 
-    const [isShared] = useState(sharedBy.includes(user.username));
+    if (!user) return <div>No User</div>;
+
+    console.log("ItemCard Props:", {
+        category, name, price, sharedBy, purchasedBy, expiryDate
+    });
+
+    const displayPurchasedBy = purchasedBy ? purchasedBy : 'Unknown';
+    const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
+    const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
+    const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
 
     return (
         <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>
             <div className="category-badge">{category}</div>
             <div className="item-info">
                 <span>{name}</span>
-                {listType == 'purchased' &&
-                    <span className="price">${price.toFixed(2)}</span>
-                }
+                {listType === 'purchased' && (
+                    <span className="price">{displayPrice}</span>
+                )}
             </div>
             <div className="shared-by-text">
-                Shared by <b>{sharedBy.length > 0 ? sharedBy.join(', ') : 'No one'}</b>
+                Shared by <b>{displaySharedBy}</b>
             </div>
             <div className="footer">
-                <div>{listType == 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{purchasedBy}</b></div>
-                {listType == 'purchased' &&
-                    <div className="expiry">Expires {expiryDate}</div>
-                }  
+                <div>{listType === 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{displayPurchasedBy}</b></div>
+                {listType === 'purchased' && (
+                    <div className="expiry">Expires {displayExpiry}</div>
+                )}
             </div>
             <div className="actions">
                 <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
-                        onClick={sharedBy.includes(user.username) ? onDelete : () => {}}>   
+                    onClick={isShared ? onDelete : () => { }}>
                     Delete
                 </button>
-                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`} 
-                        onClick={sharedBy.includes(user.username) ? onMove : () => {}}> 
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onMove : () => { }}>
                     {listType === 'grocery' ? 'Purchase' : 'Repurchase'}
                 </button>
             </div>

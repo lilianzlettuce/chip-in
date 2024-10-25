@@ -77,8 +77,8 @@ const VerifyCode: React.FC = () => {
               className="form-input"
             />
           </div>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="verify-code-button"
             disabled={loading}
           >

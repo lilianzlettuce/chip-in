@@ -32,7 +32,7 @@ type JoinHouseholdProps = {
 };
 
 export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId }) => {
-  const [householdName, setHouseholdName] = useState("");
+  const [householdID, setHouseholdID] = useState("");
 
   const { updateUser } = useUserContext();
 
@@ -40,13 +40,14 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
   const PORT = process.env.REACT_APP_PORT || 5050;
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
-  console.log("joinhousehold userid: ", userId)
+  console.log("joinhousehold householdID: ", householdID)
 
   // Function to handle form submission
   
     async function handleJoin() {
+      // Step 1: Get all households from `http://localhost:6969/household` to check if household ID exists
+      
       try {
-        // Step 1: Fetch all households from `http://localhost:6969/household`
         const response = await fetch(`${SERVER_URL}/household`, {
           method: 'GET',
           headers: {
@@ -54,28 +55,44 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
           },
         });
     
-        if (!response.ok) {
-          throw new Error('Failed to retrieve households');
+            
+        if (response.ok) {
+          const households = await response.json();
+          console.log("All hoseholds", households)
+
+          const householdexists = households.find((household: { _id: string }) => household._id === householdID);
+          if (!householdexists) {
+            console.log('error, ${householdID} does not exist');
+            alert(`Error: ${householdID} does not exist, please choose a different Household ID`);
+            return;
+          }
+          else (
+            console.log("household ID exists")
+          )
+        } else {
+          console.error("Failed to fetch household");
         }
+      } catch (err) {
+        console.error('error fetching household:', err);
+      }
+     
+      
+      //  const matchingHousehold = households.find((household: any) => household.name === householdName);
     
-        const households = await response.json();
+      //  if (!matchingHousehold) {
+      //    throw new Error(`Household with name "${householdName}" not found`);
+      //  }
     
-        // Step 2: Find the household that matches the given `householdName`
-        const matchingHousehold = households.find((household: any) => household.name === householdName);
-    
-        if (!matchingHousehold) {
-          throw new Error(`Household with name "${householdName}" not found`);
-        }
-    
-        console.log("found matching household ID", matchingHousehold._id);
+      //  console.log("found matching household ID", matchingHousehold._id);
         // Extract the `_id` of the matched household
-        const householdId = matchingHousehold._id;
+      //  const householdId = matchingHousehold._id;
         
         // Step 3: Prepare updated members array
-        const updatedMembers = [...matchingHousehold.members, userId]; // Add the user to the existing members
+      //  const updatedMembers = [...matchingHousehold.members, userId]; // Add the user to the existing members
     
         // Step 4: Send a PATCH request to update the household's members list using the `householdId`
-        const updateResponse = await fetch(`http://localhost:6969/household/addUser/${householdId}`, {
+      try { 
+        const updateResponse = await fetch(`http://localhost:6969/household/addUser/${householdID}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -85,6 +102,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
     
         if (!updateResponse.ok) {
           const errorData = await updateResponse.json();
+          alert(`Failed to update household: ${errorData.message}`)
           throw new Error(`Failed to update household: ${errorData.message}`);
         }
     
@@ -95,23 +113,23 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
         alert(`User ${userId} has been added to the household: ${updatedHousehold.name}`);
       } catch (error) {
         console.error('Error updating household:', error instanceof Error ? error.message : error);
-        alert(`Error updating household: ${error instanceof Error ? error.message : error}`);
+       // alert(`Error updating household: ${error instanceof Error ? error.message : error}`);
       }
     }
 
   return (
     <div>
-        <h3 style={{ color: 'black', display: 'block' }}>Please enter a household name to join</h3>
+        <h3 style={{ color: 'black', display: 'block' }}>Please enter a household ID to join</h3>
         <div className="modal-body">
           {/* Household Name Input */}
           <div className="input-group">
-            <button className="label-button">Household Name</button>
+            <button className="label-button">Household ID</button>
             <input
               type="text"
-              className="input-field text-white"
-              value={householdName}
-              onChange={(e) => setHouseholdName(e.target.value)}
-              placeholder="Enter household name"
+              className="input-field"
+              value={householdID}
+              onChange={(e) => setHouseholdID(e.target.value)}
+              placeholder="Enter household ID"
             />
           </div>
 

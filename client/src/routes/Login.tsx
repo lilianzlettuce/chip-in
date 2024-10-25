@@ -29,22 +29,22 @@ const Login: React.FC = () => {
       },
       body: JSON.stringify(user),
     })
-    .then(res => res.json())
-    .then(data => {
-      // Set session token if received from server
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
+      .then(res => res.json())
+      .then(data => {
+        // Set session token if received from server
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
 
-      // Redirect to profile upon successful login
-      if (data.message) {
-        navigate(`/profile/${data.id}`);
-      } else if (data.error) {
-        // Display any errors if failed login
-        console.log(data.error)
-        setMsg(data.error);
-      }
-    });
+        // Redirect to profile upon successful login
+        if (data.message) {
+          navigate(`/profile/${data.id}`);
+        } else if (data.error) {
+          // Display any errors if failed login
+          console.log(data.error)
+          setMsg(data.error);
+        }
+      });
   };
 
   useEffect(() => {
@@ -63,12 +63,12 @@ const Login: React.FC = () => {
         "x-access-token": token,
       },
     })
-    .then(res => res.json())
-    .then(data => {
-      console.log("logged in: " + data.isLoggedIn);
-      console.log("username: " + data.username)
-      data.isLoggedIn ? navigate(`/profile/${data.id}`): null;
-    });
+      .then(res => res.json())
+      .then(data => {
+        console.log("logged in: " + data.isLoggedIn);
+        console.log("username: " + data.username)
+        data.isLoggedIn ? navigate(`/profile/${data.id}`) : null;
+      });
   }, []);
 
   return (

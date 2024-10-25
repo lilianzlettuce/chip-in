@@ -12,8 +12,8 @@ interface ItemModalProps {
 
 const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, currentUserId, onClose, onSave }) => {
     const [price, setPrice] = useState(item.price || '');
-    const [expirationDate, setExpirationDate] = useState(item.expirationDate || '');
-    const [selectedRoommates, setSelectedRoommates] = useState([currentUserId]); // Add current user by default
+    const [expirationDate, setExpirationDate] = useState(item.expirationDate ? new Date(item.expirationDate).toISOString().substring(0, 10) : '');
+    const [selectedRoommates, setSelectedRoommates] = useState([currentUserId]);
 
     const handleSave = () => {
         const updatedItem = {
@@ -34,8 +34,8 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal">
+        <div className="modal-overlay" style={{ zIndex: 9999 }}>
+            <div className="modal" style={{ zIndex: 10000 }}>
                 <h2>{listType === 'purchased' ? 'Purchase Item' : 'Repurchase Item'}</h2>
                 <input
                     type="number"
@@ -45,7 +45,6 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
                 />
                 <input
                     type="date"
-                    placeholder="Expiration Date"
                     value={expirationDate}
                     onChange={(e) => setExpirationDate(e.target.value)}
                 />
