@@ -81,6 +81,7 @@ router.get('/filterby/:id', async (req, res) => {
   
         res.status(200).json(filteredItems);
     } catch (error) {
+        console.error('Error occurred while filtering items:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
