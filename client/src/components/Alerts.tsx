@@ -29,45 +29,14 @@ export default function Alerts() {
   const fetchAlerts = async () => {
     try {
       // Define the URL with householdId as a path parameter
-      const url = `http://localhost:6969/alert/${householdId}`;
+      const url = `http://localhost:6969/alert/${householdId}/${userId}`;
 
-      // Fetch all household alerts
+      // Fetch all household alerts relevant to user
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
-
-      // Filter alerts through user preferences
-      let userAlerts: AlertType[] = [];
-      for (const alert of data) {
-        // Check user's preference for this type of notification
-        let preference: string = "all";
-        if (alert.category == "Payment" && userPrefs?.paymentNotif) {
-          preference = userPrefs?.paymentNotif;
-        } else if (alert.category == "Expiration" && userPrefs?.expirationNotif) {
-          preference = userPrefs?.expirationNotif;
-        } else if (alert.category == "Nudge") {
-          // Nudge: only add if user is on recipient list
-          preference = "relevant";
-        }
-
-        // Display alert based on preference
-        if (preference == "all") {
-          // Add alert
-          userAlerts.push(alert);
-        } else if (preference == "relevant") {
-          // Add alert only if user is on recipient list
-          // TODO
-          for (const recipient of alert.recipient) {
-            if (recipient == userId) {
-              // Add to list
-              userAlerts.push(alert);
-              break;
-            }
-          }
-        }
-      }
+      const userAlerts = await response.json();
 
       // Separate alerts into unread and read lists
       let newUnreadAlerts: AlertType[] = [];
