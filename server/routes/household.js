@@ -7,52 +7,6 @@ import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
-// route to update household alerts
-router.patch('/updateAlerts/:householdID', async (req, res) => {
-  const householdId = req.params.householdID;
-  const { alertUpdates, userId } = req.body;
-
-  // Convert userId to ObjectId
-  const userObjectId = new ObjectId(userId);
-
-  console.log(alertUpdates)
-
-  const household = await Household.findOne({ _id: householdId });
-  console.log(household.alerts);
-
-  try {
-    // Perform updates for each alert in the input array
-    for (const alert of alertUpdates) {
-      const { _id, readBy } = alert;
-      let alertId = new ObjectId(_id);
-
-      const result = await Household.updateOne(
-          { _id: householdId },
-          {
-            /*$set: {
-              'alerts.$[alert].readBy': readBy,  // Set status dynamically
-              'alerts.$[alert].content': "your mother",
-            }*/
-            $addToSet: { 'alerts.$[alert].readBy': userObjectId }
-          },
-          {
-            arrayFilters: [
-              { 'alert._id': alertId } // Match by alert ID
-            ]
-          },
-      );
-
-      console.log(`Updated alert ${_id}:`, result);
-    }
-
-    console.log('All alerts updated successfully!');
-    res.status(200).json({msg: "household alerts updated"});
-  } catch (error) {
-    console.error('Error updating alerts:', error);
-    res.status(500).json({msg: error});
-  }
-});
-
 // route to update household members
 router.patch('/updateMembers/:id', async (req, res) => {
   const { userId } = req.body; // Expect _id of household and userId to add

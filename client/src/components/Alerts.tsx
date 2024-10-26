@@ -69,21 +69,13 @@ export default function Alerts() {
   // Mark all unread alerts as read 
   const markAsRead = async () => {
     try {
-      let alertUpdates: AlertType[] = structuredClone(unreadAlerts);
-      if (userId) {
-        for (let alert of alertUpdates) {
-          alert.readBy.push(userId);
-        }
-      }
-      console.log(alertUpdates)
-
       // Send patch request to update alerts
-      const response = await fetch(`http://localhost:6969/household/updateAlerts/${householdId}`, {
+      const response = await fetch(`http://localhost:6969/alert/markAsRead/${householdId}/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ alertUpdates, userId }), // Send the userId in the request body
+        body: JSON.stringify({ alertUpdates: unreadAlerts }), // Send the userId in the request body
       });
   
       if (!response.ok) {
@@ -92,6 +84,9 @@ export default function Alerts() {
 
       const updatedAlerts = await response.json();
       console.log(updatedAlerts)
+
+      // Update/refetch alerts
+      //fetchAlerts();
     } catch (err) {
       console.error('Error making request:', err);
     }
@@ -109,12 +104,15 @@ export default function Alerts() {
           onClick={() => {
             if (showAlerts) {
               // Close alerts window, mark unread as read
-              markAsRead();
+              //markAsRead();
               setShowAlerts(false);
+              // Refetch alerts to reflect new read status
+              fetchAlerts();
             } else {
               // Fetch then open alerts window
-              fetchAlerts();
+              //fetchAlerts();
               setShowAlerts(true);
+              markAsRead();
             }
           }}
       >

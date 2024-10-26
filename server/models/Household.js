@@ -7,7 +7,7 @@ const debtSchema = new mongoose.Schema({
 }, { _id: false });
 
 const alertSchema = new mongoose.Schema({
-    _id: { type: String, required: true},
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true},
     category: {
         type: String,
         enum: ['Payment', 'Nudge', 'Expiration'],
