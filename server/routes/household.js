@@ -287,6 +287,10 @@ router.get("/:id/purchasedlist", async (req, res) => {
         {
           path: 'sharedBetween',
           select: 'username'
+        },
+        {
+          path: 'splits.member',
+          select: 'username'
         }
       ]
     });
