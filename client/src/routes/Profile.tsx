@@ -295,12 +295,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   };
 
   const handleChangeUserNameClick = async () => {
-    console.log("temp username", tempUsername)
-    //if (isEditing == true) {
-    //  setDisplayUsername(tempUsername);
-    //  alert(`${tempUsername} has been changed successfully`);
-    //}
-
     try {
       console.log("display username", displayUsername)
       const uniqueChkresponse = await fetch(`http://localhost:${PORT}/user`, {
@@ -425,7 +419,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
   const handleChangeBioClick = async () => {
     setDisplayPassword(tempBio);
-    // alert("Bio has been changed successfully");
     setIsSuccessOpen(true);
     setSuccessMessage("Bio has been changed successfully")
 
@@ -653,6 +646,68 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
 // ---------- UI Function for Notification Settings --------------------------
 const Settings: React.FC = () => {
+  const { user } = useUserContext();
+
+  const [expirationNotif, setExpirationNotif] = useState(user?.preferences.expirationNotif);
+  const [paymentNotif, setPaymentNotif] = useState(user?.preferences.expirationNotif);
+
+  /*const [tempName, setTempName] = useState(email);
+  const [tempUsername, setTempUsername] = useState(username);*/
+
+  // Toggle confirmation modal for account deletion
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const openModal = () => setShowConfirmDelete(true);
+  const closeModal = () => setShowConfirmDelete(false);
+
+  // Alert modal
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
+  // Success modal
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  //update disply fields when props state change
+  useEffect(() => {
+    setExpirationNotif(expirationNotif);
+    setPaymentNotif(paymentNotif);
+
+    /*setTempName(email || '');
+    setTempUsername(username || '');*/
+
+  }, [user]);
+
+  // Event handler function for the button click
+  const handleChangeNameClick = async () => {
+    /*setDisplayName(tempName);
+    setIsSuccessOpen(true);
+    setSuccessMessage(`${tempName} has been changed successfully`);
+
+    const url = `http://localhost:${PORT}/user/${user?.id}`;
+
+    try {
+      console.log("email", displayName)
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: tempName,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('email updated successfully!');
+        setRefreshProfile((prev) => prev + 1);
+      } else {
+        console.error('Failed to update email.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }*/
+  };
+
   // State to track switch states
   const [householdAlerts, setHouseholdAlerts] = useState(true);
   const [paymentReminders, setPaymentReminders] = useState(true);
@@ -667,12 +722,20 @@ const Settings: React.FC = () => {
       {/* Settings Header */}
       <div className="settings-header">
         <h2>Settings</h2>
-
       </div>
 
       {/* Notifications Section */}
       <div className="notifications-section">
         <h3>Notifications</h3>
+        <label>Expiration notifications:</label>
+        <div>{expirationNotif}</div>
+        <select name="cars">
+          <option value="all">All</option>
+          <option value="relevant">Relevant</option>
+          <option value="none">None</option>
+        </select>
+
+
         <div className="notification-row">
           <div className="notification-item">
             <label className="notification-label">Household Alerts</label>

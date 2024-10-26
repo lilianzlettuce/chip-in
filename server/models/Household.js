@@ -7,13 +7,15 @@ const debtSchema = new mongoose.Schema({
 }, { _id: false });
 
 const alertSchema = new mongoose.Schema({
+    _id: { type: mongoose.Schema.Types.ObjectId, required: true},
     category: {
         type: String,
         enum: ['Payment', 'Nudge', 'Expiration'],
         required: true},
     content: { type: String, required: true},
     recipients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
-    date: {type: Date, required: true}
+    date: {type: Date, required: true},
+    readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
 });
 
 const noteSchema = new mongoose.Schema({

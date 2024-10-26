@@ -272,6 +272,7 @@ export default function Dashboard() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+            console.log("purchased items: " + data);
             const normalizedData = data.map((item: any) => ({
                 ...item,
                 sharedBetween: item.sharedBetween ?? [],

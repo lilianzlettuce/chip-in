@@ -4,8 +4,9 @@ import User from '../models/User.js'
 import Item from '../models/Item.js'
 import mongoose from 'mongoose'; 
 
-const router = express.Router();
+import { ObjectId } from 'mongodb';
 
+const router = express.Router();
 
 // Search for items within a specific household based on the item name
 router.get('/:householdId/search', async (req, res) => {
@@ -49,22 +50,20 @@ router.get('/:householdId/search', async (req, res) => {
 
 // POST route to update household members
 router.patch('/updateMembers/:id', async (req, res) => {
-    const { userId } = req.body; // Expect _id of household and userId to add
-    try {
-  
+  const { userId } = req.body; // Expect _id of household and userId to add
+  try {
     // Find the household and update members
     const household = await Household.findByIdAndUpdate(
-    req.params.id,
-    {$addToSet: { members: userId }},
-    { new: true, useFindAndModify: false } // Return the updated document
-      );
+      req.params.id,
+      { $addToSet: { members: userId } },
+      { new: true, useFindAndModify: false } // Return the updated document
+    );
   
     res.status(200).json({msg: "new user added to household"})
-    } catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message })
-    }
-  
-  });
+  }
+});
 
 //move from purchased to grocery
 router.patch('/repurchase', async (req, res) => {
@@ -79,8 +78,8 @@ router.patch('/repurchase', async (req, res) => {
 
     const household = await Household.findByIdAndUpdate(
       householdId,
-      {$push: {groceryList: savedItem._id}},
-      {new: true, useFindandModify: false}
+      { $push: { groceryList: savedItem._id } },
+      { new: true, useFindandModify: false }
     );
     
     if (!household) {

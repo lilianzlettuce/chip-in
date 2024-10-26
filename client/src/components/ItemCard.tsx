@@ -35,10 +35,6 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
     if (!user) return <div>No User</div>;
 
-    console.log("ItemCard Props:", {
-        category, name, price, sharedBy, purchasedBy, expiryDate
-    });
-
     const displayPurchasedBy = purchasedBy ? purchasedBy : 'Unknown';
     const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
     const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';

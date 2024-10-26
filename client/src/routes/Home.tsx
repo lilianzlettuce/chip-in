@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useUserContext } from '../UserContext';
 import { Confirm } from '../components/Confirm';
+import Alerts from '../components/Alerts';
 import {InviteHousehold , Modal2}  from './InviteHousehold'
 
 // Function to handle the "Leave Household" action
@@ -65,6 +66,7 @@ export default function Home() {
 
   return (
     <div>
+      <Alerts />
       {/*<h1>household name : {householdName}</h1>*/}
       <h1>household id : {householdId}</h1>
       <h1>user id: {userId}</h1>

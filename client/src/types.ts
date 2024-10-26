@@ -8,6 +8,15 @@ export type HouseholdNavType = {
     id: string;
     name: string;
 };
+
+export type AlertType = {
+    _id: string;
+    date: string;
+    category: "Payment" | "Nudge" | "Expiration";
+    content: string;
+    recipients: string[];
+    readBy: string[];
+}
   
 export type PreferencesType = {
     theme: string;
@@ -27,5 +36,9 @@ export type UserType = {
     username: string,
     email: string,
     households: string[],
-    preferences:  boolean[],
+    preferences:  {
+        expirationNotif: "all" | "relevant" | "none",
+        paymentNotif:  "all" | "relevant" | "none",
+    },
+    //preferences:  boolean[],
 }
