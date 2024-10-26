@@ -565,6 +565,10 @@ export default function Dashboard() {
                                         sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
                                             (user) => user.username || 'Unknown'
                                         )}
+                                        splits={(item['splits'] || []).map((split: any) => ({
+                                            member: split.member.username || 'Unknown',
+                                            split: split.split|| 0
+                                        }))}
                                         purchasedBy={item['purchasedBy']?.username || 'Unknown'}
                                         expiryDate={
                                             item['expirationDate']
@@ -653,6 +657,7 @@ export default function Dashboard() {
                                             setModalOpen(true);
                                         }}
                                         listType="grocery"
+                                        splits={[]}
                                     />
                                 </li>
                             ))

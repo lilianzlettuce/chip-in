@@ -62,6 +62,19 @@ router.patch('/purchase', async (req, res) => {
   cost *= 100;
 
   try {
+    const currItem = await Item.findById(itemId);
+    
+    if ((!splits || splits.length == 0) && currItem.sharedBetween.length == 0) {
+      if (!sharedBetween && sharedBetween.length == 0) {
+        return res.status(400).json({message: 'sharedBetween cannot be empty'})
+      }
+      const defaultSplit = 1/sharedBetween.length;
+      splits =  sharedBetween.map(userId => ({
+        member: userId,
+        split: defaultSplit
+      }));
+    }
+
     const updatedItem = await Item.findByIdAndUpdate(
       itemId,
       {
@@ -273,6 +286,10 @@ router.get("/:id/purchasedlist", async (req, res) => {
         },
         {
           path: 'sharedBetween',
+          select: 'username'
+        },
+        {
+          path: 'splits.member',
           select: 'username'
         }
       ]
