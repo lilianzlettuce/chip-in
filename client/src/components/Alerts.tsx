@@ -45,16 +45,27 @@ export default function Alerts() {
         let preference: string = "all";
         if (alert.category == "Payment" && userPrefs?.paymentNotif) {
           preference = userPrefs?.paymentNotif;
-        } else if (alert.category == "Expiration" && userPrefs?.paymentNotif) {
+        } else if (alert.category == "Expiration" && userPrefs?.expirationNotif) {
           preference = userPrefs?.expirationNotif;
+        } else if (alert.category == "Nudge") {
+          // Nudge: only add if user is on recipient list
+          preference = "relevant";
         }
 
+        // Display alert based on preference
         if (preference == "all") {
           // Add alert
           userAlerts.push(alert);
         } else if (preference == "relevant") {
-          // Add alert if relevant
+          // Add alert only if user is on recipient list
           // TODO
+          for (const recipient of alert.recipient) {
+            if (recipient == userId) {
+              // Add to list
+              userAlerts.push(alert);
+              break;
+            }
+          }
         }
       }
 
@@ -64,16 +75,18 @@ export default function Alerts() {
       for (const alert of userAlerts) {
         // Check if alert has been read by this user
         let isRead: boolean = false;
-        for (const recipient of alert.recipients) {
-          if (recipient == userId) {
-            // Add to read list
-            newReadAlerts.push(alert);
-            isRead = true;
-            break;
+        if (alert.readBy && alert.readBy.length > 0) {
+          for (const tempUserId of alert.readBy) {
+            if (tempUserId == userId) {
+              // Add to read list
+              newReadAlerts.push(alert);
+              isRead = true;
+              break;
+            }
           }
         }
 
-        // If user not found in alert recipients list, add it to unread list
+        // If user not found in alert readBy list, add it to unread list
         if (!isRead) {
           newUnreadAlerts.push(alert);
         }

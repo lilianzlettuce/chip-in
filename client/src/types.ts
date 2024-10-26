@@ -15,6 +15,7 @@ export type AlertType = {
     category: "Payment" | "Nudge" | "Expiration";
     content: string;
     recipients: string[];
+    readBy: string[];
 }
   
 export type PreferencesType = {
