@@ -93,30 +93,30 @@ router.post('/addtopurchased', async (req, res) => {
 });
 
 //get based on searched name
-router.get('/search', async (req, res) => {
-  const { name } = req.query;
+// router.get('/search', async (req, res) => {
+//   const { name } = req.query;
 
-  try {
-    const items = await Item.find({ name: new RegExp(name, 'i') })
-      .populate('purchasedBy', 'username')
-      .populate('sharedBetween', 'username');
+//   try {
+//     const items = await Item.find({ name: new RegExp(name, 'i') })
+//       .populate('purchasedBy', 'username')
+//       .populate('sharedBetween', 'username');
 
-    const itemsWithListType = await Promise.all(items.map(async (item) => {
-      try {
-        const isPurchased = await Household.exists({ purchasedList: item._id });
-        const listType = isPurchased ? 'purchased' : 'grocery';
-        return { ...item.toObject(), listType };
-      } catch (error) {
-        console.error(`Error determining list type for item ${item._id}:`, error);
-        return { ...item.toObject(), listType: 'unknown' };
-      }
-    }));
-    res.status(200).json(itemsWithListType);
-  } catch (err) {
-    console.error('Error searching items:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     const itemsWithListType = await Promise.all(items.map(async (item) => {
+//       try {
+//         const isPurchased = await Household.exists({ purchasedList: item._id });
+//         const listType = isPurchased ? 'purchased' : 'grocery';
+//         return { ...item.toObject(), listType };
+//       } catch (error) {
+//         console.error(`Error determining list type for item ${item._id}:`, error);
+//         return { ...item.toObject(), listType: 'unknown' };
+//       }
+//     }));
+//     res.status(200).json(itemsWithListType);
+//   } catch (err) {
+//     console.error('Error searching items:', err.message);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 //get all
 router.get('/', async (req, res) => {

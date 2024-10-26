@@ -60,8 +60,8 @@ export default function Dashboard() {
 
         setIsSearching(true);
         try {
-            const response = await fetch(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
-            console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
+            const response = await fetch(`http://localhost:6969/household/${householdId}/search?name=${encodeURIComponent(value)}`);
+            // console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

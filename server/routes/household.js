@@ -6,6 +6,47 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+
+// Search for items within a specific household based on the item name
+router.get('/:householdId/search', async (req, res) => {
+  const { householdId } = req.params;
+  const { name } = req.query;
+
+  try {
+    const household = await Household.findById(householdId).populate({
+      path: 'groceryList purchasedList',
+      populate: [
+        {
+          path: 'purchasedBy', 
+          select: 'username' 
+        },
+        {
+          path: 'sharedBetween', 
+          select: 'username' 
+        }
+      ]
+    });
+
+    const matchedGroceryItems = household.groceryList.filter(item => 
+      new RegExp(name, 'i').test(item.name)
+    );
+    const matchedPurchasedItems = household.purchasedList.filter(item => 
+      new RegExp(name, 'i').test(item.name)
+    );
+    
+    const itemsWithListType = [
+      ...matchedGroceryItems.map(item => ({ ...item.toObject(), listType: 'grocery' })),
+      ...matchedPurchasedItems.map(item => ({ ...item.toObject(), listType: 'purchased' }))
+    ];
+
+    res.status(200).json(itemsWithListType);
+  } catch (err) {
+    console.error('Error searching items:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // POST route to update household members
 router.patch('/updateMembers/:id', async (req, res) => {
     const { userId } = req.body; // Expect _id of household and userId to add
