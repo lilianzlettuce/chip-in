@@ -28,9 +28,9 @@ router.delete('/:listType/:id', async (req, res) => {
 
 //create item and add to grocery list
 router.post('/addtogrocery', async (req, res) => {
-  const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+  const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits } = req.body;
 
-  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
+  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
 
   try {
     const item = await newItem.save();
@@ -53,14 +53,25 @@ router.post('/addtogrocery', async (req, res) => {
 
 //create item and add to purchased list
 router.post('/addtopurchased', async (req, res) => {
-  let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+  let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits } = req.body;
 
   if (!name || !category || !purchasedBy || !purchaseDate || cost === undefined || cost === null) {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
+  if (!splits || splits.length == 0) {
+    if (!sharedBetween || sharedBetween.length == 0) {
+      return res.status(400).json({message: 'sharedBetween cannot be empty'})
+    }
+    const defaultSplit = 1/sharedBetween.length;
+    splits =  sharedBetween.map(userId => ({
+      member: userId,
+      split: defaultSplit
+    }));
+  }
+
   cost *= 100;
-  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost });
+  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
 
   try {
     const item = await newItem.save();
@@ -82,30 +93,30 @@ router.post('/addtopurchased', async (req, res) => {
 });
 
 //get based on searched name
-router.get('/search', async (req, res) => {
-  const { name } = req.query;
+// router.get('/search', async (req, res) => {
+//   const { name } = req.query;
 
-  try {
-    const items = await Item.find({ name: new RegExp(name, 'i') })
-      .populate('purchasedBy', 'username')
-      .populate('sharedBetween', 'username');
+//   try {
+//     const items = await Item.find({ name: new RegExp(name, 'i') })
+//       .populate('purchasedBy', 'username')
+//       .populate('sharedBetween', 'username');
 
-    const itemsWithListType = await Promise.all(items.map(async (item) => {
-      try {
-        const isPurchased = await Household.exists({ purchasedList: item._id });
-        const listType = isPurchased ? 'purchased' : 'grocery';
-        return { ...item.toObject(), listType };
-      } catch (error) {
-        console.error(`Error determining list type for item ${item._id}:`, error);
-        return { ...item.toObject(), listType: 'unknown' };
-      }
-    }));
-    res.status(200).json(itemsWithListType);
-  } catch (err) {
-    console.error('Error searching items:', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+//     const itemsWithListType = await Promise.all(items.map(async (item) => {
+//       try {
+//         const isPurchased = await Household.exists({ purchasedList: item._id });
+//         const listType = isPurchased ? 'purchased' : 'grocery';
+//         return { ...item.toObject(), listType };
+//       } catch (error) {
+//         console.error(`Error determining list type for item ${item._id}:`, error);
+//         return { ...item.toObject(), listType: 'unknown' };
+//       }
+//     }));
+//     res.status(200).json(itemsWithListType);
+//   } catch (err) {
+//     console.error('Error searching items:', err.message);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 //get all
 router.get('/', async (req, res) => {

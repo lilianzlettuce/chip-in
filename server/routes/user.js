@@ -135,6 +135,41 @@ router.post("/resetpass", async (req, res) => {
   }
 });
 
+router.post("/invitejoin", async (req, res) => {
+  const { email , householdId} = req.body;
+  console.log("invitejoin is called")
+  if (!email) {
+    return res.status(400).send({ message: 'Email is required' });
+  }
+
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your Invitation to Join',
+      text: `You are invited to join household code: ${householdId}
+      Please click the link http://localhost:5173/login
+      Press "Join Household" button and enter the code.`,
+    };
+
+    console.log("sender email: ", process.env.EMAIL_USER)
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email: " + error);
+        return res.status(500).send({ message: 'Error sending email' });
+      }
+
+      console.log('Email sent: ' + info.response);
+      return res.status(200).send({ message: 'Invite email sent' });
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ message: 'An error occurred' });
+  }
+});
+
 router.post("/resetcode", async (req, res) => {
   const { email, code, newPassword } = req.body;
 

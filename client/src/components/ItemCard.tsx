@@ -8,6 +8,7 @@ interface ItemCardProps {
     name: string;
     price: number;
     sharedBy: string[];
+    splits: { member: string; split: number }[];
     purchasedBy: string;
     expiryDate: string;
     isExpiringSoon: boolean;
@@ -21,6 +22,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     name,
     price,
     sharedBy,
+    splits,
     purchasedBy,
     expiryDate,
     isExpiringSoon,
@@ -47,8 +49,26 @@ const ItemCard: React.FC<ItemCardProps> = ({
                     <span className="price">{displayPrice}</span>
                 )}
             </div>
-            <div className="shared-by-text">
+            {/* <div className="shared-by-text">
                 Shared by <b>{displaySharedBy}</b>
+            </div> */}
+            <div>
+                Shared by{' '}
+                {sharedBy.length > 0 ? (
+                    sharedBy.map((username, index) => {
+                    let splitAmount = ((splits.find((split) => split.member === username)?.split || 0) * price).toFixed(2);
+                    if (sharedBy.length == 1) {splitAmount = String(price.toFixed(2))}
+                    return (
+                        <span key={index} className="shared-user">
+                            {username}
+                            <span className="custom-tooltip">Split: ${splitAmount}</span>
+                            {index < sharedBy.length - 1 ? ', ' : ''}
+                        </span>
+                    );
+                })
+                ) : (
+                    'No one'
+                )}
             </div>
             <div className="footer">
                 <div>{listType === 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{displayPurchasedBy}</b></div>

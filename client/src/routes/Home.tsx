@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useUserContext } from '../UserContext';
 import { Confirm } from '../components/Confirm';
 import Alerts from '../components/Alerts';
+import {InviteHousehold , Modal2}  from './InviteHousehold'
 
 // Function to handle the "Leave Household" action
 
@@ -18,6 +19,13 @@ export default function Home() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const openModal = () => setShowConfirmDelete(true);
   const closeModal = () => setShowConfirmDelete(false);
+
+  // Modal for Invite Household
+  const [showInviteHousehold, setInviteHousehold] = useState(false);
+  // Function to open the modal
+  const openModal2 = () => setInviteHousehold(true);
+  // Function to close the modal
+  const closeModal2 = () => setInviteHousehold(false);
 
   const handleLeave = async () => {
     try {
@@ -78,6 +86,23 @@ export default function Home() {
           onConfirm={handleLeave}
           message="Are you sure you want to leave this household?">
         </Confirm>
+
+        <h1>Press the "Invite User" button below if you wish to invite others to join this household</h1>
+            <div>
+              <button 
+                className="label-button submit-button"
+                  onClick={openModal2}>
+                Invite User
+              </button>
+              <Modal2 show={showInviteHousehold} onClose={closeModal2}>
+                <InviteHousehold onClose={closeModal2} householdId={householdId}/> 
+              </Modal2>
+              <br></br>
+              <br></br>
+            </div> 
+
+
+
       </div>
     </div>
   );

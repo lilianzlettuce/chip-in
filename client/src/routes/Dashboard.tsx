@@ -60,8 +60,8 @@ export default function Dashboard() {
 
         setIsSearching(true);
         try {
-            const response = await fetch(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
-            console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
+            const response = await fetch(`http://localhost:6969/household/${householdId}/search?name=${encodeURIComponent(value)}`);
+            // console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -566,6 +566,10 @@ export default function Dashboard() {
                                         sharedBy={(item['sharedBetween'] as { _id: string; username: string }[] || []).map(
                                             (user) => user.username || 'Unknown'
                                         )}
+                                        splits={(item['splits'] || []).map((split: any) => ({
+                                            member: split.member.username || 'Unknown',
+                                            split: split.split|| 0
+                                        }))}
                                         purchasedBy={item['purchasedBy']?.username || 'Unknown'}
                                         expiryDate={
                                             item['expirationDate']
@@ -654,6 +658,7 @@ export default function Dashboard() {
                                             setModalOpen(true);
                                         }}
                                         listType="grocery"
+                                        splits={[]}
                                     />
                                 </li>
                             ))

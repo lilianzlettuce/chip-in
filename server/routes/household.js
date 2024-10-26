@@ -2,12 +2,53 @@ import express from 'express';
 import Household from '../models/Household.js';
 import User from '../models/User.js'
 import Item from '../models/Item.js'
+import mongoose from 'mongoose'; 
 
 import { ObjectId } from 'mongodb';
 
 const router = express.Router();
 
-// route to update household members
+// Search for items within a specific household based on the item name
+router.get('/:householdId/search', async (req, res) => {
+  const { householdId } = req.params;
+  const { name } = req.query;
+
+  try {
+    const household = await Household.findById(householdId).populate({
+      path: 'groceryList purchasedList',
+      populate: [
+        {
+          path: 'purchasedBy', 
+          select: 'username' 
+        },
+        {
+          path: 'sharedBetween', 
+          select: 'username' 
+        }
+      ]
+    });
+
+    const matchedGroceryItems = household.groceryList.filter(item => 
+      new RegExp(name, 'i').test(item.name)
+    );
+    const matchedPurchasedItems = household.purchasedList.filter(item => 
+      new RegExp(name, 'i').test(item.name)
+    );
+    
+    const itemsWithListType = [
+      ...matchedGroceryItems.map(item => ({ ...item.toObject(), listType: 'grocery' })),
+      ...matchedPurchasedItems.map(item => ({ ...item.toObject(), listType: 'purchased' }))
+    ];
+
+    res.status(200).json(itemsWithListType);
+  } catch (err) {
+    console.error('Error searching items:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// POST route to update household members
 router.patch('/updateMembers/:id', async (req, res) => {
   const { userId } = req.body; // Expect _id of household and userId to add
   try {
@@ -61,6 +102,19 @@ router.patch('/purchase', async (req, res) => {
   cost *= 100;
 
   try {
+    const currItem = await Item.findById(itemId);
+    
+    if ((!splits || splits.length == 0) && currItem.sharedBetween.length == 0) {
+      if (!sharedBetween && sharedBetween.length == 0) {
+        return res.status(400).json({message: 'sharedBetween cannot be empty'})
+      }
+      const defaultSplit = 1/sharedBetween.length;
+      splits =  sharedBetween.map(userId => ({
+        member: userId,
+        split: defaultSplit
+      }));
+    }
+
     const updatedItem = await Item.findByIdAndUpdate(
       itemId,
       {
@@ -192,6 +246,12 @@ router.post("/addUser/:id", async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        // check to make sure that user is not in household
+        if (user.households.some(household => household.equals(new mongoose.Types.ObjectId(householdId)))) {
+          console.log("User is already in the household");
+          return res.status(400).json({ message: 'User is already in the household' });
+        }
         
         // add household to user
         user.households.push(householdId);
@@ -266,6 +326,10 @@ router.get("/:id/purchasedlist", async (req, res) => {
         },
         {
           path: 'sharedBetween',
+          select: 'username'
+        },
+        {
+          path: 'splits.member',
           select: 'username'
         }
       ]
