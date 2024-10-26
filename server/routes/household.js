@@ -3,26 +3,72 @@ import Household from '../models/Household.js';
 import User from '../models/User.js'
 import Item from '../models/Item.js'
 
+import { ObjectId } from 'mongodb';
+
 const router = express.Router();
 
-// POST route to update household members
+// route to update household alerts
+router.patch('/updateAlerts/:householdID', async (req, res) => {
+  const householdId = req.params.householdID;
+  const { alertUpdates, userId } = req.body;
+
+  // Convert userId to ObjectId
+  const userObjectId = new ObjectId(userId);
+
+  console.log(alertUpdates)
+
+  const household = await Household.findOne({ _id: householdId });
+  console.log(household.alerts);
+
+  try {
+    // Perform updates for each alert in the input array
+    for (const alert of alertUpdates) {
+      const { _id, readBy } = alert;
+      let alertId = new ObjectId(_id);
+
+      const result = await Household.updateOne(
+          { _id: householdId },
+          {
+            /*$set: {
+              'alerts.$[alert].readBy': readBy,  // Set status dynamically
+              'alerts.$[alert].content': "your mother",
+            }*/
+            $addToSet: { 'alerts.$[alert].readBy': userObjectId }
+          },
+          {
+            arrayFilters: [
+              { 'alert._id': alertId } // Match by alert ID
+            ]
+          },
+      );
+
+      console.log(`Updated alert ${_id}:`, result);
+    }
+
+    console.log('All alerts updated successfully!');
+    res.status(200).json({msg: "household alerts updated"});
+  } catch (error) {
+    console.error('Error updating alerts:', error);
+    res.status(500).json({msg: error});
+  }
+});
+
+// route to update household members
 router.patch('/updateMembers/:id', async (req, res) => {
-    const { userId } = req.body; // Expect _id of household and userId to add
-    try {
-  
+  const { userId } = req.body; // Expect _id of household and userId to add
+  try {
     // Find the household and update members
     const household = await Household.findByIdAndUpdate(
-    req.params.id,
-    {$addToSet: { members: userId }},
-    { new: true, useFindAndModify: false } // Return the updated document
-      );
+      req.params.id,
+      { $addToSet: { members: userId } },
+      { new: true, useFindAndModify: false } // Return the updated document
+    );
   
     res.status(200).json({msg: "new user added to household"})
-    } catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message })
-    }
-  
-  });
+  }
+});
 
 //move from purchased to grocery
 router.patch('/repurchase', async (req, res) => {
@@ -37,8 +83,8 @@ router.patch('/repurchase', async (req, res) => {
 
     const household = await Household.findByIdAndUpdate(
       householdId,
-      {$push: {groceryList: savedItem._id}},
-      {new: true, useFindandModify: false}
+      { $push: { groceryList: savedItem._id } },
+      { new: true, useFindandModify: false }
     );
     
     if (!household) {

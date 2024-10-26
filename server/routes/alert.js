@@ -30,7 +30,7 @@ router.get('/:householdID/:userID', async (req, res) => {
 
         // Filter alerts through user preferences
         let userAlerts = [];
-        for (const alert of householdAlerts) {
+        for (const alert of householdAlerts.reverse()) {
             // Check user's preference for this type of notification
             let preference = "all";
             if (alert.category == "Payment" && userPrefs.get("paymentNotif")) {

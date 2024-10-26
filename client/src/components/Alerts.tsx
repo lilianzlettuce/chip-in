@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../UserContext';
 
@@ -17,11 +17,8 @@ export default function Alerts() {
 
   // Get the state passed from NavLink (householdName and userId)
   const { user } = useUserContext();
-
   const userId = user?.id;
-  const userPrefs = user?.preferences;
 
-  const [allAlerts, setAllAlerts] = useState<AlertType[]>([]);
   const [unreadAlerts, setUnreadAlerts] = useState<AlertType[]>([]);
   const [readAlerts, setReadAlerts] = useState<AlertType[]>([]);
   const [showAlerts, setShowAlerts] = useState(false);
@@ -62,7 +59,6 @@ export default function Alerts() {
       }
 
       // Update alerts in state
-      setAllAlerts(userAlerts);
       setUnreadAlerts(newUnreadAlerts);
       setReadAlerts(newReadAlerts);
     } catch (error) {
@@ -70,27 +66,56 @@ export default function Alerts() {
     }
   };
 
+  // Mark all unread alerts as read 
+  const markAsRead = async () => {
+    try {
+      let alertUpdates: AlertType[] = structuredClone(unreadAlerts);
+      if (userId) {
+        for (let alert of alertUpdates) {
+          alert.readBy.push(userId);
+        }
+      }
+      console.log(alertUpdates)
+
+      // Send patch request to update alerts
+      const response = await fetch(`http://localhost:6969/household/updateAlerts/${householdId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ alertUpdates, userId }), // Send the userId in the request body
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedAlerts = await response.json();
+      console.log(updatedAlerts)
+    } catch (err) {
+      console.error('Error making request:', err);
+    }
+  }
+
   useEffect(() => {
     if (user && householdId) {
       fetchAlerts();
     }
   }, [householdId]);
 
-  //const location = useLocation();
-  // const {householdName} = location.state || {};
-  /*const { householdName, userId } = location.state || {}; // Use default empty object
-
-  const handleSubmit = (householdName: string, userId: string) => {
-      // Call handleLeave with householdName and userId
-      handleLeave(householdName, userId);
-  }*/
-
   return (
     <div className="fixed left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end">
       <button className="relative bg-gray-900 text-white w-10 h-10 rounded-full" 
           onClick={() => {
-            fetchAlerts();
-            setShowAlerts(showAlerts ? false : true);
+            if (showAlerts) {
+              // Close alerts window, mark unread as read
+              markAsRead();
+              setShowAlerts(false);
+            } else {
+              // Fetch then open alerts window
+              fetchAlerts();
+              setShowAlerts(true);
+            }
           }}
       >
         {unreadAlerts.length != 0 &&
@@ -110,8 +135,11 @@ export default function Alerts() {
           {unreadAlerts.map((alert, i) => (
             <div className="flex flex-col gap-2 items-start p-4 py-3 border-solid border-gray-300 border-b-2"
                 key={i}>
-              <div className={`text-sm font-bold ${alert.category == "Payment" ? "text-teal-400" : alert.category == "Nudge" ? "text-amber-400" : "text-red-400"}`}>
-                — {alert.category} —
+              <div className="w-full flex justify-between items-center">
+                <div className={`text-sm font-bold ${alert.category == "Payment" ? "text-teal-400" : alert.category == "Nudge" ? "text-amber-400" : "text-red-400"}`}>
+                  — {alert.category} —
+                </div>
+                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
               </div>
               <div className="text-start">
                 {alert.content}
