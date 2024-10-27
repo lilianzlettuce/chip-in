@@ -80,7 +80,7 @@ router.patch('/repurchase', async (req, res) => {
     const household = await Household.findByIdAndUpdate(
       householdId,
       { $push: { groceryList: savedItem._id } },
-      { new: true, useFindandModify: false }
+      { new: true, useFindAndModify: false }
     );
 
     if (!household) {
@@ -134,8 +134,31 @@ router.patch('/purchase', async (req, res) => {
         $pull: { groceryList: updatedItem._id },
         $push: { purchasedList: updatedItem._id }
       },
-      { new: true, useFindandModify: false }
+      { new: true, useFindAndModify: false }
     );
+
+    for (const split of splits) {
+      const splitCost = split.split * cost;
+      console.log(splitCost)
+      console.log('split.member', split.member)
+      console.log('purchasedby', purchasedBy)
+      if (split.member === purchasedBy) {continue;}
+      let newHousehold = await Household.findOneAndUpdate(
+        {
+          _id: householdId
+        },
+        {
+          $inc: { "debts.$[elem].amount": splitCost }
+        },
+        {
+          arrayFilters: [
+            { "elem.owedBy": split.member, "elem.owedTo": purchasedBy }
+          ],
+          new: true,
+          useFindAndModify: false
+        }
+      );   
+    }
 
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
@@ -255,30 +278,38 @@ router.post("/addUser/:id", async (req, res) => {
     }
 
     // add household to user
-    user.households.push(householdId);
+    const newUser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { households: householdId } },
+      { new: true, useFindAndModify: false }
+    );
 
-    // create new debts
+    //create new debts
+    let newDebts = [];
     for (let i = 0; i < household.members.length; i++) {
-      household.debts.push({
+      newDebts.push({
         owedBy: userId,
         owedTo: household.members[i],
         amount: 0
       });
-      household.debts.push({
+      newDebts.push({
         owedBy: household.members[i],
         owedTo: userId,
         amount: 0
       });
     }
+    
+    const newHousehold = await Household.findByIdAndUpdate(
+      householdId,
+      { $push: { 
+          members: userId,
+          debts: { $each: newDebts }
+        } 
+      },
+      { new: true, useFindAndModify: false }
+    );
 
-    // add user to household members list
-    household.members.push(userId);
-
-    // update documents
-    await user.save();
-    await household.save();
-
-    res.status(200).json(household);
+    res.status(200).json(newHousehold);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -373,13 +404,35 @@ router.post("/leave/:id", async (req, res) => {
       return res.status(400).json({ message: 'User is not a member of this household' });
     }
 
-    household.members = household.members.filter(memberId => memberId.toString() !== userId);
+    // household.members = household.members.filter(memberId => memberId.toString() !== userId);
 
-    household.debts = household.debts.filter(debt =>
-      debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+    // household.debts = household.debts.filter(debt =>
+    //   debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+    // );
+
+    // user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+
+    // Remove user from household's members and remove debts
+    await Household.updateOne(
+      { _id: householdId },
+      { 
+        $pull: { 
+          members: userId,
+          debts: { 
+            $or: [ 
+              { owedBy: userId }, 
+              { owedTo: userId } 
+            ] 
+          }
+        } 
+      }
     );
 
-    user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+    // Remove household from user's household list
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { households: householdId } }
+    );
 
     // If the last member leaves, delete the household
     if (household.members.length === 0) {
@@ -387,8 +440,8 @@ router.post("/leave/:id", async (req, res) => {
       res.status(200).json({ message: 'Household deleted as the last member left' });
     } else {
       // Otherwise save the changes
-      await household.save();
-      await user.save();
+      // await household.save();
+      // await user.save();
       res.status(200).json({ message: 'User successfully removed from household' });
     }
 
