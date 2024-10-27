@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import ItemCard from '../components/ItemCard';
 import './Dashboard.css';
 import ItemModal from '../components/ItemModal';
+import Corkboard from '../components/Corkboard';
 import AddItemModal from './AddItem';
 import AddItemModalGrocery from './AddGrocery';
 import './AddItem.css';
@@ -500,6 +501,8 @@ export default function Dashboard() {
     return (
         <div className="dashboard-container">
             <h1 className="dashboard-title">Dashboard</h1>
+            
+            <Corkboard />
 
             {/* Search Bar */}
             <div className="search-bar-wrapper">
