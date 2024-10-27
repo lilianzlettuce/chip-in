@@ -29,17 +29,17 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedRoommate = e.target.value; // Set the selected roommate as the purchaser
-    setSharedBetween((prev) => prev.filter((roommate) => roommate !== purchasedBy));
+    // setSharedBetween((prev) => prev.filter((roommate) => roommate !== purchasedBy));
 
     setPurchasedBy(selectedRoommate);
 
     // Update sharedBetween state to include the selected roommate (if not already included)
-    setSharedBetween((prev) => {
+    /*setSharedBetween((prev) => {
       if (!prev.includes(selectedRoommate)) {
         return [...prev, selectedRoommate]; // Add the selected roommate
       }
       return prev; // Return unchanged if already present
-    });
+    });*/
   };
 
   // Function to handle form submission
