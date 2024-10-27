@@ -31,9 +31,9 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
   const handleSubmit = async () => {
     // Map selected roommate names to their corresponding string IDs
     const purchasedIdsArray = purchasedBy.map((name) => {
-        const roommate = roommates.find((roommate) => roommate.name === name);
-        return roommate ? roommate._id : null;
-      }).filter((id) => id !== null); // Remove any null values
+      const roommate = roommates.find((roommate) => roommate.name === name);
+      return roommate ? roommate._id : null;
+    }).filter((id) => id !== null); // Remove any null values
 
     const sharedIdsArray = sharedBetween.map((name) => {
       const roommate = roommates.find((roommate) => roommate.name === name);
@@ -77,54 +77,61 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
   };
 
   return (
-   <div className="modal-overlay">
-     <div className="modal-content">
-       <button className="close-button" onClick={onClose}>X</button>
-       <h2>Add New Item</h2>
-      
-       {/* Form Fields */}
-       <div className="input-group">
-         <label>Name:</label>
-         <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-       </div>
-       <div className="input-group">
-         <label>Category:</label>
-         <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} />
-       </div>
-       <div className="input-group">
-         <label>Assign Purchaser:</label>
-         {roommates.map((roommate) => (
-           <div key={roommate._id}>
-             <input
-               type="radio"
-               value={roommate.name}
-               checked={purchasedBy.includes(roommate.name)}
-               onChange={handleCheckboxChange}
-             />
-             <label>{roommate.name}</label>
-           </div>
-         ))}
-       </div>
-       <div className="input-group">
-         <label>Shared Between:</label>
-         {roommates.map((roommate) => (
-           <div key={roommate._id}>
-             <input
-               type="checkbox"
-               value={roommate.name}
-               checked={sharedBetween.includes(roommate.name)}
-               onChange={handleCheckboxChange}
-             />
-             <label>{roommate.name}</label>
-           </div>
-         ))}
-       </div>
-      
-       {/* Submit Button */}
-       <button className="submit-button" onClick={handleSubmit}>Save Item</button>
-     </div>
-   </div>
- );
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <button className="close-button" onClick={onClose}>X</button>
+        <h2>Add New Item</h2>
+
+        {/* Form Fields */}
+        <div className="input-group">
+          <label>Name:</label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="input-group">
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">Select a category</option>
+            <option value="Food">Food</option>
+            <option value="Drink">Drink</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Toiletries">Toiletries</option>
+            <option value="Pet">Pet</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div className="input-group">
+          <label>Assign Purchaser:</label>
+          {roommates.map((roommate) => (
+            <div key={roommate._id}>
+              <input
+                type="radio"
+                value={roommate.name}
+                checked={purchasedBy.includes(roommate.name)}
+                onChange={handleCheckboxChange}
+              />
+              <label>{roommate.name}</label>
+            </div>
+          ))}
+        </div>
+        <div className="input-group">
+          <label>Shared Between:</label>
+          {roommates.map((roommate) => (
+            <div key={roommate._id}>
+              <input
+                type="checkbox"
+                value={roommate.name}
+                checked={sharedBetween.includes(roommate.name)}
+                onChange={handleCheckboxChange}
+              />
+              <label>{roommate.name}</label>
+            </div>
+          ))}
+        </div>
+
+        {/* Submit Button */}
+        <button className="submit-button" onClick={handleSubmit}>Save Item</button>
+      </div>
+    </div>
+  );
 };
 
 

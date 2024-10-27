@@ -20,7 +20,7 @@ export default function Dashboard() {
     const [isSearching, setIsSearching] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
-    const [categories, setCategories] = useState(['Food', 'Cleaning', 'Pet', 'Toiletries', 'Drink']);
+    const [categories, setCategories] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
     const [roommates, setRoommates] = useState([]);
     const [sortAscending, setSortAscending] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
