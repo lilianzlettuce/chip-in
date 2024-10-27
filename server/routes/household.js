@@ -404,13 +404,35 @@ router.post("/leave/:id", async (req, res) => {
       return res.status(400).json({ message: 'User is not a member of this household' });
     }
 
-    household.members = household.members.filter(memberId => memberId.toString() !== userId);
+    // household.members = household.members.filter(memberId => memberId.toString() !== userId);
 
-    household.debts = household.debts.filter(debt =>
-      debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+    // household.debts = household.debts.filter(debt =>
+    //   debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+    // );
+
+    // user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+
+    // Remove user from household's members and remove debts
+    await Household.updateOne(
+      { _id: householdId },
+      { 
+        $pull: { 
+          members: userId,
+          debts: { 
+            $or: [ 
+              { owedBy: userId }, 
+              { owedTo: userId } 
+            ] 
+          }
+        } 
+      }
     );
 
-    user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+    // Remove household from user's household list
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { households: householdId } }
+    );
 
     // If the last member leaves, delete the household
     if (household.members.length === 0) {
@@ -418,8 +440,8 @@ router.post("/leave/:id", async (req, res) => {
       res.status(200).json({ message: 'Household deleted as the last member left' });
     } else {
       // Otherwise save the changes
-      await household.save();
-      await user.save();
+      // await household.save();
+      // await user.save();
       res.status(200).json({ message: 'User successfully removed from household' });
     }
 
