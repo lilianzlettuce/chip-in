@@ -12,7 +12,7 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [sharedBetween, setSharedBetween] = useState<string[]>([]);
-  const [purchasedBy, setPurchasedBy] = useState<string[]>([]);
+  const [purchasedBy, setPurchasedBy] = useState('');
 
   const { householdId } = useParams();
 
@@ -22,18 +22,35 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
     setSharedBetween((prev) =>
       checked ? [...prev, value] : prev.filter((roommate) => roommate !== value)
     );
-    setPurchasedBy((prev) =>
+    /*setPurchasedBy((prev) =>
       checked ? [...prev, value] : prev.filter((roommate) => roommate !== value)
-    );
+    );*/
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedRoommate = e.target.value; // Set the selected roommate as the purchaser
+    setSharedBetween((prev) => prev.filter((roommate) => roommate !== purchasedBy));
+
+    setPurchasedBy(selectedRoommate);
+
+    // Update sharedBetween state to include the selected roommate (if not already included)
+    setSharedBetween((prev) => {
+      if (!prev.includes(selectedRoommate)) {
+        return [...prev, selectedRoommate]; // Add the selected roommate
+      }
+      return prev; // Return unchanged if already present
+    });
   };
 
   // Function to handle form submission
   const handleSubmit = async () => {
     // Map selected roommate names to their corresponding string IDs
-    const purchasedIdsArray = purchasedBy.map((name) => {
+    /*const purchasedIdsArray = purchasedBy.map((name) => {
       const roommate = roommates.find((roommate) => roommate.name === name);
       return roommate ? roommate._id : null;
-    }).filter((id) => id !== null); // Remove any null values
+    }).filter((id) => id !== null); // Remove any null <values></values> */
+
+    const purchasedId = roommates.find((roommate) => roommate.name === purchasedBy)?._id || null;
 
     const sharedIdsArray = sharedBetween.map((name) => {
       const roommate = roommates.find((roommate) => roommate.name === name);
@@ -45,7 +62,7 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
       householdId: householdId,
       name: name,
       category: category,
-      purchasedBy: purchasedIdsArray[0], // Send as strings
+      purchasedBy: purchasedId, // Send as strings
       sharedBetween: sharedIdsArray, // Send as strings
       purchaseDate: '',
       expirationDate: '',
@@ -105,8 +122,8 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
               <input
                 type="radio"
                 value={roommate.name}
-                checked={purchasedBy.includes(roommate.name)}
-                onChange={handleCheckboxChange}
+                checked={purchasedBy === roommate.name}
+                onChange={handleRadioChange}
               />
               <label>{roommate.name}</label>
             </div>
