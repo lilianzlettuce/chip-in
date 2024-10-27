@@ -14,7 +14,7 @@ router.get('/sortby/:id', async (req, res) => {
         if (!household) {
             return res.status(404).json({ message: 'Household not found' });
         }
-        
+
         if (sortby === "expirationDate") {
             household.purchasedList.sort((a, b) => new Date(a.expirationDate) - new Date(b.expirationDate));
         } else {
@@ -27,18 +27,104 @@ router.get('/sortby/:id', async (req, res) => {
     }
 });
 
+
+// get expired items in household
+router.get('/:householdId/expired', async (req, res) => {
+    const { householdId } = req.params;
+    const currentDate = new Date();
+
+    try {
+        const household = await Household.findById(householdId).populate({
+            path: 'purchasedList',
+            populate: [
+                {
+                    path: 'purchasedBy',
+                    select: 'username'
+                },
+                {
+                    path: 'sharedBetween',
+                    select: 'username'
+                }
+            ]
+        });
+
+        if (!household) {
+            return res.status(404).json({ message: 'Household not found' });
+        }
+
+        const expiredPurchasedItems = household.purchasedList.filter(item => item.expirationDate && new Date(item.expirationDate) < currentDate);
+        const expiredItemsWithListType = expiredPurchasedItems.map(item => ({
+            ...item.toObject(),
+            listType: 'purchased',
+            cost: item.cost / 100
+        }));
+
+        res.status(200).json(expiredItemsWithListType);
+    } catch (error) {
+        console.error('Error retrieving expired items:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// get expiring items in household
+router.get('/:householdId/expiring', async (req, res) => {
+    const { householdId } = req.params;
+    const currentDate = new Date();
+
+    try {
+        const household = await Household.findById(householdId).populate({
+            path: 'purchasedList',
+            populate: [
+                {
+                    path: 'purchasedBy',
+                    select: 'username'
+                },
+                {
+                    path: 'sharedBetween',
+                    select: 'username'
+                }
+            ]
+        });
+
+        if (!household) {
+            return res.status(404).json({ message: 'Household not found' });
+        }
+
+        const fiveDaysFromNow = new Date();
+        fiveDaysFromNow.setDate(currentDate.getDate() + 5);
+
+        const expiringPurchasedItems = household.purchasedList.filter(item =>
+            item.expirationDate &&
+            new Date(item.expirationDate) > currentDate &&
+            new Date(item.expirationDate) <= fiveDaysFromNow
+        );
+
+        const expiringItemsWithListType = expiringPurchasedItems.map(item => ({
+            ...item.toObject(),
+            listType: 'purchased',
+            cost: item.cost / 100
+        }));
+
+        res.status(200).json(expiringItemsWithListType);
+    } catch (error) {
+        console.error('Error retrieving expiring items:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 // filter items
 router.get('/filterby/:id', async (req, res) => {
     const id = req.params.id;
     const { category, purchasedBy, minPrice, maxPrice, sharedBetween } = req.query;
-  
+
     try {
         const household = await Household.findById(id).populate({
             path: 'purchasedList',
             populate: [
                 {
-                    path: 'purchasedBy',  
-                    select: 'username'    
+                    path: 'purchasedBy',
+                    select: 'username'
                 },
                 {
                     path: 'sharedBetween',
@@ -46,26 +132,26 @@ router.get('/filterby/:id', async (req, res) => {
                 }
             ]
         });
-  
+
         if (!household) {
             return res.status(404).json({ message: 'Household not found' });
         }
-  
+
         let filteredItems = household.purchasedList;
-    
+
         if (category) {
             const categories = Array.isArray(category) ? category : [category];
             filteredItems = filteredItems.filter(item => categories.includes(item.category));
         }
-    
+
         if (purchasedBy) {
             filteredItems = filteredItems.filter(item => item.purchasedBy.username === purchasedBy);
         }
-    
+
         if (minPrice) {
             filteredItems = filteredItems.filter(item => (item.cost / 100) >= parseFloat(minPrice));
         }
-    
+
         if (maxPrice) {
             filteredItems = filteredItems.filter(item => (item.cost / 100) <= parseFloat(maxPrice));
         }
@@ -78,7 +164,7 @@ router.get('/filterby/:id', async (req, res) => {
                 return selectedIds.every(id => sharedIds.includes(id));
             });
         }
-  
+
         res.status(200).json(filteredItems);
     } catch (error) {
         console.error('Error occurred while filtering items:', error.message);

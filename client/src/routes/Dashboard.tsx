@@ -9,7 +9,6 @@ import AddItemModalGrocery from './AddGrocery';
 import './AddItem.css';
 
 
-
 export default function Dashboard() {
     const { user } = useUserContext();
     const { householdId } = useParams();
@@ -32,12 +31,13 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(false);
 
 
-
-
     // Collapsing feature
     const [isCollapsed, setIsCollapsed] = useState(false)
     const [isCollapsed2, setIsCollapsed2] = useState(false)
 
+    // Toggle Expired Items Button
+    const [isToggled, setIsToggled] = useState(false)
+    const [isExpiredMode, setIsExpiredMode] = useState(true);
 
     useEffect(() => {
         if (householdID) {
@@ -57,11 +57,9 @@ export default function Dashboard() {
             fetchGroceryItems();
             return;
         }
-
         setIsSearching(true);
         try {
             const response = await fetch(`http://localhost:6969/household/${householdId}/search?name=${encodeURIComponent(value)}`);
-            // console.log(`http://localhost:6969/item/search?name=${encodeURIComponent(value)}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -72,23 +70,17 @@ export default function Dashboard() {
 
             setPurchasedItems(purchased);
             setGroceryItems(grocery);
+            setIsSearching(purchased.length === 0);
         } catch (error) {
             console.error('Error searching items:', error);
-        } finally {
-            setIsSearching(false);
         }
     };
 
     const clearSearch = () => {
         setSearchTerm('');
+        setIsSearching(false);
         fetchPurchasedItems();
         fetchGroceryItems();
-    };
-
-    const filterBySearchTerm = (items: any[]) => {
-        return items.filter((item) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
     };
 
     const isExpiringSoon = (expirationDate: string) => {
@@ -272,7 +264,6 @@ export default function Dashboard() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log("purchased items: " + data);
             const normalizedData = data.map((item: any) => ({
                 ...item,
                 sharedBetween: item.sharedBetween ?? [],
@@ -419,6 +410,57 @@ export default function Dashboard() {
         }
     };
 
+    const viewExpiredItems = async () => {
+        if (!householdID) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:6969/filter/${householdID}/expired`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            setPurchasedItems(data);
+        } catch (error) {
+            console.error('Error fetching expired items:', error);
+        }
+    };
+
+    const viewExpiringItems = async () => {
+        if (!householdID) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:6969/filter/${householdID}/expiring`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            setPurchasedItems(data);
+        } catch (error) {
+            console.error('Error fetching expiring items:', error);
+        }
+    };
+
+
+    const handleToggleClick = () => {
+        setIsExpiredMode(!isExpiredMode);
+        if (!isExpiredMode) {
+            viewExpiringItems();
+        } else {
+            viewExpiredItems();
+        }
+        setIsToggled(true);
+    }
+
 
     const handleDelete = async (id: string, listType: string) => {
         try {
@@ -468,11 +510,9 @@ export default function Dashboard() {
                     onChange={handleSearchChange}
                     className="search-bar"
                 />
-                {searchTerm && (
-                    <button className="clear-button" onClick={clearSearch}>
-                        &times;
-                    </button>
-                )}
+                <button className="clear-button" onClick={clearSearch}>
+                    &times;
+                </button>
             </div>
 
             {/* Multiselect for filtering by category and roommates */}
@@ -527,6 +567,9 @@ export default function Dashboard() {
                 <button className="dashboard-button" onClick={sortByExpirationDate}>
                     Sort by Expiration Date
                 </button>
+                <button className="dashboard-button" onClick={handleToggleClick}>
+                    {isExpiredMode ? "View Expired Items" : "View Expiring Items"}
+                </button>
             </div>
 
 
@@ -549,12 +592,25 @@ export default function Dashboard() {
                 </div>
                 {!isCollapsed && (
                     <ul className="dashboard-item-list">
-                        {purchasedItems.length === 0 ? (
-                            isSearching ? (
-                                <li className="dashboard-item">No purchased items</li>
-                            ) : (
+                        {isSearching && searchTerm && purchasedItems.length === 0 ? (
+                            // When searching with no results
+                            <>
                                 <li className="dashboard-item">No matching items</li>
-                            )
+                            </>
+                        ) : !isSearching && isToggled && purchasedItems.length === 0 ? (
+                            // Display "No Expired Items" or "No Expiring Items" based on toggle mode
+                            <>
+                                {isExpiredMode ? (
+                                    <li className="dashboard-item">No expired items found</li>
+                                ) : (
+                                    <li className="dashboard-item">No items expiring soon</li>
+                                )}
+                            </>
+                        ) : purchasedItems.length === 0 ? (
+                            // When there are no items in the list and no active search
+                            <>
+                                <li className="dashboard-item">No purchased items</li>
+                            </>
                         ) : (
                             purchasedItems.map((item: any) => (
                                 <li key={item['_id']}>
@@ -568,7 +624,7 @@ export default function Dashboard() {
                                         )}
                                         splits={(item['splits'] || []).map((split: any) => ({
                                             member: split.member.username || 'Unknown',
-                                            split: split.split|| 0
+                                            split: split.split || 0
                                         }))}
                                         purchasedBy={item['purchasedBy']?.username || 'Unknown'}
                                         expiryDate={
@@ -628,10 +684,12 @@ export default function Dashboard() {
                 {!isCollapsed2 && (
                     <ul className="dashboard-item-list">
                         {groceryItems.length === 0 ? (
-                            isSearching ? (
-                                <li className="dashboard-item">No items to purchase</li>
-                            ) : (
+                            isSearching && searchTerm ? (
+                                // When searching with no results
                                 <li className="dashboard-item">No matching items</li>
+                            ) : (
+                                // When there are no items and no active search
+                                <li className="dashboard-item">No items to purchase</li>
                             )
                         ) : (
                             groceryItems.map((item: any) => (

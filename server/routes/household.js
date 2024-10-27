@@ -2,7 +2,7 @@ import express from 'express';
 import Household from '../models/Household.js';
 import User from '../models/User.js'
 import Item from '../models/Item.js'
-import mongoose from 'mongoose'; 
+import mongoose from 'mongoose';
 
 import { ObjectId } from 'mongodb';
 
@@ -18,23 +18,23 @@ router.get('/:householdId/search', async (req, res) => {
       path: 'groceryList purchasedList',
       populate: [
         {
-          path: 'purchasedBy', 
-          select: 'username' 
+          path: 'purchasedBy',
+          select: 'username'
         },
         {
-          path: 'sharedBetween', 
-          select: 'username' 
+          path: 'sharedBetween',
+          select: 'username'
         }
       ]
     });
 
-    const matchedGroceryItems = household.groceryList.filter(item => 
+    const matchedGroceryItems = household.groceryList.filter(item =>
       new RegExp(name, 'i').test(item.name)
     );
-    const matchedPurchasedItems = household.purchasedList.filter(item => 
+    const matchedPurchasedItems = household.purchasedList.filter(item =>
       new RegExp(name, 'i').test(item.name)
     );
-    
+
     const itemsWithListType = [
       ...matchedGroceryItems.map(item => ({ ...item.toObject(), listType: 'grocery' })),
       ...matchedPurchasedItems.map(item => ({ ...item.toObject(), listType: 'purchased' }))
@@ -58,21 +58,22 @@ router.patch('/updateMembers/:id', async (req, res) => {
       { $addToSet: { members: userId } },
       { new: true, useFindAndModify: false } // Return the updated document
     );
-  
-    res.status(200).json({msg: "new user added to household"})
+
+    res.status(200).json({ msg: "new user added to household" })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+
 });
 
 //move from purchased to grocery
 router.patch('/repurchase', async (req, res) => {
-  const { householdId, itemId} = req.body;
+  const { householdId, itemId } = req.body;
 
   try {
     const oldItem = await Item.findById(itemId);
 
-    const newItem = new Item({name: oldItem.name, category: oldItem.category});
+    const newItem = new Item({ name: oldItem.name, category: oldItem.category });
 
     const savedItem = await newItem.save();
 
@@ -81,11 +82,11 @@ router.patch('/repurchase', async (req, res) => {
       { $push: { groceryList: savedItem._id } },
       { new: true, useFindandModify: false }
     );
-    
+
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-    
+
     res.status(201).json(savedItem);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -103,13 +104,13 @@ router.patch('/purchase', async (req, res) => {
 
   try {
     const currItem = await Item.findById(itemId);
-    
+
     if ((!splits || splits.length == 0) && currItem.sharedBetween.length == 0) {
       if (!sharedBetween && sharedBetween.length == 0) {
-        return res.status(400).json({message: 'sharedBetween cannot be empty'})
+        return res.status(400).json({ message: 'sharedBetween cannot be empty' })
       }
-      const defaultSplit = 1/sharedBetween.length;
-      splits =  sharedBetween.map(userId => ({
+      const defaultSplit = 1 / sharedBetween.length;
+      splits = sharedBetween.map(userId => ({
         member: userId,
         split: defaultSplit
       }));
@@ -120,26 +121,26 @@ router.patch('/purchase', async (req, res) => {
       {
         purchasedBy,
         purchaseDate,
-        ...(sharedBetween && {sharedBetween}),
-        ...(expirationDate && {expirationDate}),
+        ...(sharedBetween && { sharedBetween }),
+        ...(expirationDate && { expirationDate }),
         cost,
       },
-      {new: true, runValidators: true}
+      { new: true, runValidators: true }
     );
 
     const household = await Household.findByIdAndUpdate(
       householdId,
       {
-        $pull: {groceryList: updatedItem._id},
-        $push: {purchasedList: updatedItem._id}
+        $pull: { groceryList: updatedItem._id },
+        $push: { purchasedList: updatedItem._id }
       },
-      {new: true, useFindandModify: false}
+      { new: true, useFindandModify: false }
     );
-    
+
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-    
+
     res.status(201).json(updatedItem);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -152,7 +153,7 @@ router.get('/', async (req, res) => {
     const households = await Household.find();
     res.status(200).send(households);
   } catch (err) {
-    res.status(500).send({err})
+    res.status(500).send({ err })
   }
 });
 
@@ -170,7 +171,7 @@ router.get("/:id", async (req, res) => {
 });
 
 //get roommates from household
-router.get("/members/:id", async(req, res) => {
+router.get("/members/:id", async (req, res) => {
   try {
     const household = await Household.findById(req.params.id).populate('members');
     if (!household) {
@@ -231,56 +232,56 @@ router.delete("/:id", async (req, res) => {
 
 //add user to household
 router.post("/addUser/:id", async (req, res) => {
-    const {userId} = req.body;
-    const householdId = req.params.id;
+  const { userId } = req.body;
+  const householdId = req.params.id;
 
-    try {
-        // find household
-        const household = await Household.findById(householdId);
-        if (!household) {
-            return res.status(404).json({ message: 'Household not found' });
-        }
-        
-        // find user
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // check to make sure that user is not in household
-        if (user.households.some(household => household.equals(new mongoose.Types.ObjectId(householdId)))) {
-          console.log("User is already in the household");
-          return res.status(400).json({ message: 'User is already in the household' });
-        }
-        
-        // add household to user
-        user.households.push(householdId);
-
-        // create new debts
-        for (let i = 0; i < household.members.length; i++) {
-            household.debts.push({
-                owedBy: userId,
-                owedTo: household.members[i],
-                amount: 0
-            });
-            household.debts.push({
-                owedBy: household.members[i],
-                owedTo: userId,
-                amount: 0
-            });
-        }
-
-        // add user to household members list
-        household.members.push(userId);
-
-        // update documents
-        await user.save();
-        await household.save();
-
-        res.status(200).json(household);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+  try {
+    // find household
+    const household = await Household.findById(householdId);
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
     }
+
+    // find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // check to make sure that user is not in household
+    if (user.households.some(household => household.equals(new mongoose.Types.ObjectId(householdId)))) {
+      console.log("User is already in the household");
+      return res.status(400).json({ message: 'User is already in the household' });
+    }
+
+    // add household to user
+    user.households.push(householdId);
+
+    // create new debts
+    for (let i = 0; i < household.members.length; i++) {
+      household.debts.push({
+        owedBy: userId,
+        owedTo: household.members[i],
+        amount: 0
+      });
+      household.debts.push({
+        owedBy: household.members[i],
+        owedTo: userId,
+        amount: 0
+      });
+    }
+
+    // add user to household members list
+    household.members.push(userId);
+
+    // update documents
+    await user.save();
+    await household.save();
+
+    res.status(200).json(household);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // get grocery list
@@ -292,8 +293,8 @@ router.get("/:id/grocerylist", async (req, res) => {
       path: 'groceryList',
       populate: [
         {
-          path: 'purchasedBy',  
-          select: 'username'    
+          path: 'purchasedBy',
+          select: 'username'
         },
         {
           path: 'sharedBetween',
@@ -321,8 +322,8 @@ router.get("/:id/purchasedlist", async (req, res) => {
       path: 'purchasedList',
       populate: [
         {
-          path: 'purchasedBy',  
-          select: 'username'    
+          path: 'purchasedBy',
+          select: 'username'
         },
         {
           path: 'sharedBetween',
@@ -358,41 +359,41 @@ router.post("/leave/:id", async (req, res) => {
   const householdId = req.params.id;
 
   try {
-      const household = await Household.findById(householdId);
-      if (!household) {
-          return res.status(404).json({ message: 'Household not found' });
-      }
+    const household = await Household.findById(householdId);
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
 
-      const user = await User.findById(userId);
-      if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-      }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-      if (!household.members.includes(userId)) {
-          return res.status(400).json({ message: 'User is not a member of this household' });
-      }
+    if (!household.members.includes(userId)) {
+      return res.status(400).json({ message: 'User is not a member of this household' });
+    }
 
-      household.members = household.members.filter(memberId => memberId.toString() !== userId);
+    household.members = household.members.filter(memberId => memberId.toString() !== userId);
 
-      household.debts = household.debts.filter(debt => 
-          debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
-      );
+    household.debts = household.debts.filter(debt =>
+      debt.owedBy.toString() !== userId && debt.owedTo.toString() !== userId
+    );
 
-      user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
+    user.households = user.households.filter(householdId => householdId.toString() !== household._id.toString());
 
-      // If the last member leaves, delete the household
-      if (household.members.length === 0) {
-          await Household.findByIdAndDelete(householdId); 
-          res.status(200).json({ message: 'Household deleted as the last member left' });
-      } else {
-          // Otherwise save the changes
-          await household.save();
-          await user.save();
-          res.status(200).json({ message: 'User successfully removed from household' });
-      }
+    // If the last member leaves, delete the household
+    if (household.members.length === 0) {
+      await Household.findByIdAndDelete(householdId);
+      res.status(200).json({ message: 'Household deleted as the last member left' });
+    } else {
+      // Otherwise save the changes
+      await household.save();
+      await user.save();
+      res.status(200).json({ message: 'User successfully removed from household' });
+    }
 
   } catch (err) {
-      res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 export default router;
