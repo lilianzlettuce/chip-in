@@ -137,6 +137,29 @@ router.patch('/purchase', async (req, res) => {
       { new: true, useFindandModify: false }
     );
 
+    for (const split of splits) {
+      const splitCost = split.split * cost;
+      console.log(splitCost)
+      console.log('split.member', split.member)
+      console.log('purchasedby', purchasedBy)
+      if (split.member === purchasedBy) {continue;}
+      let newHousehold = await Household.findOneAndUpdate(
+        {
+          _id: householdId
+        },
+        {
+          $inc: { "debts.$[elem].amount": splitCost }
+        },
+        {
+          arrayFilters: [
+            { "elem.owedBy": split.member, "elem.owedTo": purchasedBy }
+          ],
+          new: true,
+          useFindAndModify: false
+        }
+      );   
+    }
+
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }

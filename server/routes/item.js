@@ -86,6 +86,42 @@ router.post('/addtopurchased', async (req, res) => {
       return res.status(404).json({ message: 'Household not found' });
     }
 
+    console.log('divider')
+    for (const split of splits) {
+      const splitCost = split.split * cost;
+      console.log(splitCost)
+      console.log('split.member', split.member)
+      console.log('purchasedby', purchasedBy)
+      if (split.member === purchasedBy) {continue;}
+
+      const household = await Household.findOne(
+        {
+          _id: householdId,
+          "debts.owedBy": split.member,
+          "debts.owedTo": purchasedBy
+        },
+        { debts: 1 }
+      );
+
+      console.log('matched debt', household?.debts.find(debt => debt.owedBy.equals(split.member) && debt.owedTo.equals(purchasedBy)))
+      let newHousehold = await Household.findOneAndUpdate(
+        {
+          _id: householdId
+        },
+        {
+          $inc: { "debts.$[elem].amount": splitCost }
+        },
+        {
+          arrayFilters: [
+            { "elem.owedBy": split.member, "elem.owedTo": purchasedBy }
+          ],
+          new: true,
+          useFindAndModify: false
+        }
+      );      
+      console.log('new debts', newHousehold.debts)
+    }
+
     res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });

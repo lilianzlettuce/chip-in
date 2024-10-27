@@ -9,6 +9,7 @@ import auth from "./routes/auth.js";
 import filter from "./routes/filter.js"
 import alerts from "./routes/alert.js"
 import notes from "./routes/note.js"
+import payments from "./routes/payment.js"
 
 import "./cronjobs/cronjobs.js"
 
@@ -27,6 +28,7 @@ app.use("/household", households);
 app.use("/filter", filter);
 app.use("/alert", alerts)
 app.use("/note", notes)
+app.use("/payment", payments)
 
 // Auth route
 app.use("/auth", auth);
