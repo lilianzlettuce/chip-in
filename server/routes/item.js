@@ -94,16 +94,16 @@ router.post('/addtopurchased', async (req, res) => {
       console.log('purchasedby', purchasedBy)
       if (split.member === purchasedBy) {continue;}
 
-      const household = await Household.findOne(
-        {
-          _id: householdId,
-          "debts.owedBy": split.member,
-          "debts.owedTo": purchasedBy
-        },
-        { debts: 1 }
-      );
+      // const household = await Household.findOne(
+      //   {
+      //     _id: householdId,
+      //     "debts.owedBy": split.member,
+      //     "debts.owedTo": purchasedBy
+      //   },
+      //   { debts: 1 }
+      // );
 
-      console.log('matched debt', household?.debts.find(debt => debt.owedBy.equals(split.member) && debt.owedTo.equals(purchasedBy)))
+      // console.log('matched debt', household?.debts.find(debt => debt.owedBy.equals(split.member) && debt.owedTo.equals(purchasedBy)))
       let newHousehold = await Household.findOneAndUpdate(
         {
           _id: householdId
