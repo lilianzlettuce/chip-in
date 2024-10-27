@@ -80,7 +80,7 @@ router.patch('/repurchase', async (req, res) => {
     const household = await Household.findByIdAndUpdate(
       householdId,
       { $push: { groceryList: savedItem._id } },
-      { new: true, useFindandModify: false }
+      { new: true, useFindAndModify: false }
     );
 
     if (!household) {
@@ -134,7 +134,7 @@ router.patch('/purchase', async (req, res) => {
         $pull: { groceryList: updatedItem._id },
         $push: { purchasedList: updatedItem._id }
       },
-      { new: true, useFindandModify: false }
+      { new: true, useFindAndModify: false }
     );
 
     for (const split of splits) {
@@ -278,30 +278,38 @@ router.post("/addUser/:id", async (req, res) => {
     }
 
     // add household to user
-    user.households.push(householdId);
+    const newUser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { households: householdId } },
+      { new: true, useFindAndModify: false }
+    );
 
-    // create new debts
+    //create new debts
+    let newDebts = [];
     for (let i = 0; i < household.members.length; i++) {
-      household.debts.push({
+      newDebts.push({
         owedBy: userId,
         owedTo: household.members[i],
         amount: 0
       });
-      household.debts.push({
+      newDebts.push({
         owedBy: household.members[i],
         owedTo: userId,
         amount: 0
       });
     }
+    
+    const newHousehold = await Household.findByIdAndUpdate(
+      householdId,
+      { $push: { 
+          members: userId,
+          debts: { $each: newDebts }
+        } 
+      },
+      { new: true, useFindAndModify: false }
+    );
 
-    // add user to household members list
-    household.members.push(userId);
-
-    // update documents
-    await user.save();
-    await household.save();
-
-    res.status(200).json(household);
+    res.status(200).json(newHousehold);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
