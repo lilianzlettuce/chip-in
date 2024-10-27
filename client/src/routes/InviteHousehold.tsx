@@ -29,16 +29,24 @@ export const Modal2: React.FC<ModalProps> = ({ show, onClose, children }) => {
   );
 };
 
+
 // Main InviteHousehold component
 type InviteHouseholdProps = {
   onClose: () => void; // Function to close the modal
   householdId: string | undefined;      // Add householdId as a prop
 };
 
+interface Notification {
+  message: string;
+  type: 'success' | 'error';
+  show: boolean;
+}
+
 export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, householdId }) => {
   const [EmailAddress, setEmailAddress] = useState("");
+  const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
-  const { updateUser } = useUserContext();
+
   // Get env vars
   const PORT = process.env.REACT_APP_PORT || 5050;
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
@@ -68,7 +76,8 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
           const emailexists = AllUsersData.find((user: { email: string }) => user.email === EmailAddress);
           if (!emailexists) {
             console.log('error, ${EmailAddress} does not exist');
-            alert(`Error: ${EmailAddress} does not exist, please choose a different user email address`);
+            //alert(`Error: ${EmailAddress} does not exist, please choose a different user email address`);
+            setNotification({ message: `${EmailAddress} does not exist, please choose a different user email address`, type: 'error', show: true });
             return;
           }
         } else {
@@ -87,55 +96,69 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
           },
           body: JSON.stringify({ email: EmailAddress,  householdId: householdId}),
         });
-  
+        {/*
         if (response.ok) {
           alert('Invitation email sent successfully!');
         } else {
           alert('Invitation email sent failed. Please try again.');
         }
-      } catch (err) {
-        console.error('error sending email', err);
-      } 
+        */}
+        if (response.ok) {
+          // Set success notification
+          setNotification({ message: 'Invitation email sent successfully!', type: 'success', show: true });
+        } else {
+          // Set error notification
+          setNotification({ message: 'Invitation email failed. Please try again.', type: 'error', show: true });
+        }
 
+        } catch (err) {
+          console.error('error sending email', err);
+          setNotification({ message: 'An error occurred. Please try again.', type: 'error', show: true });
+        }  
+            // Hide the notification after 3 seconds
+        //setTimeout(() => {
+        //  setNotification((prev) => ({ ...prev, show: false }));
+        //}, 3000);
+
+        } 
+
+        const closeNotification = () => {
+          setNotification((prev) => ({ ...prev, show: false }));
 
     }
 
-    return (
-        <div>
-            <div>
-              <h3 style={{ color: 'black', marginBottom: '10px' }}>Household ID : {householdId}</h3>
-            </div>
-            <div>
-              <h3 style={{ color: 'black', marginBottom: '10px' }}>Please enter email address for the invitation</h3>
-            </div>
-            <div className="modal-body">
-              {/* Household Name Input */}
-              <div className="input-group">
-                {/*<button className="label-button">Household ID : {householdId}</button>*/}
-                <input
-                  type="text"
-                  className="input-field"
-                  value={EmailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
-                  placeholder="email address"
-                />
-              </div>
-            
-              {/* Invite Button */}
-              <div className="input-group">
-                <button className="label-button submit-button" onClick={handleInvite}>
-                  Invite
-                </button>
-              </div>
-            </div>
-        </div>
-      );
-
-    
       
   
-  
+    return (
+      <div className="modal-body">
+        <h3>Household ID: {householdId} </h3>
+        <div className="input-group">
+          <label className="label-text">Please enter email address for the invitation</label>
+        </div>
+        <div className="input-group">
+          <input
+            type="text"
+            className="input-field"
+            value={EmailAddress}
+            onChange={(e) => setEmailAddress(e.target.value)}
+            placeholder="Enter email address"
+          />
+        </div>
+        <div className="input-group">
+          <button className="submit-button" onClick={handleInvite}>Invite</button>
+
+           {/* Notification UI */}
+          {notification.show && (
+            <div className={`notification-card ${notification.type}`}>
+              {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
+              <p>{notification.message}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
 };
 
 // export default InviteHousehold;
+
 
