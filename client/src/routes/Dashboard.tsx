@@ -71,7 +71,7 @@ export default function Dashboard() {
 
             setPurchasedItems(purchased);
             setGroceryItems(grocery);
-            setIsSearching(purchased.length === 0);
+            setIsSearching(purchased.length === 0 || grocery.length == 0);
         } catch (error) {
             console.error('Error searching items:', error);
         }
@@ -379,6 +379,8 @@ export default function Dashboard() {
         setSelectedRoommates([]);
         fetchPurchasedItems();
         fetchGroceryItems();
+        setIsExpiredMode(false);
+        setIsToggled(false);
     };
 
 
@@ -501,7 +503,7 @@ export default function Dashboard() {
     return (
         <div className="dashboard-container">
             <h1 className="dashboard-title">Dashboard</h1>
-            
+
             <Corkboard />
 
             {/* Search Bar */}
