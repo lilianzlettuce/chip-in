@@ -9,8 +9,24 @@ router.get('/sortby/:id', async (req, res) => {
     const id = req.params.id;
     const { sortby } = req.query;
     try {
-        const household = await Household.findById(id).populate('purchasedList');
-
+        // const household = await Household.findById(id).populate('purchasedList');
+        const household = await Household.findById(householdId).populate({
+            path: 'purchasedList',
+            populate: [
+                {
+                    path: 'purchasedBy',
+                    select: 'username'
+                },
+                {
+                    path: 'sharedBetween',
+                    select: 'username'
+                },
+                {
+                  path: 'splits.member',
+                  select: 'username'
+                }
+            ]
+        });
         if (!household) {
             return res.status(404).json({ message: 'Household not found' });
         }
@@ -44,6 +60,10 @@ router.get('/:householdId/expired', async (req, res) => {
                 {
                     path: 'sharedBetween',
                     select: 'username'
+                },
+                {
+                  path: 'splits.member',
+                  select: 'username'
                 }
             ]
         });
@@ -82,6 +102,10 @@ router.get('/:householdId/expiring', async (req, res) => {
                 {
                     path: 'sharedBetween',
                     select: 'username'
+                },
+                {
+                  path: 'splits.member',
+                  select: 'username'
                 }
             ]
         });
@@ -129,6 +153,10 @@ router.get('/filterby/:id', async (req, res) => {
                 {
                     path: 'sharedBetween',
                     select: '_id username' // Make sure to select the _id here for comparison
+                },
+                {
+                  path: 'splits.member',
+                  select: 'username'
                 }
             ]
         });
