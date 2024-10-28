@@ -163,9 +163,16 @@
     /* Darken the border on hover */
   }
 
-  .notification-card {
+  .notification-card.error{
     background-color: white; /* Ensure the background is white */
-    color: black; /* Ensure the text is black */
+    color: red; /* Ensure the text is black */
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .notification-card.success{
+    background-color: white; /* Ensure the background is white */
+    color: green; /* Ensure the text is black */
     padding: 10px;
     border-radius: 5px;
   }
