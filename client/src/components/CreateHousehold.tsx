@@ -45,6 +45,12 @@ export const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
   );
 };
 
+interface Notification {
+  message: string;
+  type: 'success' | 'error';
+  show: boolean;
+}
+
 // Main HouseholdForm component
 type HouseholdFormProps = {
   onClose: () => void; // Function to close the modal
@@ -54,6 +60,7 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
   const [householdName, setHouseholdName] = useState("");
   const { user, setUser, updateUser} = useUserContext();
   // const navigate = useNavigate();
+  const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
   // Get server url
   const PORT = process.env.REACT_APP_PORT || 5050;
@@ -91,23 +98,30 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
       const data = await response.json();
   
       if (response.ok) {
+        updateUser();
+        setNotification({ message: `Success: Household ${householdName} created`, type: 'success', show: true });
         console.log("New household created:", data);
       } else {
+        setNotification({ message: `Failed: Household ${householdName} already exists`, type: 'error', show: true });
         console.error("Failed to create household:", data.error);
       }
 
       // Update global user variable from database
-      updateUser();
+      //updateUser();
     } catch (error) {
       console.error("Error occurred while creating household:", error);
     }
     
-    alert(`Household Name: ${householdName} created \n`);
+    //alert(`Household Name: ${householdName} created \n`);
     // TBD: save householdName and uploadedFileName to server
     
     // navigate('/households/ ${householdName}') // reroute to household id??
     
-    onClose(); // Close the modal after submission
+    //onClose(); // Close the modal after submission
+  }
+
+  const closeNotification = () => {
+    setNotification((prev) => ({ ...prev, show: false }));
   }
 
   return (
@@ -130,6 +144,14 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
             <button className="label-button submit-button" onClick={handleSubmit}>
               Submit
             </button>
+
+            {/* Notification UI */}
+            {notification.show && (
+              <div className={`notification-card ${notification.type}`}>
+                {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
+                <p>{notification.message}</p>
+              </div>
+            )}
           </div>
         </div>
     </div>
