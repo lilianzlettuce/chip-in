@@ -193,7 +193,12 @@ router.get('/filterby/:id', async (req, res) => {
             });
         }
 
-        res.status(200).json(filteredItems);
+        const responseItems = filteredItems.map(item => ({
+            ...item.toObject(), 
+            cost: item.cost / 100 
+        }));
+
+        res.status(200).json(responseItems);
     } catch (error) {
         console.error('Error occurred while filtering items:', error.message);
         res.status(500).json({ error: error.message });
