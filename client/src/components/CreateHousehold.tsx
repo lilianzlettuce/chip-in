@@ -126,7 +126,7 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
 
   return (
     <div>
-        <h3 style={{ color: 'black', display: 'block' }}>Please fill out below and click Submit</h3>
+        <h3 style={{ color: 'black', display: 'block', fontSize: '16px' }}>Please fill out below and click Submit</h3>
         <div className="modal-body">
           {/* Household Name Input */}
           <div className="input-group">

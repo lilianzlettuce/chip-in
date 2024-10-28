@@ -38,6 +38,7 @@
     font-size: 18px;
     cursor: pointer;
     z-index: 10001;
+    color: black;
   }
   
   .modal-body {
@@ -160,4 +161,11 @@
     /* Darken background on hover */
     border-color: #003d80;
     /* Darken the border on hover */
+  }
+
+  .notification-card {
+    background-color: white; /* Ensure the background is white */
+    color: black; /* Ensure the text is black */
+    padding: 10px;
+    border-radius: 5px;
   }

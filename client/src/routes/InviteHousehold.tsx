@@ -131,7 +131,7 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
   
     return (
       <div className="modal-body">
-        <h3>Household ID: {householdId} </h3>
+        <h3 style={{ color: 'black', display: 'block', fontSize: '16px'  }}>Household ID: {householdId}</h3>
         <div className="input-group">
           <label className="label-text">Please enter email address for the invitation</label>
         </div>

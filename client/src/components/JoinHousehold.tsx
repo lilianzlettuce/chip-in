@@ -138,7 +138,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
 
   return (
     <div>
-        <h3 style={{ color: 'black', display: 'block' }}>Please enter a household ID to join</h3>
+        <h3 style={{ color: 'black', display: 'block', fontSize: '16px'  }}>Please enter a household ID to join</h3>
         <div className="modal-body">
           {/* Household Name Input */}
           <div className="input-group">
