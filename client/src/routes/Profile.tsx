@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate } from "react-router-dom";
 
 //import lettuce from '../assets/lettuce.png'
@@ -648,8 +648,9 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 const Settings: React.FC = () => {
   const { user } = useUserContext();
 
-  const [expirationNotif, setExpirationNotif] = useState(user?.preferences.expirationNotif);
-  const [paymentNotif, setPaymentNotif] = useState(user?.preferences.expirationNotif);
+  // Currently selected notif value
+  const [expirationNotif, setExpirationNotif] = useState<string>();
+  const [paymentNotif, setPaymentNotif] = useState<string>();
 
   /*const [tempName, setTempName] = useState(email);
   const [tempUsername, setTempUsername] = useState(username);*/
@@ -669,8 +670,9 @@ const Settings: React.FC = () => {
 
   //update disply fields when props state change
   useEffect(() => {
-    setExpirationNotif(expirationNotif);
-    setPaymentNotif(paymentNotif);
+    // Default selected values to current user notif settings
+    setExpirationNotif(user?.preferences.expirationNotif);
+    setPaymentNotif(user?.preferences.expirationNotif);
 
     /*setTempName(email || '');
     setTempUsername(username || '');*/
@@ -712,9 +714,16 @@ const Settings: React.FC = () => {
   const [householdAlerts, setHouseholdAlerts] = useState(true);
   const [paymentReminders, setPaymentReminders] = useState(true);
 
-  // Toggle function for switches
-  const handleToggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
-    setter((prevState) => !prevState);
+  // Handler to update the state when the user selects a different option
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    console.log("name: ", event.target.name)
+    console.log("val: ", event.target.value)
+
+    if (event.target.name == "expiration") {
+      setExpirationNotif(event.target.value);
+    } else {
+      setPaymentNotif(event.target.value);
+    }
   };
 
   return (
@@ -727,43 +736,32 @@ const Settings: React.FC = () => {
       {/* Notifications Section */}
       <div className="notifications-section">
         <h3>Notifications</h3>
-        <label>Expiration notifications:</label>
         <div>{expirationNotif}</div>
-        <select name="cars">
-          <option value="all">All</option>
-          <option value="relevant">Relevant</option>
-          <option value="none">None</option>
-        </select>
-
-
-        <div className="notification-row">
-          <div className="notification-item">
-            <label className="notification-label">Household Alerts</label>
-            <div className="toggle-container">
-              <span className="toggle-label">ON</span>
-              <input
-                type="checkbox"
-                className="toggle-switch"
-                checked={householdAlerts}
-                onChange={() => handleToggle(setHouseholdAlerts)}
-              />
-              <span className="toggle-label">OFF</span>
+        <div className="flex justify-between">
+          <div className="flex w-fit items-center justify-between gap-2 bg-navy p-4 px-6 rounded-md text-white">
+            <label>Expiration notifications:</label>
+            <div className="w-fit bg-navy p-2 rounded-md text-white">
+              <select name="expiration" value={expirationNotif} onChange={handleChange}
+                  className="bg-transparent block py-1 px-2">
+                <option value="all">All</option>
+                <option value="relevant">Relevant</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
-          <div className="notification-item">
-            <label className="notification-label">Payment Reminders</label>
-            <div className="toggle-container">
-              <span className="toggle-label">ON</span>
-              <input
-                type="checkbox"
-                className="toggle-switch"
-                checked={paymentReminders}
-                onChange={() => handleToggle(setPaymentReminders)}
-              />
-              <span className="toggle-label">OFF</span>
+          <div className="flex w-fit items-center justify-between gap-2 bg-navy p-4 px-6 rounded-md text-white">
+            <label>Payment notifications:</label>
+            <div className="w-fit bg-navy p-2 rounded-md text-white">
+              <select name="payment" value={paymentNotif} onChange={handleChange}
+                  className="bg-transparent block py-1 px-2">
+                <option value="all">All</option>
+                <option value="relevant">Relevant</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
         </div>
+        <button className="change-button" onClick={handleChangeNameClick}>Save changes</button>
       </div>
     </div>
   );
