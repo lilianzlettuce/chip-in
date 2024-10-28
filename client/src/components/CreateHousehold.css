@@ -14,7 +14,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    z-index: 99999999999999999; /* Ensure it's on top */
+    z-index: 10000; /* Ensure it's on top */
     padding-top: 50px;
   }
   
@@ -26,7 +26,7 @@
     max-width: 600px; /* Maximum width of modal */
     width: 90%; /* Take up 90% of the viewport width */
     position: relative;
-    z-index: 10000;
+    z-index: 10001;
   }
   
   .close-button {
@@ -104,3 +104,60 @@
     background-color: #1a5cb8;
   }
   
+  .close-button2 {
+    background-color: #1a5cb8; 
+    color: white; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .close-button2:hover {
+    background-color: #1a5cb8; /* Darker shade on hover */
+  }
+
+  .alert-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.18);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .alert-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+    color: black;
+  }
+  
+  .alert-modal-content button {
+    padding: 40px 40px;
+    background-color: #007BFF;
+    /* Blue background */
+    color: white;
+    /* White text */
+    border: 2px solid #0056b3;
+    /* Solid border with darker blue color */
+    border-radius: 5px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer on hover */
+    font-size: 1em;
+    /* Adjust font size */
+  }
+  
+  .alert-modal-content button:hover {
+    background-color: #0056b3;
+    /* Darken background on hover */
+    border-color: #003d80;
+    /* Darken the border on hover */
+  }
