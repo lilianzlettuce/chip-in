@@ -35,8 +35,15 @@ type JoinHouseholdProps = {
   userId: string | undefined;      // Add userId as a prop
 };
 
+interface Notification {
+  message: string;
+  type: 'success' | 'error';
+  show: boolean; 
+}   
+
 export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId }) => {
   const [householdID, setHouseholdID] = useState("");
+  const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
   const { updateUser } = useUserContext();
 
@@ -67,7 +74,8 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
           const householdexists = households.find((household: { _id: string }) => household._id === householdID);
           if (!householdexists) {
             console.log('error, ${householdID} does not exist');
-            alert(`Error: ${householdID} does not exist, please choose a different Household ID`);
+            // alert(`Error: ${householdID} does not exist, please choose a different Household ID`);
+            setNotification({ message: `${householdID} does not exist, please choose a different Household ID`, type: 'error', show: true});
             return;
           }
           else (
@@ -106,7 +114,8 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
     
         if (!updateResponse.ok) {
           const errorData = await updateResponse.json();
-          alert(`Failed to update household: ${errorData.message}`)
+          // alert(`Failed to update household: ${errorData.message}`)
+          setNotification({ message: `Failed to update household: ${errorData.message}`, type: 'error', show: true});
           throw new Error(`Failed to update household: ${errorData.message}`);
         }
     
@@ -114,12 +123,18 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
         const updatedHousehold = await updateResponse.json();
         console.log('Household updated successfully:', updatedHousehold);
         updateUser();
-        alert(`User ${userId} has been added to the household: ${updatedHousehold.name}`);
+        //alert(`User ${userId} has been added to the household: ${updatedHousehold.name}`);
+        setNotification({ message: `User ${userId} has been added to the household: ${updatedHousehold.name}`, type: 'success', show: true});
       } catch (error) {
         console.error('Error updating household:', error instanceof Error ? error.message : error);
        // alert(`Error updating household: ${error instanceof Error ? error.message : error}`);
       }
     }
+
+  const closeNotification = () => {
+    setNotification((prev) => ({ ...prev, show: false }));
+
+  }
 
   return (
     <div>
@@ -141,6 +156,13 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
             <button className="label-button submit-button" onClick={handleJoin}>
               Join
             </button>
+
+            {notification.show && (
+              <div className={`notification-card ${notification.type}`}>
+                {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
+                <p>{notification.message}</p>
+              </div>
+            )}
           </div>
         </div>
     </div>
