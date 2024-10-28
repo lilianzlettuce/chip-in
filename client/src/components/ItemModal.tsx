@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import './ItemModal.css';
 
 interface ItemModalProps {
@@ -33,9 +34,9 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
         );
     };
 
-    return (
-        <div className="modal-overlay" style={{ zIndex: 9999 }}>
-            <div className="modal" style={{ zIndex: 10000 }}>
+    return ReactDOM.createPortal(
+        <div className="modal-overlay" >
+            <div className="modal" >
                 <h2>{listType === 'purchased' ? 'Purchase Item' : 'Repurchase Item'}</h2>
                 <input
                     type="number"
@@ -67,7 +68,8 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
                 <button onClick={handleSave}>Save</button>
                 <button onClick={onClose}>Cancel</button>
             </div>
-        </div>
+        </div>, document.getElementById('modal-root') as HTMLElement
+
     );
 };
 

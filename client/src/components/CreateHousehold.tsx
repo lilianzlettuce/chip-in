@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+
 import './CreateHousehold.css'; 
 import { useUserContext } from '../UserContext';
 
@@ -13,6 +15,7 @@ type ModalProps = {
 
 export const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => { 
     // Freeze background
+    {/*
     useEffect(() => {
         if (show) {
           // Prevent background scroll when modal is open
@@ -25,10 +28,11 @@ export const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
           document.body.classList.remove("body-no-scroll");
         };
     }, [show]);
-  
+      */}
+      
       if (!show) return null;
 
-  return (
+  return ReactDOM.createPortal (
     <div className="modal-overlay">
       <div className="modal-content">
         <button className="close-button" onClick={onClose}>
@@ -36,7 +40,8 @@ export const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
         </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.getElementById('modal-root') as HTMLElement 
   );
 };
 
@@ -111,7 +116,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
         <div className="modal-body">
           {/* Household Name Input */}
           <div className="input-group">
-            <button className="label-button">Household Name</button>
             <input
               type="text"
               className="input-field text-white"
