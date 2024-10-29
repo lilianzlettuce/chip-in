@@ -41,6 +41,7 @@ router.patch('/payall/:id', async (req, res) => {
 
     try {
         const owedBy = await User.findById(owedById);
+        const owedTo = await User.findById(owedToId);
 
         let household = await Household.findOneAndUpdate(
             {
@@ -50,7 +51,7 @@ router.patch('/payall/:id', async (req, res) => {
               $set: { "debts.$[elem].amount": 0 },
               $push: { alerts: {
                 category: 'Payment',
-                content: `${owedBy.username} paid you back in full!`,
+                content: `${owedBy.username} paid ${owedTo.username} back in full!`,
                 recipients: [owedToId],
                 date: new Date()
               }}
@@ -79,6 +80,7 @@ router.patch('/partialpay/:id', async (req, res) => {
 
     try {
         const owedBy = await User.findById(owedById);
+        const owedTo = await User.findById(owedToId);
 
         let household = await Household.findOneAndUpdate(
             {
@@ -88,7 +90,7 @@ router.patch('/partialpay/:id', async (req, res) => {
                 $inc: { "debts.$[elem].amount": -amount },
                 $push: { alerts: {
                   category: 'Payment',
-                  content: `${owedBy.username} paid you back \$${(amount / 100).toFixed(2)}!`,
+                  content: `${owedBy.username} paid ${owedTo.username} back \$${(amount / 100).toFixed(2)}!`,
                   recipients: [owedToId],
                   date: new Date()
                 }}

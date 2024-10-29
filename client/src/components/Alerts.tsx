@@ -108,9 +108,8 @@ export default function Alerts() {
       <button className="relative bg-gray-900 text-white w-10 h-10 rounded-full" 
           onClick={() => {
             if (showAlerts) {
-              // Close alerts window, mark unread as read
-              //markAsRead();
               setShowAlerts(false);
+
               // Refetch alerts to reflect new read status
               fetchAlerts();
             } else {
