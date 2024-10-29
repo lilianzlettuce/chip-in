@@ -85,18 +85,54 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     }
 
     // handling full payment
-    const handlePayInFull = () => {
-        // TODO: send request to backend to process the full payment of owedTo
+    const handlePayInFull = async() => {
+        if (!householdId) return;
+        try {
+            const response = await fetch(`http://localhost:6969/payment/payall/${householdId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    owedById: user.id,
+                    owedToId: roommateId
+                }),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } 
+        } catch (error) {
+            console.error('Error paying in full:', error);
+        }
         closePayModal(); 
         setIsConfirmationOpen(true);
     };
 
 
     // handling partial payment
-    const handlePayByAmountSubmit = () => {
+    const handlePayByAmountSubmit = async() => {
         if (paymentAmount <= 0 || paymentAmount > youOwe) {
             alert('Please enter a valid amount.');
             return;
+        }
+        if (!householdId) return;
+        try {
+            const response = await fetch(`http://localhost:6969/payment/partialpay/${householdId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    owedById: user.id,
+                    owedToId: roommateId,
+                    amount: paymentAmount * 100
+                }),
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            } 
+        } catch (error) {
+            console.error('Error paying in partial:', error);
         }
         closePayModal(); 
         setIsConfirmationOpen(true);
@@ -121,7 +157,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             </div>
 
             <div className="expense-actions">
-                <button className="pay-back-btn" onClick={handlePayBackClick}>Pay back</button>
+                <button className="pay-back-btn" onClick={handlePayBackClick} disabled={youOwe <= 0}>Pay back</button>
                 {/* <button className="nudge-btn" onClick={handleNudgeClick}>Nudge</button> */}
             </div>
             <div className="expense-actions">
@@ -131,7 +167,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             {/* payment modal */}
             {isPayModalOpen && (
                 <div className="bg-black/50 w-screen h-screen fixed top-0 left-0 flex items-center justify-center z-30">
-                    <div className="modal-content">
+                    <div className="expense-modal-content">
                         <h3>Pay back ${youOwe}</h3>
                         <p>Select an option:</p>
 
@@ -171,7 +207,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             {/* confirmation popup */}
             {isConfirmationOpen && (
                 <div className="expense-modal">
-                    <div className="modal-content">
+                    <div className="expense-modal-content">
                         <h3>Payment Successful!</h3>
                         <p>Your payment has been processed.</p>
                         <button onClick={closeConfirmation}>Close</button>
@@ -181,21 +217,22 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
             {/* Nudge Modal */}
             {isNudgeModalOpen && (
-                <div className="expense-modal">
-                    <div className="modal-content">
+                <div className="nudge-modal">
+                    <div className="nudge-modal-content">
                         <h3>Nudge</h3>
                         <label>
                             Custom Message:
-                            <input
-                                type="text"
+                            <textarea
+                                //type="text"
                                 value={nudgeMessage}
                                 onChange={(e) => setNudgeMessage(e.target.value)}
-                            />
+                                placeholder='Enter message here'
+                            ></textarea>
                         </label>
                         <label>
                             Request Amount:
                             <input
-                                className="text-white"
+                                //className="text-white"
                                 type="number"
                                 step="0.01"
                                 value={nudgeAmount || ""}
