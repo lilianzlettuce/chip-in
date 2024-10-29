@@ -49,6 +49,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     }
     const closePayModal = () => {
         setIsPayModalOpen(false);
+        setIsPayByAmount(false);
     };
 
     //handle nudge modal
