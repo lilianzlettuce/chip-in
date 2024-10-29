@@ -15,7 +15,7 @@ import './AddItem.css';
 export default function Dashboard() {
     const { user } = useUserContext();
     const { householdId } = useParams();
-    const householdID = householdId
+    const householdID = householdId;
 
     const [purchasedItems, setPurchasedItems] = useState([]);
     const [groceryItems, setGroceryItems] = useState([]);
@@ -23,7 +23,7 @@ export default function Dashboard() {
     const [isSearching, setIsSearching] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedRoommates, setSelectedRoommates] = useState<string[]>([]);
-    const [categories, setCategories] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
+    const [categories] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
     const [roommates, setRoommates] = useState([]);
     const [sortAscending, setSortAscending] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
@@ -255,6 +255,9 @@ export default function Dashboard() {
         };
         console.log(`POO ${name}`);*/
 
+        // Refetch to auto-update list displays
+        fetchPurchasedItems();
+        fetchGroceryItems();
     };
 
 

@@ -101,7 +101,7 @@ export default function Alerts() {
     if (user && householdId) {
       fetchAlerts();
     }
-  }, [householdId]);
+  }, [user, householdId]);
 
   return (
     <div className="fixed left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end">
