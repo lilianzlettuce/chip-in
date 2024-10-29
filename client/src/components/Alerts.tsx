@@ -104,7 +104,7 @@ export default function Alerts() {
   }, [user, householdId]);
 
   return (
-    <div className="fixed left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end">
+    <div className="absolute left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end z-10">
       <button className="relative bg-gray-900 text-white w-10 h-10 rounded-full" 
           onClick={() => {
             if (showAlerts) {
