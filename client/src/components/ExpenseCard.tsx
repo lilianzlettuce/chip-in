@@ -3,21 +3,30 @@ import { useUserContext } from '../UserContext';
 import './ExpenseCard.css'
 
 interface ExpenseCardProps {
-    id: string;
+    // id: string;
     //user:string;
     //email: string;
-    owedTo: number; // amount you owe
-    owedFrom: number; // amount roommate owes you
+    // owedTo: number; // amount you owe
+    // owedFrom: number; // amount roommate owes you
     // onPayBack: () => void;
+    key: string;
+    roommateName: string;
+    owesYou: number;
+    youOwe: number;
 
 }
 
 const ExpenseCard: React.FC<ExpenseCardProps> = ({
    //user,
     //email,
-   owedTo,
-   owedFrom,
+//    owedTo,
+//    owedFrom,
    // onPayBack
+
+   key,
+   roommateName,
+   owesYou,
+   youOwe
 }) => { 
     const { user } = useUserContext();
     const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -44,7 +53,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
     // handling partial payment
     const handlePayByAmountSubmit = () => {
-        if (paymentAmount <= 0 || paymentAmount > owedTo) {
+        if (paymentAmount <= 0 || paymentAmount > youOwe) {
             alert('Please enter a valid amount.');
             return;
         }
@@ -61,14 +70,15 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         <div className="expense-card">
             <div className="expense-header">
                 <div className="user-info">
-                <h4>@{user.username}</h4>
-                <h4>{user.email}</h4>
+                {/* <h4>@{user.username}</h4>
+                <h4>{user.email}</h4> */}
+                <h4>@{roommateName}</h4>
                 </div>
             </div>
 
             <div className="expense-status">
-                <div className="status-item owes-you">Owes you <strong>${owedFrom}</strong></div>
-                <div className="status-item you-owe">You owe <strong>${owedTo}</strong></div>
+                <div className="status-item owes-you">Owes you <strong>${owesYou}</strong></div>
+                <div className="status-item you-owe">You owe <strong>${youOwe}</strong></div>
             </div>
 
             <div className="expense-actions">
@@ -79,7 +89,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             {isModalOpen && (
                 <div className="modal">
                     <div className="modal-content">
-                        <h3>Pay back ${owedTo}</h3>
+                        <h3>Pay back ${youOwe}</h3>
                         <p>Select an option:</p>
 
                         {/* pay in full button */}
