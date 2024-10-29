@@ -35,7 +35,8 @@
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 0.9em;
-    margin-right: 6px;
+    margin-right: 12px;
+    margin-left: 5px;
 }
 
 .owes-you {
@@ -65,6 +66,40 @@
     color: #333;
 }
 
+.expense-card .expense-modal-content .pay-in-full-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    width: 90%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.pay-in-full-btn:hover {
+    background-color: #45a049;
+}
+
+.expense-card .expense-modal-content .pay-by-amount-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    width: 90%;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.pay-by-amount-btn:hover {
+    background-color: #e53935;
+}
+
 .nudge-btn {
     width: 87%;
     padding: 10px;
@@ -90,12 +125,13 @@
     color: white;
 }
   
-.modal-content {
+.expense-modal-content {
     background-color: white;
     padding: 20px;
     border-radius: 5px;
     width: 300px;
     text-align: center;
+    color: black;
 }
 
 /* .modal-content input[type="text"]
@@ -124,6 +160,63 @@
     margin: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+/* nudges css */
+.nudge-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.nudge-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    text-align: center;
+    z-index: 101;
+}
+
+.nudge-modal-content textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: Arial, sans-serif;
+
+}
+
+.nudge-modal-content button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.nudge-modal-content button:hover {
+    background-color: #555;
+}
+
+.nudge-modal-content input[type="number"] {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%;
 }
   
 
