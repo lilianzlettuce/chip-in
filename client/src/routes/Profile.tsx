@@ -7,7 +7,7 @@ import { useUserContext } from '../UserContext';
 import { Confirm } from '../components/Confirm';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGear, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faPencil, faUser } from '@fortawesome/free-solid-svg-icons';
 import { faFloppyDisk, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 // Get server url
@@ -505,8 +505,12 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   return (
     <div className="profile-settings-container">
       {/* Header Section */}
-      <div className="profile-header">
-        <h2>Profile</h2>
+      <div className="w-full text-lg text-left font-medium flex items-center justify-between gap-2 py-2 pb-4 border-solid border-gray-300 border-b-2">
+        <div className="flex items-center gap-2">
+          Profile
+          <FontAwesomeIcon icon={faUser} className="fa-regular text-lg" />
+        </div>
+
         <div className="profile-actions">
           <button className="pf-btn" onClick={handleEditClick}>
             {isEditing ? 
@@ -733,10 +737,16 @@ const Settings: React.FC = () => {
 
   return (
     <div className="settings-container">
-      <h3 className="text-lg text-left font-medium flex items-center gap-2 py-2 pb-4 border-solid border-gray-300 border-b-2">
-        Settings
-        <FontAwesomeIcon icon={faGear} className="fa-regular text-lg" />
-      </h3>
+      <div className="w-full text-lg text-left font-medium flex items-center justify-between gap-2 py-2 pb-4 border-solid border-gray-300 border-b-2">
+        <div className="flex items-center gap-2">
+          Settings
+          <FontAwesomeIcon icon={faGear} className="fa-regular text-lg" />
+        </div>
+        <button className="pf-btn" onClick={handleSubmit}>
+          SAVE CHANGES 
+          <FontAwesomeIcon  icon={faFloppyDisk} className="fa-regular text-lg" />
+        </button>
+      </div>
       <div className="mt-3 flex flex-col gap-4 p-4">
         <h3 className="text-left font-medium">Notifications</h3>
         <div className="flex justify-between">
@@ -763,10 +773,6 @@ const Settings: React.FC = () => {
             </div>
           </div>
         </div>
-        <button className="pf-btn" onClick={handleSubmit}>
-          SAVE CHANGES 
-          <FontAwesomeIcon  icon={faFloppyDisk} className="fa-regular text-lg" />
-        </button>
       </div>
 
       {isPopupOpen && (

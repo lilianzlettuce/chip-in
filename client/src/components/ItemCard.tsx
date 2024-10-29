@@ -42,6 +42,9 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
     return (
         <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>
+            {!isShared &&
+                <span className="not-shared-text">This item is not shared with you.</span>
+            }
             <div className="category-badge">{category}</div>
             <div className="item-info">
                 <span>{name}</span>

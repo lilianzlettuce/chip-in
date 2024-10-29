@@ -76,7 +76,7 @@ router.patch('/markAsRead/:householdID/:userID', async (req, res) => {
     try {
       // Perform updates for each alert in the input array
       for (const alert of alertUpdates) {
-        const { _id, readBy } = alert;
+        const { _id } = alert;
   
         const result = await Household.updateOne(
             { _id: householdId }, // Find household by id

@@ -39,6 +39,11 @@ export default function Alerts() {
       let newUnreadAlerts: AlertType[] = [];
       let newReadAlerts: AlertType[] = [];
       for (const alert of userAlerts) {
+        // Ensure alert.date is converted to a Date object
+        if (alert.date) {
+          alert.date = new Date(alert.date);
+        }
+
         // Check if alert has been read by this user
         let isRead: boolean = false;
         if (alert.readBy && alert.readBy.length > 0) {
@@ -96,16 +101,15 @@ export default function Alerts() {
     if (user && householdId) {
       fetchAlerts();
     }
-  }, [householdId]);
+  }, [user, householdId]);
 
   return (
-    <div className="fixed left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end">
+    <div className="absolute left-[calc(100%-300px)] w-[300px] px-6 flex flex-col items-end z-10">
       <button className="relative bg-gray-900 text-white w-10 h-10 rounded-full" 
           onClick={() => {
             if (showAlerts) {
-              // Close alerts window, mark unread as read
-              //markAsRead();
               setShowAlerts(false);
+
               // Refetch alerts to reflect new read status
               fetchAlerts();
             } else {
@@ -143,7 +147,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date}
+                {alert.date.toDateString()}
               </div>
             </div>
           ))}
@@ -157,7 +161,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date}
+                {alert.date.toDateString()}
               </div>
             </div>
           ))}
