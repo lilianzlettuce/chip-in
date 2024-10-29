@@ -39,6 +39,11 @@ export default function Alerts() {
       let newUnreadAlerts: AlertType[] = [];
       let newReadAlerts: AlertType[] = [];
       for (const alert of userAlerts) {
+        // Ensure alert.date is converted to a Date object
+        if (alert.date) {
+          alert.date = new Date(alert.date);
+        }
+
         // Check if alert has been read by this user
         let isRead: boolean = false;
         if (alert.readBy && alert.readBy.length > 0) {
@@ -143,7 +148,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date}
+                {alert.date.toDateString()}
               </div>
             </div>
           ))}
@@ -157,7 +162,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date}
+                {alert.date.toDateString()}
               </div>
             </div>
           ))}

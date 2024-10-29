@@ -11,7 +11,7 @@ export type HouseholdNavType = {
 
 export type AlertType = {
     _id: string;
-    date: string;
+    date: Date;
     category: "Payment" | "Nudge" | "Expiration";
     content: string;
     recipients: string[];
