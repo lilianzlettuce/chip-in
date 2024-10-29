@@ -38,6 +38,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [nudgeMessage, setNudgeMessage] = useState('');
     const [nudgeAmount, setNudgeAmount] = useState<number | undefined>();
+    const [errorMessage, setErrorMessage] = useState(false);
 
 
     if (!user) return;
@@ -112,7 +113,8 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     // handling partial payment
     const handlePayByAmountSubmit = async() => {
         if (paymentAmount <= 0 || paymentAmount > youOwe) {
-            alert('Please enter a valid amount.');
+            //alert('Please enter a valid amount.');
+            setErrorMessage(true);
             return;
         }
         if (!householdId) return;
@@ -200,6 +202,15 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                         )}
 
                         <button className="bg-red-400" onClick={closePayModal}>Close</button>
+                    </div>
+                </div>
+            )}
+
+            {errorMessage && (
+                <div className="error-modal-overlay">
+                    <div className="error-modal-content">
+                        <h3>Please enter a valid amount.</h3>
+                        <button onClick={() => setErrorMessage(false)}>Close</button>
                     </div>
                 </div>
             )}
