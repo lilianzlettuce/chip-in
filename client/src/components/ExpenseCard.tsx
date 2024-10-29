@@ -14,6 +14,7 @@ interface ExpenseCardProps {
     roommateId: string,
     owesYou: number;
     youOwe: number;
+    onPaymentSuccess: () => void; // refresh debts
 
 }
 
@@ -27,7 +28,8 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
    roommateName,
    roommateId,
    owesYou,
-   youOwe
+   youOwe,
+   onPaymentSuccess
 }) => { 
     const { user } = useUserContext();
     const { householdId } = useParams();
@@ -108,6 +110,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         }
         closePayModal(); 
         setIsConfirmationOpen(true);
+        onPaymentSuccess();
     };
 
 
@@ -139,6 +142,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         }
         closePayModal(); 
         setIsConfirmationOpen(true);
+        onPaymentSuccess();
     };
 
     const closeConfirmation = () => {
@@ -164,7 +168,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                 {/* <button className="nudge-btn" onClick={handleNudgeClick}>Nudge</button> */}
             </div>
             <div className="expense-actions">
-                <button className="nudge-btn" onClick={handleNudgeClick}>Nudge</button>
+                <button className="nudge-btn" onClick={handleNudgeClick} disabled={owesYou <= 0}>Nudge</button>
             </div>
 
             {/* payment modal */}

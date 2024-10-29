@@ -116,6 +116,9 @@ export default function MyExpenses() {
                         roommateName={expense.roommateName}
                         owesYou={expense.owesYou}
                         youOwe={expense.youOwe}
+
+                        // refresh debts
+                        onPaymentSuccess={fetchDebts}
                     />
                 ))}
             </div>
