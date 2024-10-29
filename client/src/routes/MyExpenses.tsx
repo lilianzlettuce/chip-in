@@ -1,7 +1,10 @@
 import { useParams } from 'react-router-dom';
 import { useUserContext } from '../UserContext';
-import ExpenseCard from '../components/ExpenseCard';
 import React, { useEffect, useState } from 'react';
+
+import ExpenseCard from '../components/ExpenseCard';
+import Alerts from '../components/Alerts';
+
 import './MyExpenses.css'
 
 export default function MyExpenses() {
@@ -15,6 +18,7 @@ export default function MyExpenses() {
 
     return (
         <div>
+            <Alerts />
             { /* <h1>household id: {householdId}</h1> */}
             { /* <h1>user id: {user?.id}</h1> */}
             <h1 className="expenses-title">My Expenses</h1>

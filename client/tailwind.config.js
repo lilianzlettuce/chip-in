@@ -10,6 +10,7 @@ export default {
         green: {
           400: "#84A59D"
         },
+        navy: "#325374",
         emerald: "#006D77",
       },
       boxShadow: {

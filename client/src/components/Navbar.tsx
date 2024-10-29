@@ -15,8 +15,9 @@ import {JoinHousehold , Modal2}  from './JoinHousehold'
 export default function Navbar() {
   const { householdId } = useParams();
   const { user, households } = useUserContext();
-  const navigate = useNavigate();
   const userId = user?.id;
+
+  const navigate = useNavigate();
 
   // Implementing Modal for Creating a household
   const [showHouseholdForm, setShowHouseholdForm] = useState(false);

@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { useNavigate } from "react-router-dom";
 
-//import lettuce from '../assets/lettuce.png'
 import './Profile.css'; // Import CSS for styling
 
 import { useUserContext } from '../UserContext';
 import { Confirm } from '../components/Confirm';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faFloppyDisk, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 // Get server url
 const PORT = process.env.REACT_APP_PORT || 5050;
@@ -505,15 +508,28 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
       <div className="profile-header">
         <h2>Profile</h2>
         <div className="profile-actions">
-          <button className="delete-account" onClick={openModal}>DELETE ACCOUNT</button>
+          <button className="pf-btn" onClick={handleEditClick}>
+            {isEditing ? 
+              <span className="flex items-center gap-2">
+                DISPLAY PROFILE
+              </span> 
+            : 
+              <span className="flex items-center gap-2">
+                EDIT PROFILE
+                <FontAwesomeIcon  icon={faPencil} className="fa-regular text-lg" />
+              </span> 
+            }
+          </button>
+          <button className="pf-btn" onClick={openModal}>
+            DELETE ACCOUNT
+            <FontAwesomeIcon  icon={faTrashAlt} className="fa-regular text-lg" />
+          </button>
           <Confirm
             show={showConfirmDelete}
             onClose={closeModal}
             onConfirm={deleteAccount}
             message="Are you sure you want to delete your account?">
           </Confirm>
-          <button className="edit-profile" onClick={handleEditClick}>
-            {isEditing ? "DISPLAY PROFILE" : "EDIT PROFILE"}</button>
         </div>
       </div>
 
@@ -646,125 +662,121 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
 // ---------- UI Function for Notification Settings --------------------------
 const Settings: React.FC = () => {
-  const { user } = useUserContext();
+  const { user, updateUser } = useUserContext();
 
-  const [expirationNotif, setExpirationNotif] = useState(user?.preferences.expirationNotif);
-  const [paymentNotif, setPaymentNotif] = useState(user?.preferences.expirationNotif);
+  // Currently user selected notif value
+  const [expirationNotif, setExpirationNotif] = useState<string>();
+  const [paymentNotif, setPaymentNotif] = useState<string>();
 
-  /*const [tempName, setTempName] = useState(email);
-  const [tempUsername, setTempUsername] = useState(username);*/
+  // Popup modal
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
-  // Toggle confirmation modal for account deletion
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const openModal = () => setShowConfirmDelete(true);
-  const closeModal = () => setShowConfirmDelete(false);
-
-  // Alert modal
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
-  // Success modal
-  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-
-  //update disply fields when props state change
+  // Update display fields when props state change
   useEffect(() => {
-    setExpirationNotif(expirationNotif);
-    setPaymentNotif(paymentNotif);
-
-    /*setTempName(email || '');
-    setTempUsername(username || '');*/
-
+    // Default selected values to current user notif settings
+    setExpirationNotif(user?.preferences.expirationNotif);
+    setPaymentNotif(user?.preferences.paymentNotif);
   }, [user]);
 
-  // Event handler function for the button click
-  const handleChangeNameClick = async () => {
-    /*setDisplayName(tempName);
-    setIsSuccessOpen(true);
-    setSuccessMessage(`${tempName} has been changed successfully`);
+  // handle closing successful edits
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    setPopupMessage('');
+  };
 
-    const url = `http://localhost:${PORT}/user/${user?.id}`;
+  // Event handler function for the button click
+  const handleSubmit = async () => {
+    let newPrefs = {
+      expirationNotif: expirationNotif,
+      paymentNotif: paymentNotif
+    };
 
     try {
-      console.log("email", displayName)
-      const response = await fetch(url, {
+      const response = await fetch(`http://localhost:${PORT}/user/${user?.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: tempName,
+          preferences: newPrefs
         }),
       });
 
       if (response.ok) {
-        console.log('email updated successfully!');
-        setRefreshProfile((prev) => prev + 1);
+        console.log('user preferences updated successfully!');
+        setIsPopupOpen(true);
+        setPopupMessage("Settings successfully updated!");
+
+        updateUser();
       } else {
+        setIsPopupOpen(true);
+        setPopupMessage("Sorry, there's been an error processing your request. Please try again later.");
         console.error('Failed to update email.');
       }
     } catch (error) {
       console.error('Error:', error);
-    }*/
+
+      setIsPopupOpen(true);
+      setPopupMessage("Sorry, there's been an error processing your request. Please try again later.");
+    }
   };
 
-  // State to track switch states
-  const [householdAlerts, setHouseholdAlerts] = useState(true);
-  const [paymentReminders, setPaymentReminders] = useState(true);
-
-  // Toggle function for switches
-  const handleToggle = (setter: React.Dispatch<React.SetStateAction<boolean>>) => {
-    setter((prevState) => !prevState);
+  // Handler to update the state when the user selects a different option
+  const handleSelectionChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (event.target.name == "expiration") {
+      setExpirationNotif(event.target.value);
+    } else {
+      setPaymentNotif(event.target.value);
+    }
   };
 
   return (
     <div className="settings-container">
-      {/* Settings Header */}
-      <div className="settings-header">
-        <h2>Settings</h2>
-      </div>
-
-      {/* Notifications Section */}
-      <div className="notifications-section">
-        <h3>Notifications</h3>
-        <label>Expiration notifications:</label>
-        <div>{expirationNotif}</div>
-        <select name="cars">
-          <option value="all">All</option>
-          <option value="relevant">Relevant</option>
-          <option value="none">None</option>
-        </select>
-
-
-        <div className="notification-row">
-          <div className="notification-item">
-            <label className="notification-label">Household Alerts</label>
-            <div className="toggle-container">
-              <span className="toggle-label">ON</span>
-              <input
-                type="checkbox"
-                className="toggle-switch"
-                checked={householdAlerts}
-                onChange={() => handleToggle(setHouseholdAlerts)}
-              />
-              <span className="toggle-label">OFF</span>
+      <h3 className="text-lg text-left font-medium flex items-center gap-2 py-2 pb-4 border-solid border-gray-300 border-b-2">
+        Settings
+        <FontAwesomeIcon icon={faGear} className="fa-regular text-lg" />
+      </h3>
+      <div className="mt-3 flex flex-col gap-4 p-4">
+        <h3 className="text-left font-medium">Notifications</h3>
+        <div className="flex justify-between">
+          <div className="flex w-fit items-center justify-between gap-2 bg-navy p-4 px-6 rounded-md text-white">
+            <label>Expiration notifications:</label>
+            <div className="w-fit bg-navy p-1 rounded-md text-white border-solid border-2 border-white">
+              <select name="expiration" value={expirationNotif} onChange={handleSelectionChange}
+                  className="bg-transparent block py-1 px-2">
+                <option value="all">All</option>
+                <option value="relevant">Relevant</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
-          <div className="notification-item">
-            <label className="notification-label">Payment Reminders</label>
-            <div className="toggle-container">
-              <span className="toggle-label">ON</span>
-              <input
-                type="checkbox"
-                className="toggle-switch"
-                checked={paymentReminders}
-                onChange={() => handleToggle(setPaymentReminders)}
-              />
-              <span className="toggle-label">OFF</span>
+          <div className="flex w-fit items-center justify-between gap-2 bg-navy p-4 px-6 rounded-md text-white">
+            <label>Payment notifications:</label>
+            <div className="w-fit bg-navy p-1 rounded-md text-white border-solid border-2 border-white">
+              <select name="payment" value={paymentNotif} onChange={handleSelectionChange}
+                  className="bg-transparent block py-1 px-2">
+                <option value="all">All</option>
+                <option value="relevant">Relevant</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
         </div>
+        <button className="pf-btn" onClick={handleSubmit}>
+          SAVE CHANGES 
+          <FontAwesomeIcon  icon={faFloppyDisk} className="fa-regular text-lg" />
+        </button>
       </div>
+
+      {isPopupOpen && (
+            <div className="alert-modal text-lg font-medium">
+              <div className="alert-modal-content">
+                <h3 className="mb-4">{popupMessage}</h3>
+                <button onClick={closePopup}>OK</button>
+              </div>
+            </div>
+          )}
     </div>
   );
 };
