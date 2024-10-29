@@ -130,15 +130,20 @@ router.post('/nudge', async (req, res) => {
     let {householdId, nudgerId, recipientId, message, amount} = req.body;
     const currentDate = new Date();
 
-    console.log('nudge')
     try {
         const nudger = await User.findById(nudgerId);
         console.log(nudger.username)
         if (!nudger) {
             return res.status(404).send({ error: `Nudger not found`})
         }
-        if (!message) {
+        if ((!message || message === '') && (!amount || amount ==='')) {
             message = `Friendly reminder from ${nudger.username} to pay them back!` 
+        } else if (!amount || amount ==='') {
+            message = `Friendly reminder from ${nudger.username}: ${message}`;
+        } else if (!message || message === '') {
+            message = `Friendly reminder from ${nudger.username} to pay them back \$${amount}!` 
+        } else {
+            message = `Friendly reminder from ${nudger.username} to pay them back \$${amount}! Also, ${message}` 
         }
         const newAlert = {
             category: 'Nudge',

@@ -63,6 +63,17 @@
     color: #333;
 }
 
+.nudge-btn {
+    width: 87%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    background-color: #7c9f8a;
+    color: #333;
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -82,7 +93,10 @@
     width: 300px;
     text-align: center;
 }
-  
+
+/* .modal-content input[type="text"]
+.modal-content input[type="number"]  */
+
 /*button {
     margin: 10px 0;
 }*/

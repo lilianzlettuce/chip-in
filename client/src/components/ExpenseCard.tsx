@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useUserContext } from '../UserContext';
+import { useParams } from 'react-router-dom';
 import './ExpenseCard.css'
 
 interface ExpenseCardProps {
@@ -9,8 +10,8 @@ interface ExpenseCardProps {
     // owedTo: number; // amount you owe
     // owedFrom: number; // amount roommate owes you
     // onPayBack: () => void;
-    key: string;
     roommateName: string;
+    roommateId: string,
     owesYou: number;
     youOwe: number;
 
@@ -23,33 +24,73 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 //    owedFrom,
    // onPayBack
 
-   key,
    roommateName,
+   roommateId,
    owesYou,
    youOwe
 }) => { 
     const { user } = useUserContext();
-    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const { householdId } = useParams();
+    const [isPayModalOpen, setIsPayModalOpen] = useState(false); 
+    const [isNudgeModalOpen, setIsNudgeModalOpen] = useState(false); 
     const [paymentAmount, setPaymentAmount] = useState<number>(0); // State for custom payment
     const [isPayByAmount, setIsPayByAmount] = useState(false); // Toggle for pay by amount
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+    const [nudgeMessage, setNudgeMessage] = useState('');
+    const [nudgeAmount, setNudgeAmount] = useState<number | undefined>();
+
 
     if (!user) return;
     
     // handling pay back button and modal
     const handlePayBackClick = () => {
-        setIsModalOpen(true);
+        setIsPayModalOpen(true);
     }
-    const closeModal = () => {
-        setIsModalOpen(false);
+    const closePayModal = () => {
+        setIsPayModalOpen(false);
     };
+
+    //handle nudge modal
+    const handleNudgeClick = () => {
+        setIsNudgeModalOpen(true)
+    }
+
+    const closeNudgeModal = () => {
+        setIsNudgeModalOpen(false);
+    }
+    const handleNudgeSubmit = async () => {
+        let nudge = {
+            householdId: householdId, 
+            recipientId: roommateId, 
+            nudgerId: user.id, 
+            message: nudgeMessage,
+            amount: nudgeAmount
+        }
+        try {
+            const response = await fetch(`http://localhost:6969/alert/nudge`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(nudge),
+              });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error fetching debts:', error);
+        }
+
+        closeNudgeModal();
+    }
 
     // handling full payment
     const handlePayInFull = () => {
         // TODO: send request to backend to process the full payment of owedTo
-        closeModal(); 
+        closePayModal(); 
         setIsConfirmationOpen(true);
     };
+
 
     // handling partial payment
     const handlePayByAmountSubmit = () => {
@@ -57,7 +98,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             alert('Please enter a valid amount.');
             return;
         }
-        closeModal(); 
+        closePayModal(); 
         setIsConfirmationOpen(true);
     };
 
@@ -83,10 +124,14 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
             <div className="expense-actions">
                 <button className="pay-back-btn" onClick={handlePayBackClick}>Pay back</button>
+                {/* <button className="nudge-btn" onClick={handleNudgeClick}>Nudge</button> */}
+            </div>
+            <div className="expense-actions">
+                <button className="nudge-btn" onClick={handleNudgeClick}>Nudge</button>
             </div>
 
-            {/* modal */}
-            {isModalOpen && (
+            {/* payment modal */}
+            {isPayModalOpen && (
                 <div className="modal">
                     <div className="modal-content">
                         <h3>Pay back ${youOwe}</h3>
@@ -120,7 +165,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                             </div>
                         )}
 
-                        <button onClick={closeModal}>Close</button>
+                        <button onClick={closePayModal}>Close</button>
                     </div>
                 </div>
             )}
@@ -132,6 +177,33 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                         <h3>Payment Successful!</h3>
                         <p>Your payment has been processed.</p>
                         <button onClick={closeConfirmation}>Close</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Nudge Modal */}
+            {isNudgeModalOpen && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h3>Nudge</h3>
+                        <label>
+                            Custom Message:
+                            <input
+                                type="text"
+                                value={nudgeMessage}
+                                onChange={(e) => setNudgeMessage(e.target.value)}
+                            />
+                        </label>
+                        <label>
+                            Request Amount:
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={nudgeAmount || ""}
+                                onChange={(e) => setNudgeAmount(e.target.value ? parseFloat(e.target.value) : undefined)}
+                            />
+                        </label>
+                        <button onClick={handleNudgeSubmit}>Nudge</button>
                     </div>
                 </div>
             )}

@@ -109,6 +109,7 @@ export default function MyExpenses() {
                 // />
                 <ExpenseCard
                     key={expense.roommateId}
+                    roommateId={expense.roommateId}
                     roommateName={expense.roommateName}
                     owesYou={expense.owesYou}
                     youOwe={expense.youOwe}
