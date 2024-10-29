@@ -1,12 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { useUserContext } from '../UserContext';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import ExpenseCard from '../components/ExpenseCard';
 import Alerts from '../components/Alerts';
 
 import './MyExpenses.css'
-import exp from 'constants';
 
 export default function MyExpenses() {
     const { householdId } = useParams();
@@ -40,13 +39,12 @@ export default function MyExpenses() {
         if (householdId) {
             fetchDebts();
         }
-    }, [householdId]);
+    }, [user, householdId]);
     
     const fetchDebts = async () => {
         if (!householdId || !user) return;
 
         try {
-            console.log(householdId)
             const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -99,26 +97,28 @@ export default function MyExpenses() {
     
 
     return (
-        <div>
+        <div className="relative">
             <Alerts />
             { /* <h1>household id: {householdId}</h1> */}
             { /* <h1>user id: {user?.id}</h1> */}
             <h1 className="expenses-title">My Expenses</h1>
-            {expenses.map((expense) => (
-                // <ExpenseCard
-                //     key={expense.id}
-                //     id={expense.id}
-                //     owedTo={expense.owedTo}
-                //     owedFrom={expense.owedFrom}
-                // />
-                <ExpenseCard
-                    key={expense.roommateId}
-                    roommateId={expense.roommateId}
-                    roommateName={expense.roommateName}
-                    owesYou={expense.owesYou}
-                    youOwe={expense.youOwe}
-                />
-            ))}
+            <div className="flex flex-wrap justify-between gap-4">
+                {expenses.map((expense) => (
+                    // <ExpenseCard
+                    //     key={expense.id}
+                    //     id={expense.id}
+                    //     owedTo={expense.owedTo}
+                    //     owedFrom={expense.owedFrom}
+                    // />
+                    <ExpenseCard
+                        key={expense.roommateId}
+                        roommateId={expense.roommateId}
+                        roommateName={expense.roommateName}
+                        owesYou={expense.owesYou}
+                        youOwe={expense.youOwe}
+                    />
+                ))}
+            </div>
         </div>
 
 

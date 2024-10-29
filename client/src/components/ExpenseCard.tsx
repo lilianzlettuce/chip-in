@@ -111,8 +111,6 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         <div className="expense-card">
             <div className="expense-header">
                 <div className="user-info">
-                {/* <h4>@{user.username}</h4>
-                <h4>{user.email}</h4> */}
                 <h4>@{roommateName}</h4>
                 </div>
             </div>
@@ -132,7 +130,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
             {/* payment modal */}
             {isPayModalOpen && (
-                <div className="modal">
+                <div className="bg-black/50 w-screen h-screen fixed top-0 left-0 flex items-center justify-center z-30">
                     <div className="modal-content">
                         <h3>Pay back ${youOwe}</h3>
                         <p>Select an option:</p>
@@ -165,14 +163,14 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                             </div>
                         )}
 
-                        <button onClick={closePayModal}>Close</button>
+                        <button className="bg-red-400" onClick={closePayModal}>Close</button>
                     </div>
                 </div>
             )}
 
             {/* confirmation popup */}
             {isConfirmationOpen && (
-                <div className="modal">
+                <div className="expense-modal">
                     <div className="modal-content">
                         <h3>Payment Successful!</h3>
                         <p>Your payment has been processed.</p>
@@ -183,7 +181,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
             {/* Nudge Modal */}
             {isNudgeModalOpen && (
-                <div className="modal">
+                <div className="expense-modal">
                     <div className="modal-content">
                         <h3>Nudge</h3>
                         <label>
@@ -197,6 +195,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                         <label>
                             Request Amount:
                             <input
+                                className="text-white"
                                 type="number"
                                 step="0.01"
                                 value={nudgeAmount || ""}
@@ -204,6 +203,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                             />
                         </label>
                         <button onClick={handleNudgeSubmit}>Nudge</button>
+                        <button onClick={closeNudgeModal}>Close</button>
                     </div>
                 </div>
             )}
