@@ -132,7 +132,7 @@ router.patch('/purchase', async (req, res) => {
       householdId,
       {
         $pull: { groceryList: updatedItem._id },
-        $push: { purchasedList: updatedItem._id }
+        $push: { purchasedList: updatedItem._id, purchaseHistory: updatedItem._id }
       },
       { new: true, useFindAndModify: false }
     );

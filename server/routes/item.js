@@ -10,18 +10,24 @@ router.delete('/:listType/:id', async (req, res) => {
   const { householdId } = req.query;
 
   try {
-    const item = await Item.findByIdAndDelete(id);
-    if (!item) {
-      return res.status(404).json({ message: "Item not found" });
-    }
-
     // Remove item reference from the corresponding household list
     const update = listType === 'grocery' ? { $pull: { groceryList: id } } : { $pull: { purchasedList: id } };
 
     await Household.findByIdAndUpdate(householdId, update);
 
+    let item;
+    if (listType === 'grocery') {
+      item = await Item.findByIdAndDelete(id);
+    } else {
+      item = await Item.findByIdAndUpdate(id, {archived: true});
+    }
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
     res.status(200).json({ message: "Item deleted" });
   } catch (err) {
+    console.log('err deleting item', err)
     res.status(500).json({ error: err.message });
   }
 });
@@ -78,7 +84,7 @@ router.post('/addtopurchased', async (req, res) => {
 
     const household = await Household.findByIdAndUpdate(
       householdId,
-      { $push: { purchasedList: item._id } },
+      { $push: { purchasedList: item._id, purchaseHistory: item._id } },
       { new: true, useFindandModify: false }
     );
 
@@ -94,16 +100,6 @@ router.post('/addtopurchased', async (req, res) => {
       console.log('purchasedby', purchasedBy)
       if (split.member === purchasedBy) {continue;}
 
-      // const household = await Household.findOne(
-      //   {
-      //     _id: householdId,
-      //     "debts.owedBy": split.member,
-      //     "debts.owedTo": purchasedBy
-      //   },
-      //   { debts: 1 }
-      // );
-
-      // console.log('matched debt', household?.debts.find(debt => debt.owedBy.equals(split.member) && debt.owedTo.equals(purchasedBy)))
       let newHousehold = await Household.findOneAndUpdate(
         {
           _id: householdId
@@ -119,11 +115,11 @@ router.post('/addtopurchased', async (req, res) => {
           useFindAndModify: false
         }
       );      
-      console.log('new debts', newHousehold.debts)
     }
 
     res.status(201).json(item);
   } catch (err) {
+    console.log('error adding item', err)
     res.status(500).json({ error: err.message });
   }
 });
