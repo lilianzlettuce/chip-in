@@ -19,7 +19,10 @@ const alertSchema = new mongoose.Schema({
 });
 
 const noteSchema = new mongoose.Schema({
-    category: { type: String, required: true },
+    category: { 
+        type: String, 
+        enum: ['Note', 'Reminder', 'Meeting', 'TODO'],
+        required: true },
     content: { type: String, required: true },
     urgent: { type: Boolean, required: false, default: false }
 });

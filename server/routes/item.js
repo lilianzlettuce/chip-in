@@ -27,7 +27,7 @@ router.delete('/:listType/:id', async (req, res) => {
 
     res.status(200).json({ message: "Item deleted" });
   } catch (err) {
-    console.log('err deleting item', err)
+    // console.log('err deleting item', err)
     res.status(500).json({ error: err.message });
   }
 });
@@ -92,12 +92,12 @@ router.post('/addtopurchased', async (req, res) => {
       return res.status(404).json({ message: 'Household not found' });
     }
 
-    console.log('divider')
+    // console.log('divider')
     for (const split of splits) {
       const splitCost = split.split * cost;
-      console.log(splitCost)
-      console.log('split.member', split.member)
-      console.log('purchasedby', purchasedBy)
+      // console.log(splitCost)
+      // console.log('split.member', split.member)
+      // console.log('purchasedby', purchasedBy)
       if (split.member === purchasedBy) {continue;}
 
       let newHousehold = await Household.findOneAndUpdate(
@@ -119,7 +119,7 @@ router.post('/addtopurchased', async (req, res) => {
 
     res.status(201).json(item);
   } catch (err) {
-    console.log('error adding item', err)
+    // console.log('error adding item', err)
     res.status(500).json({ error: err.message });
   }
 });
