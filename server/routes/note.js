@@ -14,7 +14,7 @@ router.get('/:householdId', async (req, res) => {
         }
         res.status(200).json(household.notes);
     } catch (error) {
-        console.error(error);
+        // console.error(error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -37,7 +37,7 @@ router.post('/:householdId', async (req, res) => {
         const addedNote = household.notes[household.notes.length - 1];
         res.status(201).json({ message: 'Note added successfully', note: addedNote });
     } catch (error) {
-        console.error('Error adding note:', error.message);
+        // console.error('Error adding note:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
