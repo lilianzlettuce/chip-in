@@ -116,7 +116,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
     // handling partial payment
     const handlePayByAmountSubmit = async() => {
-        if (paymentAmount <= 0 || paymentAmount > youOwe) {
+        if (!paymentAmount || paymentAmount <= 0 || paymentAmount > youOwe) {
             //alert('Please enter a valid amount.');
             setErrorMessage(true);
             return;
