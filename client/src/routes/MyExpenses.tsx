@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useUserContext } from '../UserContext';
 import { useEffect, useState } from 'react';
 
+import PayStat from '../components/PayStat';
 import ExpenseCard from '../components/ExpenseCard';
 import Alerts from '../components/Alerts';
 
@@ -11,6 +12,7 @@ export default function MyExpenses() {
     const { householdId } = useParams();
     const { user } = useUserContext();
     const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [totalSpent, setTotalSpent] = useState(0);
     // const expenses = [
     //     { id: '1', owedTo: 90, owedFrom: 5 },
     //     { id: '2', owedTo: 120, owedFrom: 30 },
@@ -21,13 +23,13 @@ export default function MyExpenses() {
         _id: string;
         username: string;
     }
-    
+
     interface Debt {
         owedBy: User;
         owedTo: User;
         amount: number;
     }
-    
+
     interface Expense {
         roommateId: string;
         roommateName: string;
@@ -39,8 +41,13 @@ export default function MyExpenses() {
         if (householdId) {
             fetchDebts();
         }
+        // storing total spent in local storage for now
+        const savedTotalSpent = localStorage.getItem("totalSpent");
+        if (savedTotalSpent) {
+            setTotalSpent(parseFloat(savedTotalSpent));
+        }
     }, [user, householdId]);
-    
+
     const fetchDebts = async () => {
         if (!householdId || !user) return;
 
@@ -53,48 +60,56 @@ export default function MyExpenses() {
 
             const e = calculateExpenses(data, user.id)
             setExpenses(e);
-       
+
         } catch (error) {
             console.error('Error fetching debts:', error);
         }
     };
 
     const calculateExpenses = (debts: Debt[], currentUserId: string): Expense[] => {
-        const expensesMap: Record<string, Expense> = {};    
-    
+        const expensesMap: Record<string, Expense> = {};
+
         debts.forEach((debt: any) => {
             const { owedBy, owedTo, amount } = debt;
             const isOwedByCurrentUser = owedBy._id === currentUserId;
             const isOwedToCurrentUser = owedTo._id === currentUserId;
-    
+
             // Determine the roommate and category (owesYou or youOwe)
             if (isOwedByCurrentUser) {
                 if (!expensesMap[owedTo._id]) {
-                    expensesMap[owedTo._id] = { 
-                        roommateId: owedTo._id, 
-                        roommateName: owedTo.username, 
-                        owesYou: 0, 
-                        youOwe: 0 
+                    expensesMap[owedTo._id] = {
+                        roommateId: owedTo._id,
+                        roommateName: owedTo.username,
+                        owesYou: 0,
+                        youOwe: 0
                     };
                 }
                 expensesMap[owedTo._id].youOwe += parseFloat((amount / 100).toFixed(2));
             } else if (isOwedToCurrentUser) {
                 if (!expensesMap[owedBy._id]) {
-                    expensesMap[owedBy._id] = { 
-                        roommateId: owedBy._id, 
-                        roommateName: owedBy.username, 
-                        owesYou: 0, 
-                        youOwe: 0 
+                    expensesMap[owedBy._id] = {
+                        roommateId: owedBy._id,
+                        roommateName: owedBy.username,
+                        owesYou: 0,
+                        youOwe: 0
                     };
                 }
                 expensesMap[owedBy._id].owesYou += parseFloat((amount / 100).toFixed(2));
             }
         });
-    
+
         // Convert the map to an array
         return Object.values(expensesMap);
     };
-    
+
+    const handlePayment = (amount: number) => {
+        const updatedTotalSpent = totalSpent + amount;
+        setTotalSpent(updatedTotalSpent);
+
+        // Save the updated total spent to local storage
+        localStorage.setItem("totalSpent", updatedTotalSpent.toString());
+    };
+
 
     return (
         <div className="relative">
@@ -102,6 +117,11 @@ export default function MyExpenses() {
             { /* <h1>household id: {householdId}</h1> */}
             { /* <h1>user id: {user?.id}</h1> */}
             <h1 className="expenses-title">My Expenses</h1>
+
+            <div className="summary-container">
+                <PayStat expenses={expenses} totalSpent={totalSpent} />
+            </div>
+
             <div className="flex flex-wrap justify-between gap-4">
                 {expenses.map((expense) => (
                     // <ExpenseCard
@@ -118,7 +138,12 @@ export default function MyExpenses() {
                         youOwe={expense.youOwe}
 
                         // refresh debts
-                        onPaymentSuccess={fetchDebts}
+                        // onPaymentSuccess={fetchDebts}
+
+                        onPaymentSuccess={(amount) => {
+                            fetchDebts();
+                            handlePayment(amount);  // Update total spent
+                        }}
                     />
                 ))}
             </div>

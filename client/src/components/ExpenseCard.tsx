@@ -14,7 +14,7 @@ interface ExpenseCardProps {
     roommateId: string,
     owesYou: number;
     youOwe: number;
-    onPaymentSuccess: () => void; // refresh debts
+    onPaymentSuccess: (amount: number) => void; // refresh debts
 
 }
 
@@ -110,7 +110,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         }
         closePayModal(); 
         setIsConfirmationOpen(true);
-        onPaymentSuccess();
+        onPaymentSuccess(youOwe);
     };
 
 
@@ -142,7 +142,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         }
         closePayModal(); 
         setIsConfirmationOpen(true);
-        onPaymentSuccess();
+        onPaymentSuccess(paymentAmount);
     };
 
     const closeConfirmation = () => {
@@ -180,7 +180,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
                         {/* pay in full button */}
                         <button className="pay-in-full-btn" onClick={handlePayInFull}>
-                            Pay in Full
+                            Pay All
                         </button>
 
                         {/* pay by amount button */}
@@ -189,7 +189,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                                 className="pay-by-amount-btn" 
                                 onClick={() => setIsPayByAmount(true)}
                             >
-                                Pay by Amount
+                                Pay Custom Amount
                             </button>
                         )}
 
