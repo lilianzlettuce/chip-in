@@ -148,9 +148,13 @@ router.post("/invitejoin", async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Your Invitation to Join',
-      text: `You are invited to join household code: ${householdId}
+      /*text: `You are invited to join household code: ${householdId}
       Please click the link http://localhost:5173/login
-      Press "Join Household" button and enter the code.`,
+      Press "Join Household" button and enter the code.`,*/
+      html: `
+    <p>You are invited to join household code: <strong>${householdId}</strong>.</p>
+    <p>Please click <a href="http://localhost:5173/login">here</a> to log in, then press the "Join Household" button and enter the code.</p>
+  `,
     };
 
     console.log("sender email: ", process.env.EMAIL_USER)
