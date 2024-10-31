@@ -35,7 +35,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     const { householdId } = useParams();
     const [isPayModalOpen, setIsPayModalOpen] = useState(false); 
     const [isNudgeModalOpen, setIsNudgeModalOpen] = useState(false); 
-    const [paymentAmount, setPaymentAmount] = useState<number>(0); // State for custom payment
+    const [paymentAmount, setPaymentAmount] = useState<number | undefined>(); // useState<number>(0); // State for custom payment
     const [isPayByAmount, setIsPayByAmount] = useState(false); // Toggle for pay by amount
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [nudgeMessage, setNudgeMessage] = useState('');
@@ -199,8 +199,10 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                                 <input
                                     type="number"
                                     placeholder="Enter amount"
+                                    step = "0.01"
                                     value={paymentAmount}
-                                    onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                                    // onChange={(e) => setPaymentAmount(Number(e.target.value))}
+                                    onChange={(e) => setPaymentAmount(e.target.value ? parseFloat(e.target.value) : undefined)}
                                 />
                                 <button onClick={handlePayByAmountSubmit}>Pay</button>
                             </div>
