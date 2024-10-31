@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import nodemailer from 'nodemailer';
+import bcrypt from 'bcrypt';
 
 const router = express.Router();
 const resetCodes = new Map();
@@ -11,11 +12,11 @@ router.patch('/pfp/:id', async (req, res) => {
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id, 
-      {pfp},
-      {new: true, useFindandModify: false}
+      req.params.id,
+      { pfp },
+      { new: true, useFindandModify: false }
     );
-    res.status(200).json({msg: "new pfp saved to database"})
+    res.status(200).json({ msg: "new pfp saved to database" })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
@@ -38,7 +39,7 @@ router.get('/', async (req, res) => {
     const users = await User.find();
     res.status(200).send(users);
   } catch (err) {
-    res.status(500).send({err})
+    res.status(500).send({ err })
   }
 });
 
@@ -136,7 +137,7 @@ router.post("/resetpass", async (req, res) => {
 });
 
 router.post("/invitejoin", async (req, res) => {
-  const { email , householdId} = req.body;
+  const { email, householdId } = req.body;
   console.log("invitejoin is called")
   if (!email) {
     return res.status(400).send({ message: 'Email is required' });
@@ -173,10 +174,9 @@ router.post("/invitejoin", async (req, res) => {
 router.post("/resetcode", async (req, res) => {
   const { email, code, newPassword } = req.body;
 
-  console.log("reset code is : " + code);
+  console.log("Received reset request for:", email);
   try {
     const resetData = resetCodes.get(email);
-
     if (!resetData || resetData.resetCode !== Number(code) || Date.now() > resetData.expiresAt) {
       return res.status(400).send({ message: 'Invalid or expired reset code' });
     }
@@ -186,7 +186,8 @@ router.post("/resetcode", async (req, res) => {
       return res.status(404).send({ message: 'User not found' });
     }
 
-    user.password = newPassword;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
 
     await user.save();
 
@@ -194,9 +195,10 @@ router.post("/resetcode", async (req, res) => {
 
     res.status(200).send({ message: 'Password successfully reset' });
   } catch (error) {
-    console.error(error);
+    console.error("Error during password reset:", error);
     res.status(500).send({ message: 'An error occurred' });
   }
 });
+
 
 export default router;

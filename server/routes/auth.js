@@ -101,6 +101,29 @@ router.post("/login", (req, res) => {
     })
 });
 
+// Verify user's current password
+router.post("/verify-password", async (req, res) => {
+    const { id, password } = req.body;
+
+    try {
+        const user = await User.findById(id);
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (isPasswordMatch) {
+            return res.status(200).json({ success: true });
+        } else {
+            return res.status(401).json({ success: false, message: "Incorrect password." });
+        }
+    } catch (err) {
+        console.error("Error verifying password:", err);
+        res.status(500).json({ success: false, message: "Server error. Please try again later." });
+    }
+});
+
 // Check if user is logged in and access current user's data
 router.get("/getUserData", verifyJWT, (req, res) => {
     res.json({

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
+import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom";
 
 import './Profile.css'; // Import CSS for styling
@@ -250,6 +251,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const openPasswordModal = () => setIsPasswordModalOpen(true);
+  const closePasswordModal = () => setIsPasswordModalOpen(false);
+
+
   //update disply fields when props state change
   useEffect(() => {
     setDisplayName(email || '');
@@ -355,66 +363,71 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     }
   };
 
-  /*const handleChangePasswordClick = () => {
-    if (isEditing == true) {
-      alert(`${displayPassword} has been changed successfully`);
+  const handlePasswordInputClick = () => {
+    if (isEditing) {
+      setIsPasswordModalOpen(true);
     }
-  };*/
-  // handles validation
-  const handleChangePasswordClick = async () => {
-    // current client webpack is not setup to use password-validator
-    //const passwordValid = pwSchema.validate(tempPassword? tempPassword : "");
+  };
 
-    if (!isValidPassword(tempPassword ? tempPassword : "")) {
-      //if (!passwordValid) {
-      // alert("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no space.");
-      setIsAlertOpen(true);
-      setAlertMessage("Password must be at least 6 and at most 25 characters long, contains at least one uppper case and one lower letter, one number, and no spaces.")
-      return;
-    }
-
-    //else {
-    //  setDisplayPassword(tempPassword);
-    // Password meets all criteria
-    //  alert("Password has been changed successfully");
-    //} 
-
-    setDisplayPassword(tempPassword);
-    // alert("Password has been changed successfully");
-    setIsSuccessOpen(true);
-    setSuccessMessage("Password has been changed.");
-
-    const url = `http://localhost:${PORT}/user/${user?.id}`;
-
+  const handleVerifyCurrentPassword = async (currentPassword: string): Promise<boolean> => {
     try {
-      const response = await fetch(url, {
-        method: 'PATCH',
+      const verifyResponse = await fetch(`http://localhost:${PORT}/auth/verify-password`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: user?.id, password: currentPassword }),
+      });
+
+      const verifyData = await verifyResponse.json();
+      return verifyData.success === true; // Ensure this returns a boolean (true or false)
+    } catch (error) {
+      console.error("Error verifying password:", error);
+      return false; // Return false on error
+    }
+  };
+
+  const handleUpdatePassword = async (newPassword: string) => {
+    try {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      const response = await fetch(`http://localhost:${PORT}/user/${user?.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          password: tempPassword,
+          password: hashedPassword,
         }),
       });
 
       if (response.ok) {
-        console.log('password updated successfully!');
+        setIsSuccessOpen(true);
+        setSuccessMessage("Password has been changed.");
         setRefreshProfile((prev) => prev + 1);
       } else {
-        console.error('Failed to update password.');
+        console.error("Failed to update password.");
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error updating password:", error);
     }
   };
 
-  // handle closing alerts
+  const handleChangePasswordClick = () => {
+    if (!tempPassword) {
+      setIsAlertOpen(true);
+      setAlertMessage("Password cannot be empty.");
+      return;
+    }
+
+    setIsPasswordModalOpen(true);
+  };
+
   const closeAlert = () => {
     setIsAlertOpen(false);
     setAlertMessage('');
   };
 
-  // handle closing successful edits
   const closeSuccess = () => {
     setIsSuccessOpen(false);
     setSuccessMessage('');
@@ -513,20 +526,20 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
         <div className="profile-actions">
           <button className="pf-btn" onClick={handleEditClick}>
-            {isEditing ? 
+            {isEditing ?
               <span className="flex items-center gap-2">
                 DISPLAY PROFILE
-              </span> 
-            : 
+              </span>
+              :
               <span className="flex items-center gap-2">
                 EDIT PROFILE
-                <FontAwesomeIcon  icon={faPencil} className="fa-regular text-lg" />
-              </span> 
+                <FontAwesomeIcon icon={faPencil} className="fa-regular text-lg" />
+              </span>
             }
           </button>
           <button className="pf-btn" onClick={openModal}>
             DELETE ACCOUNT
-            <FontAwesomeIcon  icon={faTrashAlt} className="fa-regular text-lg" />
+            <FontAwesomeIcon icon={faTrashAlt} className="fa-regular text-lg" />
           </button>
           <Confirm
             show={showConfirmDelete}
@@ -602,14 +615,26 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           <label className="profile-label">Password</label>
           {/* Change input type based on isEditing state 
            type="password": This input type is specifically designed to hide user input, showing only a series of * */}
-          <input type={isEditing ? "text" : "password"} // Use "password" type when not editing
+          <input
+            type={isEditing ? "text" : "password"}
             className="profile-input"
             value={isEditing ? tempPassword : displayPassword}
-            readOnly={!isEditing} // doesn't allow users to change text field
-            onChange={(e) => setTempPassword(e.target.value)} />
+            readOnly={!isEditing}
+            onClick={handlePasswordInputClick}
+            onChange={(e) => setTempPassword(e.target.value)}
+          />
           {isEditing && (
-            <button className="change-button" onClick={handleChangePasswordClick}>CHANGE PASSWORD</button>
+            <button className="change-button" onClick={handleChangePasswordClick}>
+              CHANGE PASSWORD
+            </button>
           )}
+
+          <PasswordModal
+            isOpen={isPasswordModalOpen}
+            onClose={() => setIsPasswordModalOpen(false)}
+            onVerify={handleVerifyCurrentPassword}
+            onUpdatePassword={handleUpdatePassword}
+          />
 
           {/* confirmation popup */}
           {isAlertOpen && (
@@ -663,6 +688,107 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     </div>
   );
 };
+
+// PasswordModal Component
+interface PasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onVerify: (currentPassword: string) => Promise<boolean>;
+  onUpdatePassword: (newPassword: string) => void;
+}
+
+const PasswordModal: React.FC<PasswordModalProps> = ({ isOpen, onClose, onVerify, onUpdatePassword }) => {
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const handleVerify = async () => {
+    const verified = await onVerify(currentPassword);
+    setIsVerified(verified);
+
+    if (!verified) {
+      setErrorMessage("Current password is incorrect.");
+    } else {
+      setCurrentPassword("");
+      setErrorMessage("");
+    }
+  };
+
+
+  const handlePasswordUpdate = () => {
+    if (isValidPassword(newPassword)) {
+      onUpdatePassword(newPassword);
+      setNewPassword("");
+      onClose();
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Password must be at least 6 and at most 25 characters long, contain at least one uppercase and one lowercase letter, one number, and no spaces.");
+    }
+  };
+
+  const isValidPassword = (password: string): boolean => {
+    return (
+      password.length >= 6 &&
+      password.length <= 25 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /[0-9]/.test(password) &&
+      !/\s/.test(password)
+    );
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <h3 className="modal-title">{isVerified ? "Enter New Password" : "Enter Current Password"}</h3>
+
+        {!isVerified ? (
+          <>
+            <input
+              type="password"
+              placeholder="Current Password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="modal-input"
+            />
+            <button onClick={handleVerify} className="modal-button verify-button">
+              Verify
+            </button>
+          </>
+        ) : (
+          <>
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="modal-input"
+            />
+            <button onClick={handlePasswordUpdate} className="modal-button update-button">
+              Update Password
+            </button>
+          </>
+        )}
+
+        {errorMessage && (
+          <div className="error-message">
+            {errorMessage}
+          </div>
+        )}
+
+        <button onClick={onClose} className="modal-button cancel-button">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+  );
+};
+
 
 // ---------- UI Function for Notification Settings --------------------------
 const Settings: React.FC = () => {
@@ -743,8 +869,8 @@ const Settings: React.FC = () => {
           <FontAwesomeIcon icon={faGear} className="fa-regular text-lg" />
         </div>
         <button className="pf-btn" onClick={handleSubmit}>
-          SAVE CHANGES 
-          <FontAwesomeIcon  icon={faFloppyDisk} className="fa-regular text-lg" />
+          SAVE CHANGES
+          <FontAwesomeIcon icon={faFloppyDisk} className="fa-regular text-lg" />
         </button>
       </div>
       <div className="mt-3 flex flex-col gap-4 p-4">
@@ -754,7 +880,7 @@ const Settings: React.FC = () => {
             <label>Expiration notifications:</label>
             <div className="w-fit bg-navy p-1 rounded-md text-white border-solid border-2 border-white">
               <select name="expiration" value={expirationNotif} onChange={handleSelectionChange}
-                  className="bg-transparent block py-1 px-2">
+                className="bg-transparent block py-1 px-2">
                 <option value="all">All</option>
                 <option value="relevant">Relevant</option>
                 <option value="none">None</option>
@@ -765,7 +891,7 @@ const Settings: React.FC = () => {
             <label>Payment notifications:</label>
             <div className="w-fit bg-navy p-1 rounded-md text-white border-solid border-2 border-white">
               <select name="payment" value={paymentNotif} onChange={handleSelectionChange}
-                  className="bg-transparent block py-1 px-2">
+                className="bg-transparent block py-1 px-2">
                 <option value="all">All</option>
                 <option value="relevant">Relevant</option>
                 <option value="none">None</option>
@@ -776,13 +902,13 @@ const Settings: React.FC = () => {
       </div>
 
       {isPopupOpen && (
-            <div className="alert-modal text-lg font-medium">
-              <div className="alert-modal-content">
-                <h3 className="mb-4">{popupMessage}</h3>
-                <button onClick={closePopup}>OK</button>
-              </div>
-            </div>
-          )}
+        <div className="alert-modal text-lg font-medium">
+          <div className="alert-modal-content">
+            <h3 className="mb-4">{popupMessage}</h3>
+            <button onClick={closePopup}>OK</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -849,3 +975,7 @@ const Profile: React.FC = () => {
 };
 
 export default Profile
+
+function setIsPasswordModalOpen(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
