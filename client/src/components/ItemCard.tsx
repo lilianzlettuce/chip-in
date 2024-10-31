@@ -40,11 +40,13 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
     if (!user) return <div>No User</div>;
 
-    const displayPurchasedBy = purchasedBy ? purchasedBy : 'Unknown';
+    const displayPurchasedBy = purchasedBy;
     const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
     const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
     const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
 
+    console.log(name)
+    console.log(displayPurchasedBy);
 
     return (
         <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>
@@ -80,7 +82,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
                 )}
             </div>
             <div className="footer">
-                <div>{listType === 'purchased' ? 'Purchased by ' : 'Assigned purchaser: '} <b>{displayPurchasedBy}</b></div>
+                {listType === 'purchased' ? 
+                    <div>Purchased by <b>{displayPurchasedBy}</b></div>
+                :
+                    (displayPurchasedBy != "Unknown") ?
+                        <div>Assigned purchaser: <b>{displayPurchasedBy}</b></div>
+                    :
+                        <div><b>No assigned purchaser.</b></div>
+                }
                 {listType === 'purchased' && (
                     <div className="expiry">Expires {displayExpiry}</div>
                 )}
@@ -101,22 +110,22 @@ const ItemCard: React.FC<ItemCardProps> = ({
             </div>
             */}
             <div className="actions">
-                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
                     onClick={isShared ? onDelete : () => { }}>
                     <FontAwesomeIcon icon={faTrashAlt} className="text-white text-lg" />
-                </span>
-                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                </button>
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
                     onClick={isShared ? onMove : () => { }}>
                     {listType === 'grocery' ? (
                         <FontAwesomeIcon icon={faStore} className="text-white text-lg" title="Purchase" />
                     ) : (
                         <FontAwesomeIcon icon={faCartPlus} className="text-white text-lg" title="Repurchase" />
                     )}
-                </span>
-                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                </button>
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-blue-400' : 'hover:cursor-default'}`}
                     onClick={isShared ? onEdit : () => { }}>
                     <FontAwesomeIcon icon={faPencil} className="text-white text-lg" />
-                </span>
+                </button>
             </div>
             
         </div>
