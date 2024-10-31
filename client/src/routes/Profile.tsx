@@ -82,13 +82,16 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   }, [user?.id, refreshProfile]);
 
   // Handler to update the image preview when a new image is uploaded
+  //const MAX_SIZE = 2 * 1024 * 1024;
+  const [canUpdateImage, setCanUpdateImage] = useState(false);
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         const imageString = reader.result as string;
-        setProfileImage(reader.result as string); // Update profile image state with uploaded image
+        //setProfileImage(reader.result as string); // Update profile image state with uploaded image
+        setCanUpdateImage(false);
         handleSubmit(imageString);
       };
       reader.readAsDataURL(file);
@@ -115,6 +118,8 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
       });
 
       if (response.ok) {
+        setCanUpdateImage(true);
+        setProfileImage(base64String);
         setAlertMessage("Profile picture updated successfully!");
         setIsAlertOpen(true);
         console.log('Profile picture updated successfully!');
