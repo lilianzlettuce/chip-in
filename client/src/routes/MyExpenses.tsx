@@ -13,11 +13,6 @@ export default function MyExpenses() {
     const { user } = useUserContext();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [totalSpent, setTotalSpent] = useState(0);
-    // const expenses = [
-    //     { id: '1', owedTo: 90, owedFrom: 5 },
-    //     { id: '2', owedTo: 120, owedFrom: 30 },
-    // ];
-    // const [debts, setDebts] = useState([]);
 
     interface User {
         _id: string;
@@ -41,8 +36,10 @@ export default function MyExpenses() {
         if (householdId) {
             fetchDebts();
         }
-        // storing total spent in local storage for now
-        const savedTotalSpent = localStorage.getItem("totalSpent");
+
+        // Retrieve total spent specific to this user
+        const storageKey = `totalSpent_${user?.id}_${householdId}`;
+        const savedTotalSpent = localStorage.getItem(storageKey);
         if (savedTotalSpent) {
             setTotalSpent(parseFloat(savedTotalSpent));
         }
@@ -69,7 +66,7 @@ export default function MyExpenses() {
     const calculateExpenses = (debts: Debt[], currentUserId: string): Expense[] => {
         const expensesMap: Record<string, Expense> = {};
 
-        debts.forEach((debt: any) => {
+        debts.forEach((debt: Debt) => {
             const { owedBy, owedTo, amount } = debt;
             const isOwedByCurrentUser = owedBy._id === currentUserId;
             const isOwedToCurrentUser = owedTo._id === currentUserId;
@@ -106,16 +103,16 @@ export default function MyExpenses() {
         const updatedTotalSpent = totalSpent + amount;
         setTotalSpent(updatedTotalSpent);
 
-        // Save the updated total spent to local storage
-        localStorage.setItem("totalSpent", updatedTotalSpent.toString());
+        // Save the updated total spent to local storage with a user & household key
+        if (user?.id && householdId) {
+            const storageKey = `totalSpent_${user.id}_${householdId}`;
+            localStorage.setItem(storageKey, updatedTotalSpent.toString());
+        }
     };
-
 
     return (
         <div className="relative">
             <Alerts />
-            { /* <h1>household id: {householdId}</h1> */}
-            { /* <h1>user id: {user?.id}</h1> */}
             <h1 className="expenses-title">My Expenses</h1>
 
             <div className="summary-container">
@@ -124,22 +121,12 @@ export default function MyExpenses() {
 
             <div className="flex flex-wrap justify-between gap-4">
                 {expenses.map((expense) => (
-                    // <ExpenseCard
-                    //     key={expense.id}
-                    //     id={expense.id}
-                    //     owedTo={expense.owedTo}
-                    //     owedFrom={expense.owedFrom}
-                    // />
                     <ExpenseCard
                         key={expense.roommateId}
                         roommateId={expense.roommateId}
                         roommateName={expense.roommateName}
                         owesYou={expense.owesYou}
                         youOwe={expense.youOwe}
-
-                        // refresh debts
-                        // onPaymentSuccess={fetchDebts}
-
                         onPaymentSuccess={(amount) => {
                             fetchDebts();
                             handlePayment(amount);  // Update total spent
@@ -148,7 +135,5 @@ export default function MyExpenses() {
                 ))}
             </div>
         </div>
-
-
     );
 }

@@ -25,7 +25,7 @@ const PayStat: React.FC<PayStatProps> = ({ expenses, totalSpent }) => {
             <div className="summary-metrics">
                 <div>
                     <span className="metric-value">${totalSpent.toFixed(2)}</span>
-                    <span className="metric-label">spent</span>
+                    <span className="metric-label">paid back</span>
                 </div>
                 <div>
                     <span className="metric-value">${totalOwed.toFixed(2)}</span>
