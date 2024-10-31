@@ -8,6 +8,8 @@ import Corkboard from '../components/Corkboard';
 import AddItemModal from './AddItem';
 import AddItemModalGrocery from './AddGrocery';
 import Alerts from '../components/Alerts';
+import EditPurchasedItemModal from './EditPurchased'
+import EditGroceryItemModal from './EditGrocery'
 
 import './Dashboard.css';
 import './AddItem.css';
@@ -41,6 +43,13 @@ export default function Dashboard() {
     // Toggle Expired Items Button
     const [isToggled, setIsToggled] = useState(false)
     const [isExpiredMode, setIsExpiredMode] = useState(true);
+
+    // Edit Items
+    const [editPurchasedModalOpen, setEditPurchasedModalOpen]  = useState(false);
+    const [editGroceryModalOpen, setEditGroceryModalOpen]  = useState(false);
+    const [purchasedName, setPurchasedName] = useState('');
+    const [purchasedCategory, setPurchasedCategory] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
+    const [editItemId, setEditItemId] = useState('');
 
     useEffect(() => {
         if (householdID) {
@@ -232,6 +241,56 @@ export default function Dashboard() {
             setModalOpen(false);
             setSelectedItem(null);
         }
+    };
+
+
+    const handlePurchasedEditModalSave = async(updatedItem: any) => {
+        try {
+            const response = await fetch(`http://localhost:6969/item/editpurchased/${editItemId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: updatedItem.name,
+                  category: updatedItem.category,
+                  // id: editItemId
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            console.log('Item edited successfully!');
+        } catch (error) {
+            console.error('Error editing item:', error);
+        }
+        await fetchPurchasedItems();
+    };
+
+    const handleGroceryEditModalSave = async(updatedItem: any) => {
+        try {
+            const response = await fetch(`http://localhost:6969/item/editgrocery/${editItemId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  name: updatedItem.name,
+                  category: updatedItem.category,
+                  purchasedBy: updatedItem.purchasedBy,
+                  sharedBetween: updatedItem.sharedBetween,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            console.log('Item edited successfully!');
+        } catch (error) {
+            console.error('Error editing item:', error);
+        }
+        await fetchGroceryItems();
     };
 
 
@@ -657,6 +716,13 @@ export default function Dashboard() {
                                                 'grocery'
                                             );
                                         }}
+                                        onEdit={() => {
+                                            //setPurchasedName(item['name']);
+                                            //setPurchasedCategory(item['category'])
+                                            setSelectedItem(item);
+                                            setEditItemId(item['_id']);
+                                            setEditPurchasedModalOpen(true);
+                                        }}
                                         listType="purchased"
                                     />
                                 </li>
@@ -664,6 +730,8 @@ export default function Dashboard() {
                         )}
                     </ul>
                 )}
+                
+
                 {/* Modal for adding new item */}
                 {modalOpen2 && (
                     <AddItemModal
@@ -726,6 +794,13 @@ export default function Dashboard() {
                                             setTargetList('purchased');
                                             setModalOpen(true);
                                         }}
+                                        onEdit={() => {
+                                            //setPurchasedName(item['name']);
+                                            //setPurchasedCategory(item['category'])
+                                            setSelectedItem(item);
+                                            setEditItemId(item['_id']);
+                                            setEditGroceryModalOpen(true);
+                                        }}
                                         listType="grocery"
                                         splits={[]}
                                     />
@@ -743,6 +818,7 @@ export default function Dashboard() {
                     />
                 )}
             </div>
+
             {/* Modal for entering details when moving from grocery to purchased */}
             {modalOpen && selectedItem && (
                 <ItemModal
@@ -756,6 +832,42 @@ export default function Dashboard() {
                     }}
                 />
             )}
+
+            {/* Modal for editing items in purchased list*/}
+            {editPurchasedModalOpen && (
+                <EditPurchasedItemModal
+                    item={selectedItem}
+                    //name = {purchasedName}
+                    //category = {selectedItem.category}
+                    onClose={() => setEditPurchasedModalOpen(false)}
+                    onSave={(updatedItem) => {
+                        // item={selectedItem} 
+                        console.log(updatedItem.name);
+                        console.log(updatedItem.category);
+                        //console.log(editItemId);
+                        handlePurchasedEditModalSave(updatedItem);
+                    }}
+                />
+            )}
+
+            {/* Modal for editing items in grocery list */}
+            {editGroceryModalOpen && (
+                <EditGroceryItemModal
+                    item={selectedItem}
+                    roommates={roommates}
+                    onClose={() => setEditGroceryModalOpen(false)}
+                    onSave={(updatedItem) => {
+                        // item={selectedItem} 
+                        console.log(updatedItem.name);
+                        console.log(updatedItem.category);
+                        console.log(updatedItem.purchasedBy);
+                        console.log(updatedItem.sharedBetween);
+                        //console.log(editItemId);
+                        handleGroceryEditModalSave(updatedItem);
+                    }}
+                />
+            )}
+            
         </div>
     );
 }

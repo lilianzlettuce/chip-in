@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useUserContext } from '../UserContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt, faCartPlus, faPencil, faStore} from '@fortawesome/free-solid-svg-icons';
 import './ItemCard.css';
+
 
 interface ItemCardProps {
     id: string;
@@ -14,6 +17,7 @@ interface ItemCardProps {
     isExpiringSoon: boolean;
     onDelete: () => void;
     onMove: () => void;
+    onEdit: () => void;
     listType: string;
 }
 
@@ -28,6 +32,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     isExpiringSoon,
     onDelete,
     onMove,
+    onEdit,
     listType
 }) => {
     const { user } = useUserContext();
@@ -39,6 +44,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
     const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
     const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
+
 
     return (
         <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>
@@ -79,7 +85,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
                     <div className="expiry">Expires {displayExpiry}</div>
                 )}
             </div>
-            <div className="actions">
+            {/*<div className="actions">
                 <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
                     onClick={isShared ? onDelete : () => { }}>
                     Delete
@@ -88,7 +94,31 @@ const ItemCard: React.FC<ItemCardProps> = ({
                     onClick={isShared ? onMove : () => { }}>
                     {listType === 'grocery' ? 'Purchase' : 'Repurchase'}
                 </button>
+                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onDelete : () => { }}>
+                    Edit
+                </button>
             </div>
+            */}
+            <div className="actions">
+                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onDelete : () => { }}>
+                    <FontAwesomeIcon icon={faTrashAlt} className="text-white text-lg" />
+                </span>
+                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onMove : () => { }}>
+                    {listType === 'grocery' ? (
+                        <FontAwesomeIcon icon={faStore} className="text-white text-lg" title="Purchase" />
+                    ) : (
+                        <FontAwesomeIcon icon={faCartPlus} className="text-white text-lg" title="Repurchase" />
+                    )}
+                </span>
+                <span className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                    onClick={isShared ? onEdit : () => { }}>
+                    <FontAwesomeIcon icon={faPencil} className="text-white text-lg" />
+                </span>
+            </div>
+            
         </div>
     );
 };
