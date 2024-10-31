@@ -10,7 +10,7 @@ router.get('/sortby/:id', async (req, res) => {
     const { sortby } = req.query;
     try {
         // const household = await Household.findById(id).populate('purchasedList');
-        const household = await Household.findById(householdId).populate({
+        const household = await Household.findById(id).populate({
             path: 'purchasedList',
             populate: [
                 {
@@ -38,7 +38,8 @@ router.get('/sortby/:id', async (req, res) => {
         }
 
         res.status(200).json(household.purchasedList);
-    } catch (error) {
+    } catch (err) {
+        console.log('error sorting:', err)
         res.status(500).json({ error: err.message });
     }
 });

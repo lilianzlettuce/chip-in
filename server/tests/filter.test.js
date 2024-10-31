@@ -68,7 +68,7 @@ before(async () => {
         .expect(201)
 
     payload = {
-        "name": "dawn",
+        "name": "spin mop",
         "category": "Cleaning",
         "purchasedBy": user1Id,
         "sharedBetween": [user1Id, user3Id],
@@ -202,6 +202,52 @@ describe('sorting items', () => {
             const next = new Date(response.body[i + 1].expirationDate);
             assert(curr <= next, `Items are not sorted by expiration date at index ${i}`);
         }
+    })
+})
+
+describe('searching items', () => {
+    test('search partial word', async () => {
+        let response = await api
+            .get(`/household/${householdId}/search`)
+            .query(
+                {name: 'spin'}
+            )
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+            
+        assert(Array.isArray(response.body));
+        assert.strictEqual(response.body.length, 2)
+        for (let i = 0; i < response.body.length - 1; i++) {
+            assert(response.body[i].name.toLowerCase().includes('spin'), `Expected item name to contain 'spin', but got '${response.body[i].name}'`);
+        }
+    })
+
+    test('search whole word', async () => {
+        let response = await api
+            .get(`/household/${householdId}/search`)
+            .query(
+                {name: 'spinach'}
+            )
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+            
+        assert(Array.isArray(response.body));
+        for (let i = 0; i < response.body.length - 1; i++) {
+            assert(response.body[i].name, `spinach`);
+        }
+    })
+
+    test('search nonexistent item', async () => {
+        let response = await api
+            .get(`/household/${householdId}/search`)
+            .query(
+                {name: 'asfljkadljew'}
+            )
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+            
+        assert.strictEqual(response.body.length, 0)
+
     })
 })
 
