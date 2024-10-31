@@ -32,6 +32,53 @@ router.delete('/:listType/:id', async (req, res) => {
   }
 });
 
+// edit item in grocery and purchased list
+/*router.patch('/:listType/:id', async(req, res) => {
+  const {listType, id} = req.params;
+  const { householdId } = req.query;
+  const updatedItem = req.body;
+
+  try {
+    let fieldsToUpdate;
+
+    if (listType === 'grocery') {
+      fieldsToUpdate = {
+        name: updatedItem.name,
+        category: updatedItem.category,
+        purchasedBy: updatedItem.purchasedBy,
+        sharedBetween: updatedItem.sharedBetween
+      };
+    }
+    else if (listType === 'purchased') {
+      fieldsToUpdate = {
+        name: updatedItem.name,
+        category: updatedItem.category,
+      };
+    }
+    else {
+      return res.status(400).json({ message: "Invalid list type" });
+    }
+
+    // avoids overwriting with undefined values
+    Object.keys(fieldsToUpdate).forEach(key => {
+      if (fieldsToUpdate[key] === undefined) delete fieldsToUpdate[key];
+    });
+
+    const editedItem = await Item.findByIdAndUpdate (
+      { _id: id, householdId: householdId },
+      fieldsToUpdate,
+      {new: true}
+    );
+
+    if (!editedItem) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    res.status(200).json(editedItem); // update item
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});*/
+
 //create item and add to grocery list
 router.post('/addtogrocery', async (req, res) => {
   const { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits } = req.body;
@@ -188,11 +235,39 @@ router.post("/", async (req, res) => {
 });
 
 //update by id
-router.patch("/:id", async (req, res) => {
+/*router.patch("/:id", async (req, res) => {
   const { name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
 
   try {
     const item = await Item.findByIdAndUpdate(req.params.id, { name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost }, { new: true });
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    res.status(200).json(item);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});*/
+
+router.patch("/editpurchased/:id", async (req, res) => {
+  const { name, category} = req.body;
+  
+  try {
+    const item = await Item.findByIdAndUpdate(req.params.id, { name, category}, { new: true });
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+    res.status(200).json(item);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/editgrocery/:id", async (req, res) => {
+  const { name, category, purchasedBy, sharedBetween} = req.body;
+  
+  try {
+    const item = await Item.findByIdAndUpdate(req.params.id, { name, category, purchasedBy, sharedBetween}, { new: true });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
