@@ -45,8 +45,8 @@ export default function Dashboard() {
     const [isExpiredMode, setIsExpiredMode] = useState(true);
 
     // Edit Items
-    const [editPurchasedModalOpen, setEditPurchasedModalOpen]  = useState(false);
-    const [editGroceryModalOpen, setEditGroceryModalOpen]  = useState(false);
+    const [editPurchasedModalOpen, setEditPurchasedModalOpen] = useState(false);
+    const [editGroceryModalOpen, setEditGroceryModalOpen] = useState(false);
     const [purchasedName, setPurchasedName] = useState('');
     const [purchasedCategory, setPurchasedCategory] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
     const [editItemId, setEditItemId] = useState('');
@@ -244,17 +244,17 @@ export default function Dashboard() {
     };
 
 
-    const handlePurchasedEditModalSave = async(updatedItem: any) => {
+    const handlePurchasedEditModalSave = async (updatedItem: any) => {
         try {
             const response = await fetch(`http://localhost:6969/item/editpurchased/${editItemId}`, {
                 method: 'PATCH',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  name: updatedItem.name,
-                  category: updatedItem.category,
-                  // id: editItemId
+                    name: updatedItem.name,
+                    category: updatedItem.category,
+                    // id: editItemId
                 }),
             });
 
@@ -268,18 +268,18 @@ export default function Dashboard() {
         await fetchPurchasedItems();
     };
 
-    const handleGroceryEditModalSave = async(updatedItem: any) => {
+    const handleGroceryEditModalSave = async (updatedItem: any) => {
         try {
             const response = await fetch(`http://localhost:6969/item/editgrocery/${editItemId}`, {
                 method: 'PATCH',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  name: updatedItem.name,
-                  category: updatedItem.category,
-                  purchasedBy: updatedItem.purchasedBy,
-                  sharedBetween: updatedItem.sharedBetween,
+                    name: updatedItem.name,
+                    category: updatedItem.category,
+                    purchasedBy: updatedItem.purchasedBy,
+                    sharedBetween: updatedItem.sharedBetween,
                 }),
             });
 
@@ -697,11 +697,11 @@ export default function Dashboard() {
                                             split: split.split || 0
                                         }))}
                                         purchasedBy={item['purchasedBy']?.username || 'Unknown'}
-                                        expiryDate={
+                                        expiryDate = {
                                             item['expirationDate']
-                                                ? new Date(item['expirationDate']).toLocaleDateString()
+                                                ? new Date(item['expirationDate']).toLocaleDateString('en-US', { timeZone: 'UTC' })
                                                 : 'N/A'
-                                        }
+                                        }                                        
                                         isExpiringSoon={
                                             item['expirationDate'] && isExpiringSoon(item['expirationDate'])
                                         }
@@ -730,7 +730,7 @@ export default function Dashboard() {
                         )}
                     </ul>
                 )}
-                
+
 
                 {/* Modal for adding new item */}
                 {modalOpen2 && (
@@ -867,7 +867,7 @@ export default function Dashboard() {
                     }}
                 />
             )}
-            
+
         </div>
     );
 }
