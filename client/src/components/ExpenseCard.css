@@ -156,6 +156,8 @@
 }
 
 .expense-card input[type="number"] {
+    background-color: black;
+    color: white;
     padding: 10px;
     margin: 10px;
     border: 1px solid #ccc;
@@ -194,6 +196,8 @@
     border-radius: 5px;
     resize: vertical;
     font-family: Arial, sans-serif;
+    background-color: black;
+    color: white;
 
 }
 
@@ -212,6 +216,7 @@
 }
 
 .nudge-modal-content input[type="number"] {
+    color: white;
     padding: 10px;
     margin-top: 10px;
     border: 1px solid #ccc;
