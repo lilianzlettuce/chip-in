@@ -252,8 +252,8 @@ router.post("/", async (req, res) => {
 router.patch("/editpurchased/:id", async (req, res) => {
   const itemId = req.params.id;
   const { name, category, cost, householdId} = req.body;
-  console.log('cost', cost)
-  console.log('hID', householdId)
+  // console.log('cost', cost)
+  // console.log('hID', householdId)
   try {
     const originalItem = await Item.findById(itemId);
 
@@ -261,8 +261,8 @@ router.patch("/editpurchased/:id", async (req, res) => {
       const oldCost = originalItem.cost;
       const newCost = cost;
 
-      console.log('oldcost', oldCost)
-      console.log('newCost', newCost)
+      // console.log('oldcost', oldCost)
+      // console.log('newCost', newCost)
 
       for (const split of originalItem.splits) {
         const oldSplitCost = split.split * oldCost;
@@ -281,7 +281,7 @@ router.patch("/editpurchased/:id", async (req, res) => {
             useFindAndModify: false
           }
         );
-        console.log('new debts', newHousehold.debts)
+        // console.log('new debts', newHousehold.debts)
       }
     }
 

@@ -14,6 +14,7 @@ let user1Id;
 let user2Id;
 let user3Id;
 let householdId;
+let itemId;
 
 before(async () => {
     await User.deleteMany({});
@@ -79,7 +80,7 @@ describe('updating debts', () => {
     test('adding item', async () => {
         let payload = {
             "name": "spinach",
-            "category": "Food",
+            "category": "Pet",
             "purchasedBy": user1Id,
             "sharedBetween": [user1Id, user2Id],
             "purchaseDate": "2024-10-12T10:00:00.000+00:00",
@@ -93,6 +94,7 @@ describe('updating debts', () => {
             .expect(201)
         
         const household = await Household.findById(householdId);
+        itemId = household.purchasedList[0];
 
         const debt = household.debts.find(
            (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
@@ -126,7 +128,7 @@ describe('updating debts', () => {
 
     test('adding item, purchasedBy does not share item', async () => {
         let payload = {
-            "name": "beef",
+            "name": "oreos",
             "category": "Food",
             "purchasedBy": user1Id,
             "sharedBetween": [user2Id, user3Id],
@@ -160,6 +162,49 @@ describe('updating debts', () => {
     })
 })
 
+describe('editing items', () => {
+    test('editing name/category', async () => {
+        let payload = {
+            "name": "prewashed spinach",
+            "category": "Food",
+            "cost": 500,
+            "householdId": householdId
+        }
+        let response = await api
+            .patch(`/item/editpurchased/${itemId}/`)
+            .send(payload)
+            .expect(200)
+        
+        const spinach = await Item.findById(itemId);
+        assert.strictEqual(spinach.name, "prewashed spinach");
+        assert.strictEqual(spinach.category, "Food");
+    })
+
+    test('editing cost', async () => {
+        let payload = {
+            "name": "prewashed spinach",
+            "category": "Food",
+            "cost": 1000,
+            "householdId": householdId
+        }
+        let response = await api
+            .patch(`/item/editpurchased/${itemId}/`)
+            .send(payload)
+            .expect(200)
+        
+        const spinach = await Item.findById(itemId);
+        assert.strictEqual(spinach.name, "prewashed spinach");
+        assert.strictEqual(spinach.category, "Food");
+
+        const household = await Household.findById(householdId);
+        const debt = household.debts.find(
+            (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
+         );
+         assert.strictEqual(debt.amount, 750);
+    })
+
+})
+
 
 describe('payments', () => {
     test('pay in full', async () => {
@@ -180,14 +225,14 @@ describe('payments', () => {
         debt = household.debts.find(
             (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
         );
-        assert.strictEqual(debt.amount, 500);
+        assert.strictEqual(debt.amount, 750);
     })
 
     test('pay partial debt', async () => {
         let payload = {
             "owedById": user2Id,
             "owedToId": user1Id,
-            "amount": 200
+            "amount": 250
         }
         let response = await api
             .patch(`/payment/partialpay/${householdId}`)
@@ -198,7 +243,7 @@ describe('payments', () => {
         let debt = household.debts.find(
             (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
         );
-        assert.strictEqual(debt.amount, 300);
+        assert.strictEqual(debt.amount, 500);
     })
 })
 
