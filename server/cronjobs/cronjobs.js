@@ -71,7 +71,7 @@ const createAlerts = async () => {
     }
 } 
 
-cron.schedule('39 22 * * *', () => {
+cron.schedule('1 0 * * *', () => {
     console.log('Running expiration check...');
     createAlerts();
 });
