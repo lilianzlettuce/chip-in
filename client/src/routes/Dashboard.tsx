@@ -673,7 +673,7 @@ export default function Dashboard() {
                             // Display "No Expired Items" or "No Expiring Items" based on toggle mode
                             <>
                                 {isExpiredMode ? (
-                                    <li className="dashboard-item">No expired items found</li>
+                                    <li className="dashboard-item">No items expiring soon</li>
                                 ) : (
                                     <li className="dashboard-item">No expired items found</li>
                                 )}
