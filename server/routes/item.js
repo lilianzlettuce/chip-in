@@ -250,10 +250,10 @@ router.post("/", async (req, res) => {
 });*/
 
 router.patch("/editpurchased/:id", async (req, res) => {
-  const { name, category} = req.body;
+  const { name, category, cost} = req.body;
   
   try {
-    const item = await Item.findByIdAndUpdate(req.params.id, { name, category}, { new: true });
+    const item = await Item.findByIdAndUpdate(req.params.id, { name, category, cost}, { new: true });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
