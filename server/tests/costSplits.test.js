@@ -205,6 +205,73 @@ describe('editing items', () => {
 
 })
 
+describe('nudges', () => {
+    test('default message', async () => {
+        let payload = {
+            "householdId": householdId,
+            "nudgerId": user1Id, 
+            "recipientId": user2Id
+        }
+        let response = await api
+            .post(`/alert/nudge`)
+            .send(payload)
+            .expect(201)
+        
+        const household = await Household.findById(householdId);
+        assert.strictEqual(household.alerts[0].content, "Friendly reminder from john to pay them back!");
+    })
+
+    test('custom message', async () => {
+        let payload = {
+            "householdId": householdId,
+            "nudgerId": user1Id, 
+            "recipientId": user2Id,
+            "message": "hurry up"
+        }
+        let response = await api
+            .post(`/alert/nudge`)
+            .send(payload)
+            .expect(201)
+        
+        const household = await Household.findById(householdId);
+        assert.strictEqual(household.alerts[1].content, "Friendly reminder from john: hurry up");
+    })
+
+    test('custom amount', async () => {
+        let payload = {
+            "householdId": householdId,
+            "nudgerId": user1Id, 
+            "recipientId": user2Id,
+            "amount": 5
+        }
+        let response = await api
+            .post(`/alert/nudge`)
+            .send(payload)
+            .expect(201)
+        
+        const household = await Household.findById(householdId);
+        assert.strictEqual(household.alerts[2].content, "Friendly reminder from john to pay them back $5!");
+    })
+
+    test('custom message + amount', async () => {
+        let payload = {
+            "householdId": householdId,
+            "nudgerId": user1Id, 
+            "recipientId": user2Id,
+            "message": "hurry up",
+            "amount": 5
+        }
+        let response = await api
+            .post(`/alert/nudge`)
+            .send(payload)
+            .expect(201)
+        
+        const household = await Household.findById(householdId);
+        assert.strictEqual(household.alerts[3].content, "Friendly reminder from john to pay them back $5! Also, hurry up");
+    })
+
+})
+
 
 describe('payments', () => {
     test('pay in full', async () => {
