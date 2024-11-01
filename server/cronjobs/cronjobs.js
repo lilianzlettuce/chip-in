@@ -9,10 +9,15 @@ const createAlerts = async () => {
         const households = await Household.find().populate('purchasedList');
         console.log(households.length)
 
-        const today = new Date();
-        const threshold = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 5));
-        today.setUTCHours(0, 0, 0, 0);
+        // const today = new Date();
+        // const threshold = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + 5));
+        // today.setUTCHours(0, 0, 0, 0);
 
+        const now = new Date();
+        const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const threshold = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 5));
+        
+        console.log('now', now)
         console.log('threshold', threshold)
         console.log('today', today)
 
@@ -66,7 +71,7 @@ const createAlerts = async () => {
     }
 } 
 
-cron.schedule('1 0 * * *', () => {
+cron.schedule('39 22 * * *', () => {
     console.log('Running expiration check...');
     createAlerts();
 });
