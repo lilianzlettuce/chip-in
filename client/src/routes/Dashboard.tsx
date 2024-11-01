@@ -254,6 +254,7 @@ export default function Dashboard() {
                 body: JSON.stringify({
                     name: updatedItem.name,
                     category: updatedItem.category,
+                    cost: updatedItem.cost * 100,
                     // id: editItemId
                 }),
             });

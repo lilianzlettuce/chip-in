@@ -16,16 +16,19 @@ const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose
 
   const [newName, setNewName] = useState(item.name);
   const [newCategory, setNewCategory] = useState(item.category);
+  const [newCost, setNewCost] = useState(item.cost);
 
   useEffect(() => {
     setNewName(item.name);
     setNewCategory(item.category);
+    setNewCost(item.cost);
   }, [item]);
     
   const handleSave = () => {
     const updatedItem = {
         name: newName,
         category: newCategory,
+        cost: newCost
     };
     onSave(updatedItem);
     onClose();
@@ -52,6 +55,10 @@ const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose
             <option value="Pet">Pet</option>
             <option value="Other">Other</option>
           </select>
+        </div>
+        <div className="input-group">
+          <label>Cost:</label>
+          <input type="number" value={newCost} onChange={(e) => setNewCost(e.target.value)} />
         </div>
 
         {/* Submit Button */}
