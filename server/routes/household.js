@@ -95,7 +95,7 @@ router.patch('/repurchase', async (req, res) => {
 
 //move from grocery to purchased
 router.patch('/purchase', async (req, res) => {
-  let { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost } = req.body;
+  let { householdId, itemId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, splits, cost } = req.body;
 
   if (!purchasedBy || !purchaseDate || !purchasedBy || cost == undefined || cost == null) {
     return res.status(400).json({ message: 'Fields must be populated' });
@@ -139,9 +139,9 @@ router.patch('/purchase', async (req, res) => {
 
     for (const split of splits) {
       const splitCost = split.split * cost;
-      console.log(splitCost)
-      console.log('split.member', split.member)
-      console.log('purchasedby', purchasedBy)
+      // console.log(splitCost)
+      // console.log('split.member', split.member)
+      // console.log('purchasedby', purchasedBy)
       if (split.member === purchasedBy) {continue;}
       let newHousehold = await Household.findOneAndUpdate(
         {
@@ -166,6 +166,7 @@ router.patch('/purchase', async (req, res) => {
 
     res.status(201).json(updatedItem);
   } catch (err) {
+    console.log('error moving grocery to purchased', err)
     res.status(500).json({ error: err.message });
   }
 });
@@ -390,7 +391,7 @@ router.post("/leave/:id", async (req, res) => {
   const householdId = req.params.id;
 
   try {
-    const household = await Household.findById(householdId);
+    let household = await Household.findById(householdId);
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
@@ -424,16 +425,17 @@ router.post("/leave/:id", async (req, res) => {
       { _id: userId },
       { $pull: { households: householdId } }
     );
-
+    household = await Household.findById(householdId);
     // If the last member leaves, delete the household
     if (household.members.length === 0) {
       await Household.findByIdAndDelete(householdId);
-      res.status(200).json({ message: 'Household deleted as the last member left' });
+      return res.status(200).json({ message: 'Household deleted as the last member left' });
     } else {
-      res.status(200).json({ message: 'User successfully removed from household' });
+      return res.status(200).json({ message: 'User successfully removed from household' });
     }
 
   } catch (err) {
+    console.log('error leaving household', err)
     res.status(500).json({ error: err.message });
   }
 });
