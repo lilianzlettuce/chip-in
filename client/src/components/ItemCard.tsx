@@ -45,8 +45,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
     const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
     const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
 
-    console.log(name)
-    console.log(displayPurchasedBy);
+    //console.log(name)
+    //console.log(displayPurchasedBy);
 
     return (
         <div className={`card-container ${isShared ? 'bg-neutral-900 text-white' : 'bg-slate-500 text-gray-200'} ${isExpiringSoon && 'highlight-expiring'}`}>

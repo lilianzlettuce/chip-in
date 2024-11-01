@@ -14,14 +14,18 @@ const EditGroceryItemModal: React.FC<EditGroceryItemModalProps> = ({ onClose, on
   // const [category, setCategory] = useState('');
   // const [sharedBetween, setSharedBetween] = useState<string[]>([]);
   // const [purchasedBy, setPurchasedBy] = useState('');
-  console.log("NAME!!!");
-    console.log(item.purchasedBy);
-    console.log("SHARED BY!!!")
-    console.log(item.sharedBetween)
+  //console.log("NAME!!!");
+  //  console.log(item.purchasedBy);
+  //  console.log("SHARED BY!!!")
+  //  console.log(item.sharedBetween)
   const [newName, setNewName] = useState(item.name);
   const [newCategory, setNewCategory] = useState(item.category);
-  const [newSharedBetween, setNewSharedBetween] = useState<string[]>(item.sharedBetween || []); // useState<string[]>([]);
-  const [newPurchasedBy, setNewPurchasedBy] = useState(item.purchasedBy);
+  const sharedUsers: string[] = [];
+  for (let i = 0; i < item.sharedBetween.length; i++) {
+    sharedUsers.push(item.sharedBetween[i].username);
+  }
+  const [newSharedBetween, setNewSharedBetween] = useState<string[]>(sharedUsers || []); // useState<string[]>([]);
+  const [newPurchasedBy, setNewPurchasedBy] = useState(item.purchasedBy.username);
 
   const { householdId } = useParams();
 
@@ -29,14 +33,14 @@ const EditGroceryItemModal: React.FC<EditGroceryItemModalProps> = ({ onClose, on
     if (item) {
         setNewName(item.name);
         setNewCategory(item.category);
-        setNewSharedBetween(item.sharedBetween || []);
-        setNewPurchasedBy(item.purchasedBy);
+        setNewSharedBetween(sharedUsers || []);
+        setNewPurchasedBy(item.purchasedBy.username);
     }
     
   }, [item]);
 
-  console.log("new purchased by: ", newPurchasedBy, item.purchasedBy);
-  console.log("new shared by: ", newSharedBetween)
+ // console.log("new purchased by: ", newPurchasedBy, item.purchasedBy);
+  //console.log("new shared by: ", newSharedBetween)
  
   // Function to handle checkbox changes for sharedBetween
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +53,7 @@ const EditGroceryItemModal: React.FC<EditGroceryItemModalProps> = ({ onClose, on
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedRoommate = e.target.value; // Set the selected roommate as the purchaser
     // setSharedBetween((prev) => prev.filter((roommate) => roommate !== purchasedBy));
-    console.log("selected-roommate: ", selectedRoommate);
+    //console.log("selected-roommate: ", selectedRoommate);
     setNewPurchasedBy(selectedRoommate);
 
   };

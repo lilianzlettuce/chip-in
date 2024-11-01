@@ -14,7 +14,7 @@ const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose
   //const [name, setName] = useState('');
   //const [category, setCategory] = useState('');
   const { householdId } = useParams();
-  console.log(householdId)
+  //console.log(householdId)
   const [newName, setNewName] = useState(item.name);
   const [newCategory, setNewCategory] = useState(item.category);
   const [newCost, setNewCost] = useState(item.cost);
@@ -60,7 +60,7 @@ const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose
         </div>
         <div className="input-group">
           <label>Cost:</label>
-          <input type="number" value={newCost} onChange={(e) => setNewCost(e.target.value)} />
+          <input type="number" value={newCost} onChange={(e) => setNewCost(parseFloat(e.target.value))} />
         </div>
 
         {/* Submit Button */}
