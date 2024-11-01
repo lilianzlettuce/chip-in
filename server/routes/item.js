@@ -250,15 +250,48 @@ router.post("/", async (req, res) => {
 });*/
 
 router.patch("/editpurchased/:id", async (req, res) => {
-  const { name, category, cost} = req.body;
-  
+  const itemId = req.params.id;
+  const { name, category, cost, householdId} = req.body;
+  console.log('cost', cost)
+  console.log('hID', householdId)
   try {
-    const item = await Item.findByIdAndUpdate(req.params.id, { name, category, cost}, { new: true });
+    const originalItem = await Item.findById(itemId);
+
+    if (cost !== null && cost !== undefined && cost !== originalItem.cost) {
+      const oldCost = originalItem.cost;
+      const newCost = cost;
+
+      console.log('oldcost', oldCost)
+      console.log('newCost', newCost)
+
+      for (const split of originalItem.splits) {
+        const oldSplitCost = split.split * oldCost;
+        const newSplitCost = split.split * newCost;
+        const costDifference = newSplitCost - oldSplitCost;
+        const newHousehold = await Household.findOneAndUpdate(
+          { _id: householdId }, // Ensure householdId is associated with the item
+          {
+            $inc: { "debts.$[elem].amount": costDifference }
+          },
+          {
+            arrayFilters: [
+              { "elem.owedBy": split.member, "elem.owedTo": originalItem.purchasedBy }
+            ],
+            new: true,
+            useFindAndModify: false
+          }
+        );
+        console.log('new debts', newHousehold.debts)
+      }
+    }
+
+    const item = await Item.findByIdAndUpdate(itemId, { name, category, cost}, { new: true, runValidators: true });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
     res.status(200).json(item);
   } catch (err) {
+    console.log('error editing item', err)
     res.status(500).json({ error: err.message });
   }
 });

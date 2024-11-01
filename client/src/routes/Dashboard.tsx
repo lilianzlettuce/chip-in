@@ -255,6 +255,7 @@ export default function Dashboard() {
                     name: updatedItem.name,
                     category: updatedItem.category,
                     cost: updatedItem.cost * 100,
+                    householdId: updatedItem.householdId
                     // id: editItemId
                 }),
             });
