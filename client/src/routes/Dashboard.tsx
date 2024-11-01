@@ -674,7 +674,7 @@ export default function Dashboard() {
                                 {isExpiredMode ? (
                                     <li className="dashboard-item">No expired items found</li>
                                 ) : (
-                                    <li className="dashboard-item">No items expiring soon</li>
+                                    <li className="dashboard-item">No expired items found</li>
                                 )}
                             </>
                         ) : purchasedItems.length === 0 ? (
