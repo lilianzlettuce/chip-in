@@ -255,6 +255,7 @@ export default function Dashboard() {
                     name: updatedItem.name,
                     category: updatedItem.category,
                     cost: updatedItem.cost * 100,
+                    householdId: updatedItem.householdId
                     // id: editItemId
                 }),
             });
@@ -843,8 +844,8 @@ export default function Dashboard() {
                     onClose={() => setEditPurchasedModalOpen(false)}
                     onSave={(updatedItem) => {
                         // item={selectedItem} 
-                        console.log(updatedItem.name);
-                        console.log(updatedItem.category);
+                        //console.log(updatedItem.name);
+                        //console.log(updatedItem.category);
                         //console.log(editItemId);
                         handlePurchasedEditModalSave(updatedItem);
                     }}
@@ -859,10 +860,10 @@ export default function Dashboard() {
                     onClose={() => setEditGroceryModalOpen(false)}
                     onSave={(updatedItem) => {
                         // item={selectedItem} 
-                        console.log(updatedItem.name);
-                        console.log(updatedItem.category);
-                        console.log(updatedItem.purchasedBy);
-                        console.log(updatedItem.sharedBetween);
+                        //console.log(updatedItem.name);
+                        //console.log(updatedItem.category);
+                        //console.log(updatedItem.purchasedBy);
+                        //console.log(updatedItem.sharedBetween);
                         //console.log(editItemId);
                         handleGroceryEditModalSave(updatedItem);
                     }}

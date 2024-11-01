@@ -132,7 +132,6 @@ router.post('/nudge', async (req, res) => {
 
     try {
         const nudger = await User.findById(nudgerId);
-        console.log(nudger.username)
         if (!nudger) {
             return res.status(404).send({ error: `Nudger not found`})
         }
@@ -157,7 +156,6 @@ router.post('/nudge', async (req, res) => {
             return res.status(404).send({ error: `Household with id ${householdId} not found` });
         }
 
-        console.log(household)
         res.status(201).send(newAlert)
     } catch (err) {
         console.error('Error:', err); 
