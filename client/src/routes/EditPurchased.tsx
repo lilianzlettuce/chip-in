@@ -13,7 +13,8 @@ type EditPurchasedItemModalProps = {
 const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose, onSave, item}) => {
   //const [name, setName] = useState('');
   //const [category, setCategory] = useState('');
-
+  const { householdId } = useParams();
+  console.log(householdId)
   const [newName, setNewName] = useState(item.name);
   const [newCategory, setNewCategory] = useState(item.category);
   const [newCost, setNewCost] = useState(item.cost);
@@ -28,7 +29,8 @@ const EditPurchasedItemModal: React.FC<EditPurchasedItemModalProps> = ({ onClose
     const updatedItem = {
         name: newName,
         category: newCategory,
-        cost: newCost
+        cost: newCost,
+        householdId: householdId
     };
     onSave(updatedItem);
     onClose();
