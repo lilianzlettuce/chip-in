@@ -147,7 +147,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date.toDateString()}
+                {alert.date.toLocaleDateString('en-US', {timeZone: 'UTC'})}
               </div>
             </div>
           ))}
@@ -161,7 +161,7 @@ export default function Alerts() {
                 {alert.content}
               </div>
               <div className="text-sm">
-                {alert.date.toDateString()}
+                {alert.date.toLocaleDateString('en-US', {timeZone: 'UTC'})}
               </div>
             </div>
           ))}
