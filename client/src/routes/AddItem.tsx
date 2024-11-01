@@ -15,7 +15,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   const [sharedBetween, setSharedBetween] = useState<string[]>([]);
   const [purchaseDate, setPurchaseDate] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
-  const [cost, setCost] = useState('');
+  const [cost, setCost] = useState<number>(0);
 
   const { householdId } = useParams();
 
@@ -158,7 +158,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
         </div>
         <div className="input-group">
           <label>Cost:</label>
-          <input type="number" value={cost} onChange={(e) => setCost(e.target.value)} />
+          <input type="number" value={cost} onChange={(e) => setCost(parseFloat(e.target.value))} />
         </div>
 
         {/* Submit Button */}
