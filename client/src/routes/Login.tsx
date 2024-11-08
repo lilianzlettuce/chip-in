@@ -1,12 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import GoogleLogin from '../components/GoogleLogin';
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
 
   const navigate = useNavigate();
+
+  // Google login id
+  const googleClientId = "189463683003-7mhrlsq9ihctl9bnd6ii08vagcjhegs1.apps.googleusercontent.com";
 
   // Get server url
   const PORT = process.env.REACT_APP_PORT || 5050;
@@ -72,42 +78,47 @@ const Login: React.FC = () => {
   }, []);
 
   return (
-    <div className="h-screen flex justify-center items-center">
-      <div className="flex flex-col bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
-        <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-4">Welcome to ChipIn</h2>
-        <p className="text-gray-800 mb-6">Please log in to continue</p>
-        <form onSubmit={handleLogin}>
-          <input
-            type="username"
-            id="username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="auth-input"
-          />
-          <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="auth-input"
-          />
-          <div className="text-red-400 text-left text-sm">
-            {msg}
-          </div>
-          <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">Login</button>
-        </form>
-        <Link to="/forgotpass" className="text-base m-0 mb-1 text-emerald font-medium hover:underline hover:text-blue-800">
-          Forgot Password?
-        </Link>
-        <Link to="/signup" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
-          Don't have an account? Sign up here.
-        </Link>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <div className="h-screen flex justify-center items-center">
+        <div className="flex flex-col bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
+          <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-4">Welcome to ChipIn</h2>
+          <p className="text-gray-800 mb-6">Please log in to continue</p>
+          <form onSubmit={handleLogin}>
+            <input
+              type="username"
+              id="username"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="auth-input"
+            />
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="auth-input"
+            />
+            <div className="text-red-400 text-left text-sm">
+              {msg}
+            </div>
+            <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">
+              Login
+            </button>
+          </form>
+          <GoogleLogin />
+          <Link to="/forgotpass" className="text-base m-0 mb-1 text-emerald font-medium hover:underline hover:text-blue-800">
+            Forgot Password?
+          </Link>
+          <Link to="/signup" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
+            Don't have an account? Sign up here.
+          </Link>
+        </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 
