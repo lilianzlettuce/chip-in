@@ -56,9 +56,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     //localStorage.removeItem("token");
     let token = localStorage.getItem("token");
-    console.log("token: " + token);
     if (!token) {
-      //throw new Error("no token supplied");
       console.log("no token supplied");
       return;
     }
@@ -82,7 +80,6 @@ const Login: React.FC = () => {
       <div className="h-screen flex justify-center items-center">
         <div className="flex flex-col bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
           <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-4">Welcome to ChipIn</h2>
-          <p className="text-gray-800 mb-6">Please log in to continue</p>
           <form onSubmit={handleLogin}>
             <input
               type="username"
@@ -105,8 +102,8 @@ const Login: React.FC = () => {
             <div className="text-red-400 text-left text-sm">
               {msg}
             </div>
-            <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">
-              Login
+            <button type="submit" className="auth-btn my-3">
+              Log in
             </button>
           </form>
           <GoogleLogin />

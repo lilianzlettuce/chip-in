@@ -106,7 +106,9 @@ const SignUp: React.FC = () => {
                     <div className={`text-${msg ? "red" : "green"}-400 text-left text-sm`}>
                         {msg}
                     </div>
-                    <button type="submit" className="w-full bg-green-400 text-white font-semibold p-3 my-4 rounded">Sign up</button>
+                    <button type="submit" className="auth-btn my-3">
+                        Sign up
+                    </button>
                 </form>
                 <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
                     Already have an account? Sign in here.

@@ -1,14 +1,16 @@
-/* eslint-disable import/no-anonymous-default-export */
-import { useGoogleLogin } from "@react-oauth/google";
-                              
+import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from "@react-oauth/google";   
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';                      
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 export default () => {
+	const navigate = useNavigate();
+
 	const responseGoogle = async (authResult: any) => {
 		try {
 			if (authResult["code"]) {
 				console.log(authResult.code);
-				//const result = await googleAuth(authResult.code);
-
 				try {
 					const res = await fetch(`http://localhost:6969/auth/google?code=${authResult.code}`);
 			
@@ -16,8 +18,10 @@ export default () => {
 						const data = await res.json();
 						console.log('google auth data', data);
 				
+						// Store token and redirect upon successful login
 						if (data.token) {
 							localStorage.setItem("token", data.token);
+							navigate(`/profile/${data.id}`);
 						}
 					} else {
 					  console.error("Failed to fetch user profile");
@@ -25,15 +29,6 @@ export default () => {
 				} catch (err) {
 					console.error('Google auth error:', err);
 				}
-
-				/*console.log(result);
-				//props.setUser(result.data.data.user);
-				alert("successfuly logged in");
-
-				// Store token
-				if (result.data.token) {
-					localStorage.setItem("token", result.data.token);
-				}*/
 			} else {
 				console.log(authResult);
 				throw new Error(authResult);
@@ -51,12 +46,11 @@ export default () => {
 
 	return (
 		<button
-			style={{
-				padding: "10px 20px",
-			}}
+			className="auth-btn mb-4 flex gap-3 justify-center items-center"
 			onClick={googleLogin}
 		>
-			Sign in with Google
+			<FontAwesomeIcon icon={faGoogle} className="text-white text-lg" />
+			<div>Log in with Google</div>
 		</button>
 	);
 };

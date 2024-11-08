@@ -52,6 +52,9 @@
 }
 
 @layer components {
+  .auth-btn {
+    @apply w-full bg-green-400 text-white font-semibold p-3 rounded;
+  }
   .auth-input {
     @apply w-full bg-[#EDF6F9] p-3 mb-4 rounded;
   }
