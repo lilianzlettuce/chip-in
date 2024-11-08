@@ -27,15 +27,6 @@ const signToken = (user) => {
         payload, 
         process.env.JWT_SECRET, 
         {expiresIn: process.env.JWT_TIMEOUT},
-        /*(err, token) => {
-            if (err) return res.json({ error: err });
-
-            return res.json({
-                message: "Success",
-                token: "Bearer " + token,
-                id: user._id,
-            });
-        }*/
     );
 };
 
@@ -64,11 +55,9 @@ const createSendToken = (user, statusCode, res) => {
     console.log(user);
 
     return res.status(statusCode).json({
-        message: 'success',
-        token,
-        data: {
-            user,
-        },
+        message: "Success",
+        token: token, //"Bearer " + token,
+        id: user._id,
     });
 };
 
@@ -89,10 +78,13 @@ const googleAuth = catchAsync(async (req, res, next) => {
    
     if (!user) {
         console.log('New User found');
+        console.log(userRes);
+
         user = await User.create({
-            name: userRes.data.name,
+            username: userRes.data.name,
             email: userRes.data.email,
-            image: userRes.data.picture,
+            password: "Pass54321",
+            pfp: userRes.data.picture,
         });
     }
 
