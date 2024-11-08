@@ -8,12 +8,16 @@ import { UserProvider } from './UserContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 type AppProps = {
   message: string;
 };
 
 export default function App({ message }: AppProps) {
   const navigate = useNavigate();
+
+  const googleClientId = "189463683003-7mhrlsq9ihctl9bnd6ii08vagcjhegs1.apps.googleusercontent.com";
 
   // Get server url
   const PORT = process.env.REACT_APP_PORT || 5050;
@@ -41,25 +45,27 @@ export default function App({ message }: AppProps) {
   }, []);
 
   return (
-    <UserProvider>
-      <div className="flex justify-between items-start">
-        <Navbar />
-        <div className="w-4/5 min-h-screen p-4 flex flex-col justify-between">
-          <Outlet />
-          <div>
-            <a target="_blank">
-              <img src={chipInLogo} className="logo" alt="Vite logo" />
-            </a>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <UserProvider>
+        <div className="flex justify-between items-start">
+          <Navbar />
+          <div className="w-4/5 min-h-screen p-4 flex flex-col justify-between">
+            <Outlet />
+            <div>
+              <a target="_blank">
+                <img src={chipInLogo} className="logo" alt="Vite logo" />
+              </a>
+            </div>
+            <p>
+              <code>src/App.tsx</code>
+            </p>
+            <div>Message: {message}</div>
+            <div className="card">
+            </div>
+            <Footer />
           </div>
-          <p>
-            <code>src/App.tsx</code>
-          </p>
-          <div>Message: {message}</div>
-          <div className="card">
-          </div>
-          <Footer />
         </div>
-      </div>
-    </UserProvider>
+      </UserProvider>
+    </GoogleOAuthProvider>
   );
 };
