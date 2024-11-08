@@ -11,7 +11,7 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Google login id
+  // Google login client id
   const googleClientId = "189463683003-7mhrlsq9ihctl9bnd6ii08vagcjhegs1.apps.googleusercontent.com";
 
   // Get server url
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
               {msg}
             </div>
             <button type="submit" className="auth-btn my-3">
-              Log in
+              Login
             </button>
           </form>
           <GoogleLogin />

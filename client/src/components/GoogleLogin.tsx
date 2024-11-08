@@ -50,7 +50,7 @@ export default () => {
 			onClick={googleLogin}
 		>
 			<FontAwesomeIcon icon={faGoogle} className="text-white text-lg" />
-			<div>Log in with Google</div>
+			<div>Sign in with Google</div>
 		</button>
 	);
 };
