@@ -1,8 +1,11 @@
 import express, { application } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import User from '../models/User.js';
 import PasswordValidator from 'password-validator';
+
+import googleAuth from '../controllers/authController.js';
+
+import User from '../models/User.js';
 
 // Create pw schema and add properties
 let pwSchema = new PasswordValidator();
@@ -15,6 +18,9 @@ pwSchema // uncomment for deployment
 .has().not().spaces();*/
 
 const router = express.Router();
+
+// Log in with Google auth
+router.get("/google", googleAuth);
 
 // Sign up 
 router.post("/signup", async (req, res) => {
@@ -89,7 +95,7 @@ router.post("/login", (req, res) => {
 
                         return res.json({
                             message: "Success",
-                            token: "Bearer " + token,
+                            token: token, //"Bearer " + token,
                             id: dbUser._id,
                         });
                     }
@@ -138,11 +144,14 @@ router.get("/getUserData", verifyJWT, (req, res) => {
 
 // Check if user is authorized to access a route
 function verifyJWT(req, res, next) {
-    const token = req.headers["x-access-token"]?.split(' ')[1];
+    console.log("in verify jwt")
+    const token = req.headers["x-access-token"]; //?.split(' ')[1];
+    console.log(token)
 
     // Verify given token
     if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err) console.log("jwt error", err);
             if (err) return res.json({
                 isLoggedIn: false,
                 error: "Failed to Authenticate",
@@ -156,12 +165,13 @@ function verifyJWT(req, res, next) {
                 households: decoded.households,
                 preferences: decoded.preferences,
             };
-            /*req.user.id = decoded.id;
-            req.user.username = decoded.username;*/
+
+            console.log("req.user: ", req.user)
 
             next();
         });
     } else {
+        console.log("incorrect token")
         res.json({
             error: "Incorrect token given",
             isLoggedIn: false,
