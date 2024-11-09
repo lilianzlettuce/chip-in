@@ -66,6 +66,34 @@ Should look something like this:
     REACT_APP_PORT=6969
     REACT_APP_SERVER_URL=https://chip-in-backend.onrender.com
 ```
+### Flask Server
+NB: Make sure your python/pip versions are more fairly recent (> 3.8)
+
+If Rust is not installed (check by running 'rustc' in terminal, if output is empty then it isn't), run the following to install a Rust compiler (needed for transformers library):
+```
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+Create a python virtual environment: 
+```
+cd recipes-server/
+python -m venv env
+```
+Activate the envrionemnt:
+```
+source env/bin/activate
+```
+Install packages:
+```
+pip install -r requirements.txt
+```
+Run server:
+```
+python app.py
+```
+Add to server/config.env so Express server can make requests:
+```
+FLASK_PORT=4200
+```
 
 ## To run dev environment
 
@@ -81,6 +109,9 @@ Open up another terminal window:
 cd client/
 npm run dev
 ```
+
+### Client
+Open up another terminal window:
 
 ## Workflow
 
