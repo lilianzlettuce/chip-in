@@ -27,6 +27,12 @@ const noteSchema = new mongoose.Schema({
     urgent: { type: Boolean, required: false, default: false }
 });
 
+const recipeSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    ingredients: { type: String, required: true },
+    directions: { type: Boolean, required: true },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true}
+});
 
 const householdSchema = new mongoose.Schema({
     name: {type: String, required: true},
@@ -36,7 +42,7 @@ const householdSchema = new mongoose.Schema({
     debts: [debtSchema],
     alerts: [alertSchema],
     notes: [noteSchema],
-    recipes: { type: [String], required: false},
+    recipes: [recipeSchema],
     purchaseHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item', required: false }],
 });
 
