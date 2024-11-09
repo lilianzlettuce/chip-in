@@ -134,3 +134,4 @@ dist
 
 #python env
 env/
+__pycache__/

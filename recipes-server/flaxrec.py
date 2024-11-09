@@ -76,31 +76,61 @@ def generation_function(texts):
     )
     return generated_recipe
 
-items = [
-    # "macaroni, butter, salt, bacon, milk, flour, pepper, cream corn",
-    # "provolone cheese, bacon, bread, ginger"
-    "cinnamon, brown sugar, flour, egg, milk"
-]
-generated = generation_function(items)
-for text in generated:
-    sections = text.split("\n")
-    for section in sections:
-        section = section.strip()
-        if section.startswith("title:"):
-            section = section.replace("title:", "")
-            headline = "TITLE"
-        elif section.startswith("ingredients:"):
-            section = section.replace("ingredients:", "")
-            headline = "INGREDIENTS"
-        elif section.startswith("directions:"):
-            section = section.replace("directions:", "")
-            headline = "DIRECTIONS"
+# items = [
+#     # "macaroni, butter, salt, bacon, milk, flour, pepper, cream corn",
+#     # "provolone cheese, bacon, bread, ginger"
+#     "cinnamon, brown sugar, flour, egg, milk"
+# ]
+# generated = generation_function(items)
+# print(generated)
+# for text in generated:
+#     sections = text.split("\n")
+#     for section in sections:
+#         section = section.strip()
+#         if section.startswith("title:"):
+#             section = section.replace("title:", "")
+#             headline = "TITLE"
+#         elif section.startswith("ingredients:"):
+#             section = section.replace("ingredients:", "")
+#             headline = "INGREDIENTS"
+#         elif section.startswith("directions:"):
+#             section = section.replace("directions:", "")
+#             headline = "DIRECTIONS"
         
-        if headline == "TITLE":
-            print(f"[{headline}]: {section.strip().capitalize()}")
-        else:
-            section_info = [f"  - {i+1}: {info.strip().capitalize()}" for i, info in enumerate(section.split("--"))]
-            print(f"[{headline}]:")
-            print("\n".join(section_info))
+#         if headline == "TITLE":
+#             print(f"[{headline}]: {section.strip().capitalize()}")
+#         else:
+#             section_info = [f"  - {i+1}: {info.strip().capitalize()}" for i, info in enumerate(section.split("--"))]
+#             print(f"[{headline}]:")
+#             print("\n".join(section_info))
 
-    print("-" * 130)
+# for text in generated:
+#     recipe_parts = {}
+#     sections = text.split("\n")
+#     for section in sections:
+#         section = section.strip()
+#         if section.startswith("title:"):
+#             section = section.replace("title:", "")
+#             headline = "title"
+#         elif section.startswith("ingredients:"):
+#             section = section.replace("ingredients:", "")
+#             headline = "ingredients"
+#         elif section.startswith("directions:"):
+#             section = section.replace("directions:", "")
+#             headline = "directions"
+        
+#         if headline == "title":
+#             recipe_parts['title'] = f'{section.strip().capitalize()}'
+#         elif headline == 'ingredients':
+#             recipe_parts['ingredients'] = ''
+#             for item in section.split("--"):
+#                 recipe_parts['ingredients'] = recipe_parts['ingredients'] + f'\n- {item}'
+
+#         else:
+#             recipe_parts['directions'] = ''
+#             for i, item in enumerate(section.split("--"), start=1):
+#                 recipe_parts['directions'] = recipe_parts['directions'] + f'\n{i}. {item}'
+
+# print(recipe_parts['directions'])
+
+#     print("-" * 130)
