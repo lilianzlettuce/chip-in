@@ -443,7 +443,7 @@ router.post("/leave/:id", async (req, res) => {
 router.get('/owed/:id', async (req, res) => {
   console.log("search request accepted")
   const userId = req.params.id;
-  console.log("purchaser ID:", userId)
+  //console.log("purchaser ID:", userId)
   try {
     const households = await Household.find();
     let cost = 0;
@@ -456,7 +456,7 @@ router.get('/owed/:id', async (req, res) => {
         }
         if (households[i].debts[j].owedTo == userId){
           totalOwedTo += households[i].debts[j].amount;
-          console.log("Total owed to Amount:", totalOwedTo);
+          //console.log("Total owed to Amount:", totalOwedTo);
         }
       }
     }

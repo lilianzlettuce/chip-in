@@ -58,7 +58,7 @@
 }
 
 .payment-summary {
-  text-align: right;
+  text-align: center;
 }
 
 .summary-title {
@@ -424,4 +424,9 @@
   color: red;
   font-size: 0.9rem;
   margin-top: 0.5rem;
+}
+
+.chart-container {
+  transform: scale(1); /* Scale to 80% of original size */
+  transform-origin: center;
 }
