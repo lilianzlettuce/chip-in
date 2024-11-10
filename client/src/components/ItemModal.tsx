@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './ItemModal.css';
 
@@ -15,13 +15,34 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
     const [price, setPrice] = useState(item.price || '');
     const [expirationDate, setExpirationDate] = useState(item.expirationDate ? new Date(item.expirationDate).toISOString().substring(0, 10) : '');
     const [selectedRoommates, setSelectedRoommates] = useState([currentUserId]);
+    const [roommatePerc, setRoommatePerc] = useState<{ [key: string]: string }>({});
+    const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        const totalPercentage = Object.values(roommatePerc)
+            .map((value) => parseFloat(value) || 0)
+            .reduce((sum, value) => sum + value, 0);
+
+        const allEmpty = Object.values(roommatePerc).every((value) => !value);
+
+        if (allEmpty && (selectedRoommates.length > 1)) {
+            setErrorMessage('Price will be split evenly');
+        } else if (totalPercentage !== 100 && selectedRoommates.length > 1) {
+            setErrorMessage('The total percentage must add up to 100%');
+        } else {
+            setErrorMessage('');
+        }
+    }, [roommatePerc]);
 
     const handleSave = () => {
+        if (errorMessage && errorMessage !== 'Price will be split evenly') return;
+
         const updatedItem = {
             ...item,
             price: parseFloat(price),
             expirationDate,
             sharedBetween: selectedRoommates,
+            roommatePerc,
         };
         onSave(updatedItem);
     };
@@ -32,6 +53,13 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
                 ? prev.filter((id) => id !== roommateId)
                 : [...prev, roommateId]
         );
+    };
+
+    const handleRoommateSplit = (roommateId: string, newPrice: string) => {
+        setRoommatePerc((prev) => ({
+            ...prev,
+            [roommateId]: newPrice,
+        }));
     };
 
     return ReactDOM.createPortal(
@@ -61,15 +89,25 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
                                 onChange={() => toggleRoommateSelection(roommate._id)}
                             />
                             <label>{roommate.name}</label>
+                            {selectedRoommates.length > 1 && selectedRoommates.includes(roommate._id) && (
+                                <input
+                                    type="number"
+                                    placeholder="Enter custom split %"
+                                    value={roommatePerc[roommate._id] || ''}
+                                    onChange={(e) => handleRoommateSplit(roommate._id, e.target.value)}
+                                />
+                            )}
                         </div>
                     ))}
                 </div>
 
-                <button onClick={handleSave}>Save</button>
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
+
+                <button onClick={handleSave} disabled={!!errorMessage && errorMessage !== 'Price will be split evenly'}>Save</button>
                 <button onClick={onClose}>Cancel</button>
             </div>
-        </div>, document.getElementById('modal-root') as HTMLElement
-
+        </div>,
+        document.getElementById('modal-root') as HTMLElement
     );
 };
 
