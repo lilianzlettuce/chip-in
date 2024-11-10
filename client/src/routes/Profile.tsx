@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,9 @@ import { Confirm } from '../components/Confirm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear, faPencil, faUser } from '@fortawesome/free-solid-svg-icons';
 import { faFloppyDisk, faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+
+import { Chart, PieController, ArcElement, Tooltip, Legend, ChartOptions, ChartData } from 'chart.js';
+Chart.register(PieController, ArcElement, Tooltip, Legend);
 
 // Get server url
 const PORT = process.env.REACT_APP_PORT || 5050;
@@ -35,15 +38,6 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-
-  //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
-
-  // Effect to set the initial image if imageUrl is not provided
-  // useEffect(() => {
-  //   if (!imageUrl) {
-  //     setProfileImage(lettuce);
-  //   }
-  // }, [imageUrl]);
 
   //effect to retrieve user profile from backend
   const { user } = useUserContext();
@@ -78,6 +72,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   useEffect(() => {
     if (user?.id) {
       fetchUserProfile();
+      // searchItems();
     }
   }, [user?.id, refreshProfile]);
 
@@ -176,37 +171,28 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
       )}
 
       {/* Payment Summary Section */}
-      <div className="payment-summary">
+      {/*<div className="payment-summary">
         <h3 className="summary-title">Payment Summary</h3>
         <div className="summary-details">
           <p className="summary-item">
-            <span className="summary-value">200</span> spent
+            <span className="summary-value">${totalCost.toFixed(2)}</span> spent
           </p>
           <p className="summary-item">
-            <span className="summary-value">300</span> paid back
+            <span className="summary-value">${totalOwedTo.toFixed(2)}</span> owed from roommates
           </p>
           <p className="summary-item">
-            <span className="summary-value">15</span> items bought
+            <span className="summary-value">{totalItem}</span> items bought
           </p>
           <p className="summary-item">
-            <span className="summary-value">150</span> owed
+            <span className="summary-value">${totalOwedBy.toFixed(2)}</span> owed to roommates
           </p>
         </div>
       </div>
+      */}
     </div>
   );
 };
 
-//export default ProfileSummary (hardcoded for now. comes from server later);
-// const profileProps = {
-//    name: "Lettuce the Great",
-//    joinedDate: "9/17/2024",
-//    imageUrl: "",
-//    spent: 500,
-//    paidBack: 200,
-//    itemsBought: 15,
-//    amountOwed: 3000000,
-// };
 
 // ---------- UI Function for Profile Setting --------------------------
 interface ProfileSettingsProps {
@@ -484,20 +470,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
     return isLongEnough && hasUpperAlphabet && hasLowerAlphabet && hasNumber && hasNoSpaces;
   };
-
-  /*// Helper function to validate password
-  const isValidPassword = (password: string): boolean => {
-    // Check for minimum length of 12 characters
-    const isLongEnough = password.length >= 12;
-  
-    // Check for at least one alphabet (case insensitive)
-    const hasAlphabet = /[a-zA-Z]/.test(password);
-
-    // Check for at least one number
-    const hasNumber = /[0-9]/.test(password);
-
-    return isLongEnough && hasAlphabet && hasNumber;
-  };*/
 
   // Event handler to toggle edit mode or display mode
   const handleEditClick = () => {
@@ -918,6 +890,176 @@ const Settings: React.FC = () => {
   );
 };
 
+
+// ---------- UI Function for User Stats Summary --------------------------
+const Stats: React.FC = () => {
+  //effect to retrieve user profile from backend
+  const { user } = useUserContext();
+  
+  // states for user stats
+  const [totalItem, setTotalItem] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
+  const [totalOwedTo, setTotalOwedTo] = useState(0);
+  const [totalOwedBy, setTotalOwedBy] = useState(0);
+  const [itemBreakdown, setItemBreakdown] = useState<[string, number][]>([]);
+  const chartRef = useRef<Chart | null>(null);
+  // user stats
+  const searchItems = async () => {
+    if (!user) return; // Ensure user is available
+
+    // Search item table for the amount spent and total items purchased
+    try {
+      const itemResponse = await fetch(`http://localhost:6969/item/search/${user?.id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (itemResponse.ok) {
+        const itemData = await itemResponse.json();
+        setTotalItem(itemData.totalItems);
+        setTotalCost(itemData.totalCost);
+        setItemBreakdown(itemData.itemBreakdown);
+        console.log("Total items bought", totalItem, "$",totalCost)
+      } else {
+        console.log("Failed to search for Items")
+      }
+    } catch (err) {
+      console.error('error searching items:', err);
+    }
+
+    // Search household table for the amount owed
+    try {
+      const OweResponse = await fetch(`http://localhost:6969/household/owed/${user?.id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (OweResponse.ok) {
+        const OweData = await OweResponse.json();
+        setTotalOwedTo(OweData.totalOwedTo);
+        setTotalOwedBy(OweData.totalOwedBy);
+        console.log("Total Owed", totalOwedTo, "$",totalOwedBy)
+      } else {
+        console.log("Failed to search for Items")
+      }
+    } catch (err) {
+      console.error('error searching items:', err);
+    }
+
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      searchItems();
+    }
+  }, [user?.id]);
+
+  const itemName = itemBreakdown.map(item => item[0]); // item name
+  const itemCost = itemBreakdown.map(item => item[1]); // item cost
+
+  const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  
+  const getChartColors = (count: number) => {
+    const storedColors = localStorage.getItem('pieChartColors');
+    if (storedColors) {
+      return JSON.parse(storedColors);  // Retrieve stored colors from localStorage
+    } else {
+      const newColors = Array.from({ length: count }, () => generateRandomColor());
+      localStorage.setItem('pieChartColors', JSON.stringify(newColors));  // Store colors in localStorage
+      return newColors;
+    }
+  };
+
+  useEffect (() => {
+    if (chartRef.current) {
+      chartRef.current.destroy();
+    }
+    if (itemCost.length > 0) {
+      const colors = getChartColors(itemCost.length); 
+      const ctx = document.getElementById('itemCostPieChart') as HTMLCanvasElement;
+      chartRef.current = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: itemName,
+            datasets: [{
+                label: 'Item Costs',
+                data: itemCost,
+                backgroundColor: colors,
+                hoverBackgroundColor: colors
+                /*backgroundColor: [
+                  '#FF6384', '#36A2EB', '#FFCE56', '#66BB6A', '#FFA726', '#AB47BC', '#42A5F5'
+                ],
+                hoverBackgroundColor: [
+                  '#FF6384', '#36A2EB', '#FFCE56', '#66BB6A', '#FFA726', '#AB47BC', '#42A5F5'
+                ]*/
+            }]
+        } as ChartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (tooltipItem) => {
+                            return `${itemName[tooltipItem.dataIndex]}: $${itemCost[tooltipItem.dataIndex].toFixed(2)}`;
+                        }
+                    }
+                }
+            }
+        }
+      }) as ChartOptions;
+    }
+  }, [itemCost]);
+  
+  return (
+    <div className="settings-container">
+      <div className="w-full text-lg text-left font-medium flex items-center justify-between gap-2 py-2 pb-4 border-solid border-gray-300 border-b-2">
+        <div className="flex items-center gap-2">
+          Payment Summary
+        </div>
+      </div>
+
+      <div className="payment-summary">
+        <h3 className="summary-title"> </h3>
+        <div className="summary-details">
+          <p className="summary-item">
+            <span className="summary-value">${totalCost.toFixed(2)}</span> spent
+          </p>
+          <p className="summary-item">
+            <span className="summary-value">${totalOwedTo.toFixed(2)}</span> owed from roommates
+          </p>
+          <p className="summary-item">
+            <span className="summary-value">{totalItem}</span> items bought and shared
+          </p>
+          <p className="summary-item">
+            <span className="summary-value">${totalOwedBy.toFixed(2)}</span> owed to roommates
+          </p>
+        </div>
+      </div>
+
+      <div className="chart-container">
+        <canvas id="itemCostPieChart" width="450" height="450"></canvas>
+      </div>
+ 
+    </div>
+  );
+
+};
+
 const Profile: React.FC = () => {
   const { user } = useUserContext();
   const [username, setUsername] = useState<string>('');
@@ -975,6 +1117,7 @@ const Profile: React.FC = () => {
       <ProfileSummary refreshProfile={refreshProfile} />
       <ProfileSettings {...profileSettingsProps} />
       <Settings />
+      <Stats/>
     </div>
   );
 };
