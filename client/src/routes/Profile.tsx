@@ -36,14 +36,59 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  //const [imageFile, setImageFile] = useState<File | null>(null); // Store the image file itself so that it can be sent to the server
+  // states for user stats
+  const [totalItem, setTotalItem] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
+  const [totalOwedTo, setTotalOwedTo] = useState(0);
+  const [totalOwedBy, setTotalOwedBy] = useState(0);
 
-  // Effect to set the initial image if imageUrl is not provided
-  // useEffect(() => {
-  //   if (!imageUrl) {
-  //     setProfileImage(lettuce);
-  //   }
-  // }, [imageUrl]);
+    // user stats
+  const searchItems = async () => {
+    if (!user) return; // Ensure user is available
+
+    // Search item table for the amount spent and total items purchased
+    try {
+      const itemResponse = await fetch(`http://localhost:6969/item/search/${user?.id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (itemResponse.ok) {
+        const itemData = await itemResponse.json();
+        setTotalItem(itemData.totalItems);
+        setTotalCost(itemData.totalCost);
+        console.log("Total items bought", totalItem, "$",totalCost)
+      } else {
+        console.log("Failed to search for Items")
+      }
+    } catch (err) {
+      console.error('error searching items:', err);
+    }
+
+    // Search household table for the amount owed
+    try {
+      const OweResponse = await fetch(`http://localhost:6969/household/owed/${user?.id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+      });
+
+      if (OweResponse.ok) {
+        const OweData = await OweResponse.json();
+        setTotalOwedTo(OweData.totalOwedTo);
+        setTotalOwedBy(OweData.totalOwedBy);
+        console.log("Total Owed", totalOwedTo, "$",totalOwedBy)
+      } else {
+        console.log("Failed to search for Items")
+      }
+    } catch (err) {
+      console.error('error searching items:', err);
+    }
+
+  };
 
   //effect to retrieve user profile from backend
   const { user } = useUserContext();
@@ -78,6 +123,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   useEffect(() => {
     if (user?.id) {
       fetchUserProfile();
+      searchItems();
     }
   }, [user?.id, refreshProfile]);
 
@@ -180,16 +226,16 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
         <h3 className="summary-title">Payment Summary</h3>
         <div className="summary-details">
           <p className="summary-item">
-            <span className="summary-value">200</span> spent
+            <span className="summary-value">${totalCost.toFixed(2)}</span> spent
           </p>
           <p className="summary-item">
-            <span className="summary-value">300</span> paid back
+            <span className="summary-value">${totalOwedTo.toFixed(2)}</span> owed from roommates
           </p>
           <p className="summary-item">
-            <span className="summary-value">15</span> items bought
+            <span className="summary-value">{totalItem}</span> items bought
           </p>
           <p className="summary-item">
-            <span className="summary-value">150</span> owed
+            <span className="summary-value">${totalOwedBy.toFixed(2)}</span> owed to roommates
           </p>
         </div>
       </div>
@@ -197,16 +243,6 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   );
 };
 
-//export default ProfileSummary (hardcoded for now. comes from server later);
-// const profileProps = {
-//    name: "Lettuce the Great",
-//    joinedDate: "9/17/2024",
-//    imageUrl: "",
-//    spent: 500,
-//    paidBack: 200,
-//    itemsBought: 15,
-//    amountOwed: 3000000,
-// };
 
 // ---------- UI Function for Profile Setting --------------------------
 interface ProfileSettingsProps {
@@ -484,20 +520,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
 
     return isLongEnough && hasUpperAlphabet && hasLowerAlphabet && hasNumber && hasNoSpaces;
   };
-
-  /*// Helper function to validate password
-  const isValidPassword = (password: string): boolean => {
-    // Check for minimum length of 12 characters
-    const isLongEnough = password.length >= 12;
-  
-    // Check for at least one alphabet (case insensitive)
-    const hasAlphabet = /[a-zA-Z]/.test(password);
-
-    // Check for at least one number
-    const hasNumber = /[0-9]/.test(password);
-
-    return isLongEnough && hasAlphabet && hasNumber;
-  };*/
 
   // Event handler to toggle edit mode or display mode
   const handleEditClick = () => {

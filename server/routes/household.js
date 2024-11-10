@@ -439,4 +439,34 @@ router.post("/leave/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+router.get('/owed/:id', async (req, res) => {
+  console.log("search request accepted")
+  const userId = req.params.id;
+  console.log("purchaser ID:", userId)
+  try {
+    const households = await Household.find();
+    let cost = 0;
+    let totalOwedTo = 0;
+    let totalOwedBy = 0;
+    for (let i = 0; i < households.length; i++) {
+      for (let j = 0; j < households[i].debts.length; j++){
+        if (households[i].debts[j].owedBy == userId){
+          totalOwedBy += households[i].debts[j].amount;
+        }
+        if (households[i].debts[j].owedTo == userId){
+          totalOwedTo += households[i].debts[j].amount;
+          console.log("Total owed to Amount:", totalOwedTo);
+        }
+      }
+    }
+
+    totalOwedBy = totalOwedBy / 100;
+    totalOwedTo = totalOwedTo / 100;
+    res.status(200).send({ totalOwedTo: totalOwedTo, totalOwedBy: totalOwedBy });
+  } catch (err) {
+    console.log("server db connection error")
+    res.status(500).send({ err })
+  }
+});
 export default router;
