@@ -2,7 +2,7 @@
     padding: 1rem;
     background-color: #8aa9a1;
     border-radius: 12px;
-    color: #ffffff;
+    color: #e6e6e6;
     width: 100%;
     max-width: 400px;
     text-align: center;
@@ -13,7 +13,7 @@
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #e6e3e3;
+    color: #ffffff;
 }
 
 .summary-metrics {

@@ -4,12 +4,6 @@ import { useParams } from 'react-router-dom';
 import './ExpenseCard.css'
 
 interface ExpenseCardProps {
-    // id: string;
-    //user:string;
-    //email: string;
-    // owedTo: number; // amount you owe
-    // owedFrom: number; // amount roommate owes you
-    // onPayBack: () => void;
     roommateName: string;
     roommateId: string,
     owesYou: number;
@@ -19,22 +13,16 @@ interface ExpenseCardProps {
 }
 
 const ExpenseCard: React.FC<ExpenseCardProps> = ({
-   //user,
-    //email,
-//    owedTo,
-//    owedFrom,
-   // onPayBack
-
-   roommateName,
-   roommateId,
-   owesYou,
-   youOwe,
-   onPaymentSuccess
-}) => { 
+    roommateName,
+    roommateId,
+    owesYou,
+    youOwe,
+    onPaymentSuccess
+}) => {
     const { user } = useUserContext();
     const { householdId } = useParams();
-    const [isPayModalOpen, setIsPayModalOpen] = useState(false); 
-    const [isNudgeModalOpen, setIsNudgeModalOpen] = useState(false); 
+    const [isPayModalOpen, setIsPayModalOpen] = useState(false);
+    const [isNudgeModalOpen, setIsNudgeModalOpen] = useState(false);
     const [paymentAmount, setPaymentAmount] = useState<number | undefined>(); // useState<number>(0); // State for custom payment
     const [isPayByAmount, setIsPayByAmount] = useState(false); // Toggle for pay by amount
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -44,7 +32,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
 
     if (!user) return;
-    
+
     // handling pay back button and modal
     const handlePayBackClick = () => {
         setIsPayModalOpen(true);
@@ -64,9 +52,9 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     }
     const handleNudgeSubmit = async () => {
         let nudge = {
-            householdId: householdId, 
-            recipientId: roommateId, 
-            nudgerId: user.id, 
+            householdId: householdId,
+            recipientId: roommateId,
+            nudgerId: user.id,
             message: nudgeMessage,
             amount: nudgeAmount
         }
@@ -74,10 +62,10 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             const response = await fetch(`http://localhost:6969/alert/nudge`, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(nudge),
-              });
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -89,7 +77,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     }
 
     // handling full payment
-    const handlePayInFull = async() => {
+    const handlePayInFull = async () => {
         if (!householdId) return;
         try {
             const response = await fetch(`http://localhost:6969/payment/payall/${householdId}`, {
@@ -104,18 +92,18 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
-            } 
+            }
         } catch (error) {
             console.error('Error paying in full:', error);
         }
-        closePayModal(); 
+        closePayModal();
         setIsConfirmationOpen(true);
         onPaymentSuccess(youOwe);
     };
 
 
     // handling partial payment
-    const handlePayByAmountSubmit = async() => {
+    const handlePayByAmountSubmit = async () => {
         if (!paymentAmount || paymentAmount <= 0 || paymentAmount > youOwe) {
             //alert('Please enter a valid amount.');
             setErrorMessage(true);
@@ -136,11 +124,11 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
-            } 
+            }
         } catch (error) {
             console.error('Error paying in partial:', error);
         }
-        closePayModal(); 
+        closePayModal();
         setIsConfirmationOpen(true);
         onPaymentSuccess(paymentAmount);
     };
@@ -154,13 +142,23 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         <div className="expense-card">
             <div className="expense-header">
                 <div className="user-info">
-                <h4>@{roommateName}</h4>
+                    <h4>@{roommateName}</h4>
                 </div>
             </div>
 
             <div className="expense-status">
-                <div className="status-item owes-you">Owes you <strong>${owesYou}</strong></div>
-                <div className="status-item you-owe">You owe <strong>${youOwe}</strong></div>
+                {owesYou === 0 && youOwe === 0 ? (
+                    <div className="status-item no-debts">No debts</div>
+                ) : (
+                    <>
+                        {owesYou > 0 && (
+                            <div className="status-item owes-you">Owes you <strong>${owesYou}</strong></div>
+                        )}
+                        {youOwe > 0 && (
+                            <div className="status-item you-owe">You owe <strong>${youOwe}</strong></div>
+                        )}
+                    </>
+                )}
             </div>
 
             <div className="expense-actions">
@@ -185,8 +183,8 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
 
                         {/* pay by amount button */}
                         {!isPayByAmount && (
-                            <button 
-                                className="pay-by-amount-btn" 
+                            <button
+                                className="pay-by-amount-btn"
                                 onClick={() => setIsPayByAmount(true)}
                             >
                                 Pay Custom Amount
@@ -199,7 +197,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
                                 <input
                                     type="number"
                                     placeholder="Enter amount"
-                                    step = "0.01"
+                                    step="0.01"
                                     value={paymentAmount}
                                     // onChange={(e) => setPaymentAmount(Number(e.target.value))}
                                     onChange={(e) => setPaymentAmount(e.target.value ? parseFloat(e.target.value) : undefined)}

@@ -1,7 +1,7 @@
 /* ExpenseCard.css */
 .expense-card {
     position: relative;
-    background-color: #9bbdb5c5;
+    background-color: #96c7bbad;
     padding: 20px;
     border-radius: 10px;
     width: 30%;
@@ -13,18 +13,34 @@
 .expense-header {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; 
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
 .user-info {
     margin: 0;
     font-size: 1em;
-    text-align: left; 
+    text-align: left;
     color: #222324;
     font-weight: 900;
 }
-    
+
+.expense-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.status-item {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    margin: 5px;
+    text-align: center;
+}
+
+/*
 .expense-status {
     display: flex;
     justify-content: space-between;
@@ -37,6 +53,14 @@
     font-size: 0.9em;
     margin-right: 12px;
     margin-left: 5px;
+}
+*/
+
+.status-item.no-debts {
+    font-weight: bold;
+    text-align: center;
+    flex: 1;
+    color: #475b54;
 }
 
 .owes-you {
@@ -63,7 +87,7 @@
     cursor: pointer;
     font-size: 0.9em;
     background-color: #7c9f8a;
-    color: #333;
+    color: #000000;
 }
 
 .expense-card .expense-modal-content .pay-in-full-btn {
@@ -124,7 +148,7 @@
     z-index: 90;
     color: white;
 }
-  
+
 .expense-modal-content {
     background-color: white;
     padding: 20px;
@@ -133,13 +157,6 @@
     text-align: center;
     color: black;
 }
-
-/* .modal-content input[type="text"]
-.modal-content input[type="number"]  */
-
-/*button {
-    margin: 10px 0;
-}*/
 
 .expense-card button {
     margin: 10px;
@@ -223,7 +240,7 @@
     border-radius: 5px;
     width: 80%;
 }
-  
+
 /* error message css */
 .error-modal-overlay {
     position: fixed;
@@ -231,7 +248,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -264,6 +281,3 @@
 .error-modal-content button:hover {
     background-color: #555;
 }
-
- 
-  
