@@ -200,6 +200,7 @@ export default function Dashboard() {
             purchaseDate: new Date().toISOString(),
             expirationDate: updatedItem.expirationDate,
             cost: updatedItem.price,
+            splits: updatedItem.splits,
         };
 
         try {
@@ -381,7 +382,6 @@ export default function Dashboard() {
             console.error('Error fetching roommates:', error);
         }
     };
-
 
     const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = event.target;

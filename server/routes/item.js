@@ -19,7 +19,7 @@ router.delete('/:listType/:id', async (req, res) => {
     if (listType === 'grocery') {
       item = await Item.findByIdAndDelete(id);
     } else {
-      item = await Item.findByIdAndUpdate(id, {archived: true});
+      item = await Item.findByIdAndUpdate(id, { archived: true });
     }
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
@@ -112,16 +112,20 @@ router.post('/addtopurchased', async (req, res) => {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
-  if (!splits || splits.length == 0) {
-    if (!sharedBetween || sharedBetween.length == 0) {
-      return res.status(400).json({message: 'sharedBetween cannot be empty'})
+  console.log('Request Body:', req.body);
+
+  if (!splits || !Array.isArray(splits) || splits.length === 0) {
+    if (!sharedBetween || sharedBetween.length === 0) {
+      return res.status(400).json({ message: 'sharedBetween cannot be empty' });
     }
-    const defaultSplit = 1/sharedBetween.length;
-    splits =  sharedBetween.map(userId => ({
+    const defaultSplit = 1 / sharedBetween.length;
+    splits = sharedBetween.map(userId => ({
       member: userId,
       split: defaultSplit
     }));
-  }
+  }  
+
+  console.log(splits)
 
   cost *= 100;
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
@@ -145,7 +149,7 @@ router.post('/addtopurchased', async (req, res) => {
       // console.log(splitCost)
       // console.log('split.member', split.member)
       // console.log('purchasedby', purchasedBy)
-      if (split.member === purchasedBy) {continue;}
+      if (split.member === purchasedBy) { continue; }
 
       let newHousehold = await Household.findOneAndUpdate(
         {
@@ -161,7 +165,7 @@ router.post('/addtopurchased', async (req, res) => {
           new: true,
           useFindAndModify: false
         }
-      );      
+      );
     }
 
     res.status(201).json(item);
@@ -170,32 +174,6 @@ router.post('/addtopurchased', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-//get based on searched name
-// router.get('/search', async (req, res) => {
-//   const { name } = req.query;
-
-//   try {
-//     const items = await Item.find({ name: new RegExp(name, 'i') })
-//       .populate('purchasedBy', 'username')
-//       .populate('sharedBetween', 'username');
-
-//     const itemsWithListType = await Promise.all(items.map(async (item) => {
-//       try {
-//         const isPurchased = await Household.exists({ purchasedList: item._id });
-//         const listType = isPurchased ? 'purchased' : 'grocery';
-//         return { ...item.toObject(), listType };
-//       } catch (error) {
-//         console.error(`Error determining list type for item ${item._id}:`, error);
-//         return { ...item.toObject(), listType: 'unknown' };
-//       }
-//     }));
-//     res.status(200).json(itemsWithListType);
-//   } catch (err) {
-//     console.error('Error searching items:', err.message);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
 
 router.get('/search/:id', async (req, res) => {
   console.log("search request accepted")
@@ -309,7 +287,7 @@ router.post("/", async (req, res) => {
 
 router.patch("/editpurchased/:id", async (req, res) => {
   const itemId = req.params.id;
-  const { name, category, cost, householdId} = req.body;
+  const { name, category, cost, householdId } = req.body;
   // console.log('cost', cost)
   // console.log('hID', householdId)
   try {
@@ -343,7 +321,7 @@ router.patch("/editpurchased/:id", async (req, res) => {
       }
     }
 
-    const item = await Item.findByIdAndUpdate(itemId, { name, category, cost}, { new: true, runValidators: true });
+    const item = await Item.findByIdAndUpdate(itemId, { name, category, cost }, { new: true, runValidators: true });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }
@@ -355,10 +333,10 @@ router.patch("/editpurchased/:id", async (req, res) => {
 });
 
 router.patch("/editgrocery/:id", async (req, res) => {
-  const { name, category, purchasedBy, sharedBetween} = req.body;
-  
+  const { name, category, purchasedBy, sharedBetween } = req.body;
+
   try {
-    const item = await Item.findByIdAndUpdate(req.params.id, { name, category, purchasedBy, sharedBetween}, { new: true });
+    const item = await Item.findByIdAndUpdate(req.params.id, { name, category, purchasedBy, sharedBetween }, { new: true });
     if (!item) {
       return res.status(404).json({ message: "Item not found" });
     }

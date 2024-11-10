@@ -22,27 +22,32 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
         const totalPercentage = Object.values(roommatePerc)
             .map((value) => parseFloat(value) || 0)
             .reduce((sum, value) => sum + value, 0);
-
+    
         const allEmpty = Object.values(roommatePerc).every((value) => !value);
-
-        if (allEmpty && (selectedRoommates.length > 1)) {
+    
+        if (selectedRoommates.length > 1 && allEmpty) {
             setErrorMessage('Price will be split evenly');
-        } else if (totalPercentage !== 100 && selectedRoommates.length > 1) {
+        } else if (selectedRoommates.length > 1 && totalPercentage !== 100) {
             setErrorMessage('The total percentage must add up to 100%');
         } else {
             setErrorMessage('');
         }
-    }, [roommatePerc]);
+    }, [roommatePerc, selectedRoommates]);
 
     const handleSave = () => {
         if (errorMessage && errorMessage !== 'Price will be split evenly') return;
+
+        const splits = Object.entries(roommatePerc).map(([roommateId, percentage]) => ({
+            member: roommateId,
+            split: parseFloat(percentage) / 100,
+        }));
 
         const updatedItem = {
             ...item,
             price: parseFloat(price),
             expirationDate,
             sharedBetween: selectedRoommates,
-            roommatePerc,
+            splits,
         };
         onSave(updatedItem);
     };
