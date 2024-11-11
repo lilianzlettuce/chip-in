@@ -69,6 +69,9 @@ export default function MyExpenses() {
 
         debts.forEach((debt: Debt) => {
             const { owedBy, owedTo, amount } = debt;
+
+            //if (!owedBy || !owedTo) return;
+
             const isOwedByCurrentUser = owedBy._id === currentUserId;
             const isOwedToCurrentUser = owedTo._id === currentUserId;
 
@@ -94,9 +97,20 @@ export default function MyExpenses() {
                 }
                 expensesMap[owedBy._id].owesYou += parseFloat((amount / 100).toFixed(2));
             }
+
         });
 
-        // Convert the map to an array
+        Object.values(expensesMap).forEach((entry) => {
+            const debtDiff = entry.owesYou - entry.youOwe;
+            if (debtDiff > 0) {
+                entry.owesYou = debtDiff;
+                entry.youOwe = 0;
+            } else if (debtDiff < 0) {
+                entry.owesYou = 0;
+                entry.youOwe = -debtDiff;
+            }
+        });
+
         return Object.values(expensesMap);
     };
 
