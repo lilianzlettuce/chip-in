@@ -1,0 +1,26 @@
+.utility-card {
+    background-color: #dfe6e9;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    width: 150px;
+    margin: 10px;
+}
+
+.utility-icon {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.utility-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.utility-status {
+    font-size: 0.9rem;
+    color: #636e72;
+}

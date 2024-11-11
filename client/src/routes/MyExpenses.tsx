@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import PayStat from '../components/PayStat';
 import ExpenseCard from '../components/ExpenseCard';
 import Alerts from '../components/Alerts';
+import UtilityCard from '../components/UtilityCard';
 
 import './MyExpenses.css'
 
@@ -133,6 +134,12 @@ export default function MyExpenses() {
                         }}
                     />
                 ))}
+            </div>
+            {/* Utility Cards Section */}
+            <div className="flex flex-wrap justify-between gap-4 mt-6">
+                <UtilityCard name="Water" status="Running" icon="💧" />
+                <UtilityCard name="Electricity" status="Active" icon="⚡" />
+                <UtilityCard name="WiFi" status="Connected" icon="📶" />
             </div>
         </div>
     );
