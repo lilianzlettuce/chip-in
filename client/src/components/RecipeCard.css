@@ -1,0 +1,110 @@
+.recipe-card {
+    background-color: #3a1f03;
+    /*background-color: #7ea6a6;*/
+    border-radius: 15px;
+    padding: 15px;
+    color: #ffffff;
+    width: 250px;
+    text-align: left;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.recipe-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.recipe-card-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    flex: 1;
+    line-height: 1.2;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.recipe-actions {
+    display: flex;
+    gap: 5px;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.tags {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background-color: #f08e78;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.added-by {
+    font-size: 15px;
+    margin: 3px 0;
+    color: #b9ffef;
+    margin-left: 5px;
+}
+
+.ingredients-count {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-left: 5px;
+    color: #d9b992;
+}
+
+.ingredients {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #cbe8ea;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.directions {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #cbe8ea;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.expand-collapse-btn {
+    background-color: #bcd8cf;
+    color: #7ea6a6;
+    border: none;
+    padding: 2px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+    margin-left: 5px;
+}
+
+.expand-collapse-btn:hover {
+    background-color: #f0f0f0;
+    color: #5d7b7b;
+}

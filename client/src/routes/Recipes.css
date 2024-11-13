@@ -1,0 +1,113 @@
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.recipe-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+    letter-spacing: 1.5px;
+    color: #333;
+}
+
+.recipes-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #fdf7ec;
+    text-align: center;
+}
+
+.recipes-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.search-bar-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 10px 35px 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+    border-color: #52575d;
+    background-color: #fff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(61, 49, 50, 0.39);
+}
+
+.clear-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.clear-button:hover {
+    color: #333;
+}
+
+.generate-recipe-btn {
+    padding: 8px 12px;
+    background-color: #0a110f;
+    color: #dcfffb;
+    border: 1px solid #000;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.generate-recipe-btn:hover {
+    color: #a2b8bd;
+    background-color: #293733;
+}
+
+.sort-by-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sort-by-dropdown select {
+    background-color: #0b0a0a;
+    color: #dddfe1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    appearance: none;
+}
+
+.sort-by-dropdown select:focus {
+    border-color: #52575d;
+    outline: none;
+}
+
+.sort-by-dropdown option {
+    color: #333;
+}
