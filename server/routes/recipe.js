@@ -20,6 +20,27 @@ router.get('/generate-recipe', async (req, res) => {
     }
 });
 
+// save ingredients to flask app
+router.post('/generate-recipe', async (req, res) => {
+    const { items } = req.body;
+    try {
+        const response = await fetch(`http://localhost:${process.env.FLASK_PORT}/generate-recipe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items })
+        })
+        
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to generate recipe');
+        }
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 //get all recipes from a household
 router.get('/:householdId', async (req, res) => {
     const { householdId } = req.params;
