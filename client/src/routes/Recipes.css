@@ -23,6 +23,13 @@
     text-align: center;
 }
 
+.recipe-cards {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 16px; 
+    justify-content: left; 
+}
+
 .recipes-toolbar {
     display: flex;
     justify-content: space-between;
