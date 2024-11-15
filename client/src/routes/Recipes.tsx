@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import Alerts from '../components/Alerts';
 import RecipeCard from '../components/RecipeCard';
 import './Recipes.css';
+import AddRecipeModal from './AddRecipe';
 
 interface Recipe {
     tags: string[];
@@ -26,6 +27,8 @@ export default function Recipes() {
     const [householdUsers, setHouseholdUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
+    const [currIngredients, setCurrIngredients] = useState<{ _id: string; name: string }[]>([]);
 
     useEffect(() => {
         if (!householdId) {
@@ -88,6 +91,44 @@ export default function Recipes() {
         fetchData();
     }, [householdId]);
 
+    const getFilteredPurchasedItems = async () => {
+        if (!householdId) return;
+
+        console.log("USER ", user?.id);
+
+        try {
+            const response = await fetch(`http://localhost:6969/household/${householdId}/purchasedlist`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Purchased Items Data:', data);
+
+            const filteredData = data.filter(item => {
+                return item.category === "Food" && 
+                item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
+            });
+
+            console.log('Filtered Items Data:', filteredData);
+            setCurrIngredients(filteredData);
+
+        } catch (error) {
+            console.error('Error fetching purchased items:', error);
+        }
+        
+    };
+
+    useEffect(() => {
+        getFilteredPurchasedItems();
+    }, [user, householdId]);
+
+
+    const handleSaveRecipe = (newRecipe: { title: string; ingredients: string; directions: string }) => {
+        setRecipes(prevRecipes => [...prevRecipes, { ...newRecipe, tags: [], owner: user?.username || 'Unknown', email: user?.email || '' }]);
+        setIsRecipeModalOpen(false); 
+    };
+
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
 
@@ -106,7 +147,13 @@ export default function Recipes() {
                     />
                     <button className="clear-button">&times;</button>
                 </div>
-                <button className="generate-recipe-btn">GENERATE RECIPE 🍽️</button>
+                <button className="generate-recipe-btn"
+                /*onClick={() => setIsRecipeModalOpen(true)}*/
+                onClick={() => {
+                    setIsRecipeModalOpen(true);
+                    //console.log("Generate Recipe button clicked"); // Confirm button click
+                }}
+                >GENERATE RECIPE 🍽️</button>
             </div>
 
             <div className="recipes-toolbar">
@@ -128,6 +175,15 @@ export default function Recipes() {
                     <RecipeCard key={index} recipe={recipe} />
                 ))}
             </div>
+
+            {isRecipeModalOpen && (
+                <AddRecipeModal onClose={() => setIsRecipeModalOpen(false)} 
+                 onSave={handleSaveRecipe}
+                 filteredIngredients={currIngredients}
+                />
+            )}
         </div>
+
+        
     );
 }
