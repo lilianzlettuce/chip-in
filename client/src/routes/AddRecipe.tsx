@@ -104,17 +104,19 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                 <div className = "recipe-modal-overlay">
                     <div className="recipeModal">
                     <label>Ingredients:</label>
-                    {filteredIngredients.map((item) => (
-                        <div key={item._id}>
-                        <input
-                            type="checkbox"
-                            value={item.name}
-                            checked={items.includes(item.name)}
-                            onChange={handleCheckboxChange}
-                        />
-                        <label>{item.name}</label>
-                        </div>
-                    ))}
+                    <div className='checkbox-container'>
+                        {filteredIngredients.map((item) => (
+                            <div key={item._id}>
+                            <input
+                                type="checkbox"
+                                value={item.name}
+                                checked={items.includes(item.name)}
+                                onChange={handleCheckboxChange}
+                            />
+                            <label>{item.name}</label>
+                            </div>
+                        ))}
+                    </div>
                     <button className="generate-recipe-button" onClick={handleGenerateRecipe}>Generate!</button>
                     <button className="cancel-recipe-button" onClick={onClose}>Cancel</button>
                     </div>
