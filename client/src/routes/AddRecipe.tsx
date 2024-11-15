@@ -38,7 +38,8 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
 
     const handleGenerateRecipe = async () => {
         try {
-            const response = await fetch(`http://localhost:4200/generate-recipe`, {  
+            //const response = await fetch(`http://localhost:4200/generate-recipe`, { 
+            const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {  
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
