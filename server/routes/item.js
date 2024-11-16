@@ -183,23 +183,16 @@ router.get('/search/:id', async (req, res) => {
     const itemsShared = await Item.find({ sharedBetween: { $in: [userId] } });
     //const items = await Item.find();
     let realcost = 0;
-    let totalBought = 0;
+    
     let splitCostItems = 0;
-    /*for (let i = 0; i < itemsPurchased.length; i++) {
-      // it's in purchase list, cost of 0 means it has not been purchased yet
-      if (itemsPurchased[i].cost != 0) {
-        totalBought += 1;
-      //  const numberOfSharers = itemsPurchased[i].sharedBetween.length || 1;
-      //  realcost += (itemsPurchased[i].cost / 100) / numberOfSharers;
-      }
-    }*/
+    
     let itemCost = [];
     let flag = 0;
     for (let i = 0; i < itemsShared.length; i++) {
       // it's in purchase list, cost of 0 means it has not been purchased yet
-      if (itemsShared[i].cost != 0) {
+      if (itemsShared[i].cost != 0 && itemsShared[i].archived == false) {
         //console.log("shared item: ", itemsShared[i].name);
-        totalBought += 1;
+        //totalBought += 1;
         const numberOfSharers = itemsShared[i].sharedBetween.length || 1;
         realcost += (itemsShared[i].cost / 100) / numberOfSharers;
         splitCostItems = (itemsShared[i].cost / 100) / numberOfSharers;
@@ -219,6 +212,8 @@ router.get('/search/:id', async (req, res) => {
 
       }
     }
+    console.log("totalBought: ", itemCost.length);
+    let totalBought = itemCost.length;
     res.status(200).send({ totalItems: totalBought, totalCost: realcost, itemBreakdown: itemCost });
   } catch (err) {
     console.log("server db connection error")
