@@ -29,13 +29,15 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
+        const lowercasedValue = value.toLowerCase();
         if (checked) {
-            setCheckedItems((prevSelected) => [...prevSelected, value]);
+            setCheckedItems((prevSelected) => [...prevSelected, lowercasedValue]);
         }
         else {
             setCheckedItems((prevSelected) => prevSelected.filter(item => item !== value ));
         }
     }; 
+
 
     const handleGenerateRecipe = async () => {
         const items = [...checkedItems, ...newItems];
