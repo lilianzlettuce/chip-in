@@ -10,8 +10,10 @@ type AddRecipeModalProps = {
 };
 
 const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filteredIngredients }) => {
-    const [items, setItems] = useState<string[]>([]);
-    const [addIngredients, setAddIngredients] = useState<string[]>([]);
+    //const [items, setItems] = useState<string[]>([]);
+    const [checkedItems, setCheckedItems] = useState<string[]>([]);
+    const [newItems, setNewItems] = useState<string[]>([]);
+    const [addIngredients, setAddIngredients] = useState('');
 
     const [generatedRecipe, setGeneratedRecipe] = useState<{ title: string; ingredients: string; directions: string } | null>(null);
     const [showRecipeModal, setShowRecipeModal] = useState(false);
@@ -29,16 +31,16 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         if (checked) {
-            setItems((prevSelected) => [...prevSelected, value]);
+            setCheckedItems((prevSelected) => [...prevSelected, value]);
         }
         else {
-            setItems((prevSelected) => prevSelected.filter(item => item !== value));
+            setCheckedItems((prevSelected) => prevSelected.filter(item => item !== value));
         }
     };
 
     const handleGenerateRecipe = async () => {
+        const items = [...checkedItems, ...newItems];
         try {
-            //const response = await fetch(`http://localhost:4200/generate-recipe`, { 
             const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {
                 method: 'POST',
                 headers: {
@@ -62,6 +64,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
             console.error('Error generating recipe:', error);
         }
     }
+       
 
     const handleSubmit = async () => {
         const requestBody = {
@@ -95,12 +98,30 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
         onClose();
     }
 
+    // adding additional items
+    const handleAddAddtionalItems = () => {
+        // checks if new ingredient isnt in items and gets rid of spaces 
+        const trimmedIngredient = addIngredients.trim();
+        const isInFilteredIngredients = filteredIngredients.some((item) => item.name === trimmedIngredient);
+        
+        if (trimmedIngredient && !newItems.includes(addIngredients) && !checkedItems.includes(addIngredients) && !isInFilteredIngredients) {
+            setNewItems((prevItems) => [...prevItems, addIngredients.trim()]);
+            setAddIngredients('');  // clear field for next additional item
+        }
+    };
+
+    // deleting additional items
+    const handleDeleteAdditionalItems = (ingredient: string) => {
+        setNewItems((prevItems) => prevItems.filter(item => item !== ingredient ));
+    };
+
 
     return (
         <div>
             {showItemsModal && (
                 <div className="recipe-modal-overlay">
                     <div className="recipeModal">
+                        {/* Items from checklist */}
                         <label>Available Ingredients:</label>
                         <div className='checkbox-container'>
                             {filteredIngredients.map((item) => (
@@ -108,13 +129,38 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                                     <input
                                         type="checkbox"
                                         value={item.name}
-                                        checked={items.includes(item.name)}
+                                        checked={checkedItems.includes(item.name)}
                                         onChange={handleCheckboxChange}
                                     />
                                     <label>{item.name}</label>
                                 </div>
                             ))}
                         </div>
+                        <label>Add More Ingredients:</label>
+                        <div className="fill-container">
+                            <div className="input-add-container">
+                                <input
+                                    type="text"
+                                    placeholder="Ingredient"
+                                    value={addIngredients}
+                                    onChange={(e) => setAddIngredients(e.target.value)}
+                                />
+                                <button className="add-item-button" onClick={handleAddAddtionalItems}>Add</button>
+                            </div>
+                            <h4>Added Ingredients</h4>
+                            <div className="added-ingredients">
+                                
+                                <div className="tags-container">
+                                    {newItems.map((item, index) => (
+                                        <div key={index} className="ingredient-tag">
+                                            {item}
+                                            <button onClick={() => handleDeleteAdditionalItems(item)}>x</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
                         <button className="generate-recipe-button" onClick={handleGenerateRecipe}>Generate!</button>
                         <button className="cancel-recipe-button" onClick={onClose}>Cancel</button>
                     </div>
