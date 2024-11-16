@@ -121,7 +121,23 @@ export default function Recipes() {
             });
 
             console.log('Filtered Items Data:', filteredData);
-            setCurrIngredients(filteredData);
+
+            const uniqueFilteredData: { _id: string; name: string }[] = [];
+            const seenItem = new Set<string>();
+
+            for (const item of filteredData) {
+                const lowerCaseName = item.name.toLowerCase();
+                if (!seenItem.has(lowerCaseName)) { 
+                    seenItem.add(lowerCaseName);
+                    uniqueFilteredData.push({
+                        _id: item._id, 
+                        name: lowerCaseName, 
+                    });
+                }
+            }
+            
+            setCurrIngredients(uniqueFilteredData);
+
 
         } catch (error) {
             console.error('Error fetching purchased items:', error);
