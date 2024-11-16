@@ -7,6 +7,12 @@ import {InviteHousehold , Modal2}  from './InviteHousehold'
 
 import { UserType, ItemType } from '../types';
 
+import { Line, Pie, Bar } from 'react-chartjs-2';
+import { Chart, CategoryScale, LinearScale, PointElement, LineElement, 
+  PieController, ArcElement, Tooltip, Legend, ChartOptions, ChartData } from 'chart.js';
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, 
+  PieController, ArcElement, Tooltip, Legend);
+
 export default function Home() {
   const { householdId } = useParams();
   const navigate = useNavigate();
@@ -19,8 +25,11 @@ export default function Home() {
   const [ householdName, updateHouseholdName ] = useState("");
   const [ householdMembers, updateHouseholdMembers ] = useState<UserType[]>([]);
   const [ purchaseHistory, updatePurchaseHistory ] = useState<ItemType[]>([]);
-  const [ totalExpenses, updateTotalExpenses ] = useState(0);
+  const [ totalExpenses, updateTotalExpenses ] = useState<string>("0");
   const [ householdAge, updateHouseholdAge ] = useState(100);
+
+  // Chart data
+  const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -92,7 +101,7 @@ export default function Home() {
   };
 
   const getPurchaseHistory = async () => {
-    // Get household name
+    // Get purchase history
     try {
       // GET request to server
       const url = `http://localhost:6969/household/${householdId}/purchaseHistory`;
@@ -105,6 +114,44 @@ export default function Home() {
           purchaseDate: new Date(item.purchaseDate),
         }));
         updatePurchaseHistory(parsedData);
+        console.log(parsedData);
+      } else {
+        console.log("Failed to fetch purchase history")
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+    }
+
+    // Get chart data (expenditure per month)
+    try {
+      // GET request to server
+      const url = `http://localhost:6969/household/${householdId}/expenditurePerMonth`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        
+        console.log(data.labels)
+        console.log(data.data)
+
+        // Intialize chart data
+        setExpenditurePerMonthData({
+          labels: data.labels, 
+          datasets: [
+            {
+              label: "Expenditure",
+              data: data.data,
+              backgroundColor: [
+                "rgba(75,192,192,1)",
+                "#ecf0f1",
+                "#50AF95",
+                "#f3ba2f",
+                "#2a71d0"
+              ],
+              borderColor: "black",
+              borderWidth: 2
+            }
+          ]
+        });
       } else {
         console.log("Failed to fetch purchase history")
       }
@@ -120,7 +167,8 @@ export default function Home() {
 
   // Update when purchase history fetched
   useEffect(() => {
-    updateTotalExpenses(purchaseHistory.reduce((sum, item) => sum + (item.cost || 0), 0));
+    let expenses = purchaseHistory.reduce((sum, item) => sum + (item.cost || 0), 0);
+    updateTotalExpenses((expenses / 100).toFixed(2));
     if (purchaseHistory[0]) {
       const creationDate = purchaseHistory[0].purchaseDate;
       const currentDate = new Date(); // Current date
@@ -187,7 +235,48 @@ export default function Home() {
           <br></br>
         </div> 
 
-
+        <div className="w-full flex flex-col">
+          <div>Expenses Over Time</div>
+          {expenditurePerMonthData ? 
+            <div className="w-[500px] h-[200px]">
+              <Line
+                data={expenditurePerMonthData}
+                options={{
+                  plugins: {
+                    title: {
+                      display: true,
+                      text: "Recent Purchase History"
+                    },
+                    legend: {
+                      display: false
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function (context) {
+                          const value = context.raw as number; // get raw value
+                          return `$${Number(value).toFixed(2)}`; // currency format
+                        }
+                      }
+                    }
+                  },
+                  scales: {
+                    y: {
+                      ticks: {
+                        callback: function (value) {
+                          return `$${Number(value).toFixed(2)}`; // currency format
+                        }
+                      }
+                    }
+                  },
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }}
+              />
+            </div>
+          :
+            <div>Loading...</div>
+          }
+        </div>
 
       </div>
     </div>
