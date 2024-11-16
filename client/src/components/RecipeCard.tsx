@@ -44,14 +44,13 @@ function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
     };
 
     const ingredientsArray = recipe.ingredients
-        .split('\n')
-        .map(ingredient => ingredient.trim())
-        .filter(ingredient => ingredient);
+        ? recipe.ingredients.split('\n').map(ingredient => ingredient.trim()).filter(ingredient => ingredient)
+        : [];
 
     const directionsArray = recipe.directions
-        .split('\n')
-        .map(step => step.trim())
-        .filter(step => step);
+        ? recipe.directions.split('\n').map(step => step.trim()).filter(step => step)
+        : [];
+
 
     return (
         <div className="recipe-card">
