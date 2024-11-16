@@ -40,6 +40,10 @@
     flex-wrap: wrap; 
     gap: 10px; 
     margin: 16px 0; 
+    padding: 10px;
+    background-color: #e5ded5;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .recipeModal div {
@@ -52,7 +56,7 @@
     width: 15px;
     height: 15px;
     margin-right: 10px;
-    vertical-align: middle;
+    vertical-align: bottom;
     cursor: pointer;
 }
 
@@ -60,6 +64,69 @@
     font-size: 16px;
     color: #555;
 }
+
+/* Style for Additional Ingredients Section */
+/* Style for Additional Ingredients Section */
+.recipeModal .fill-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e5ded5;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recipeModal .fill-container input {
+    flex: 100;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+/*.fill-container button {
+    padding: 8px 16px;
+    cursor: pointer;
+}*/
+
+.recipeModal .fill-container .add-item-button {
+    padding: 4px 12px;
+    background-color: #5d3005;  
+    color: white;
+    cursor: pointer;
+}
+
+.recipeModal .fill-container .add-item-button:hover {
+    background-color: #5d3005ca;  
+    color: white;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ingredient-tag {
+    background-color: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ingredient-tag button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
 
 /* Style for the 'Generate' button */
 .recipeModal button {
@@ -76,7 +143,7 @@
 }
 
 .cancel-recipe-button {
-    background-color: #dc3545; 
+    background-color: #833c39; 
     color: white;
 }
 
@@ -86,12 +153,12 @@
 
 
 .generate-recipe-button {
-    background-color: #007bff;  
+    background-color: #be9b7b/*#b66e58*/;  
     color: white;
 }
 
 .generate-recipe-button:hover {
-    background-color: #0056b3;  
+    background-color: #977c62;  
 }
 
 
@@ -119,6 +186,7 @@
 .recipe-details-modal h2 {
     margin-top: 0;
     font-weight: bold;
+    font-size: 25px;
 }
 .recipe-details-modal h3 {
     font-weight: bold;
@@ -156,7 +224,7 @@
 }
 
 .recipe-option-buttons .no-recipe-button {
-    background-color: #dc354688; 
+    background-color: #d23444aa; 
     color: white;
     padding: 8px 16px;
     border-radius: 4px;
