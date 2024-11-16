@@ -447,6 +447,7 @@ export default function Dashboard() {
         fetchGroceryItems();
         setIsExpiredMode(false);
         setIsToggled(false);
+        setSearchTerm('');
     };
 
 
