@@ -1084,7 +1084,8 @@ const Profile: React.FC = () => {
 
           if (profileData.username) setUsername(profileData.username);
           if (profileData.email) setEmail(profileData.email);
-          if (profileData.password) setPassword(profileData.password);
+          //if (profileData.password) setPassword(profileData.password);
+          setPassword('');
           if (profileData.bio) setBio(profileData.bio); // You may want to handle password securely
         } else {
           console.error("Failed to fetch user profile");
