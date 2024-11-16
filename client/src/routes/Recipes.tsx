@@ -13,11 +13,17 @@ interface Recipe {
     email: string;
     ingredients: string;
     directions: string;
+    _id?: string;
 }
 
 interface User {
     _id: string;
     username: string;
+}
+
+interface PurchasedItem {
+    category: string;
+    sharedBetween: { username: string }[];
 }
 
 export default function Recipes() {
@@ -29,6 +35,8 @@ export default function Recipes() {
     const [error, setError] = useState<string | null>(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
     const [currIngredients, setCurrIngredients] = useState<{ _id: string; name: string }[]>([]);
+    const [selectedUser, setSelectedUser] = useState<string>('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         if (!householdId) {
@@ -41,29 +49,32 @@ export default function Recipes() {
 
         const fetchData = async () => {
             try {
-                // Fetch recipes
                 const recipeResponse = await fetch(`http://localhost:6969/recipes/${householdId}`);
                 if (!recipeResponse.ok) throw new Error('Network response was not ok');
                 const recipeData = await recipeResponse.json();
 
-                // Fetch usernames for each recipe
                 if (recipeData && Array.isArray(recipeData)) {
-                    const updatedRecipes = await Promise.all(
-                        recipeData.map(async (recipe: Recipe) => {
-                            try {
-                                const userResponse = await fetch(`http://localhost:6969/user/${recipe.owner}`);
-                                if (userResponse.ok) {
-                                    const userData = await userResponse.json();
-                                    recipe.owner = userData.username;
-                                } else {
-                                    recipe.owner = 'Unknown';
-                                }
-                            } catch {
-                                recipe.owner = 'Unknown';
-                            }
-                            return recipe;
-                        })
+                    const ownerIds = [...new Set(recipeData.map(recipe => recipe.owner).filter(Boolean))];
+                    const userResponses = await Promise.all(
+                        ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
                     );
+
+                    console.log("User responses:", userResponses);
+
+                    const userIdToUsername = userResponses.reduce((map, user) => {
+                        if (user && user._id && user.username) {
+                            map[user._id] = user.username;
+                        }
+                        return map;
+                    }, {} as Record<string, string>);
+
+                    console.log("User ID to Username map:", userIdToUsername);
+
+                    const updatedRecipes = recipeData.map(recipe => ({
+                        ...recipe,
+                        owner: userIdToUsername[recipe.owner] || 'Unknown'
+                    }));
+
                     setRecipes(updatedRecipes);
                 } else {
                     throw new Error('Invalid data format received from API');
@@ -73,28 +84,87 @@ export default function Recipes() {
                 if (!userResponse.ok) throw new Error('Error fetching household users');
                 const users = await userResponse.json();
                 setHouseholdUsers(users);
-
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching data:", err);
-                if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError("An unknown error occurred");
-                }
-
+                setError(err instanceof Error ? err.message : "An unknown error occurred");
                 setLoading(false);
             }
-
         };
 
         fetchData();
     }, [householdId]);
 
+    const handleDeleteRecipe = (id: string) => {
+        setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe._id !== id));
+    };
+
+    const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+
+        if (!e.target.value.trim()) {
+            fetchAllRecipes();
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:6969/recipes/search/${householdId}?searchTerm=${encodeURIComponent(e.target.value)}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch search results');
+            }
+            const searchResults = await response.json();
+            const ownerIds = [...new Set(searchResults.map((recipe: Recipe) => recipe.owner).filter(Boolean))];
+            const userResponses = await Promise.all(
+                ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
+            );
+            const userIdToUsername = userResponses.reduce((map, user) => {
+                if (user && user._id && user.username) {
+                    map[user._id] = user.username;
+                }
+                return map;
+            }, {} as Record<string, string>);
+
+            const updatedSearchResults = searchResults.map((recipe: Recipe) => ({
+                ...recipe,
+                owner: userIdToUsername[recipe.owner] || 'Unknown'
+            }));
+
+            setRecipes(updatedSearchResults);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        }
+    };
+
+    const fetchAllRecipes = async () => {
+        try {
+            const recipeResponse = await fetch(`http://localhost:6969/recipes/${householdId}`);
+            if (!recipeResponse.ok) throw new Error('Network response was not ok');
+            const recipeData = await recipeResponse.json();
+            const ownerIds = [...new Set(recipeData.map((recipe: Recipe) => recipe.owner).filter(Boolean))];
+            const userResponses = await Promise.all(
+                ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
+            );
+
+            const userIdToUsername = userResponses.reduce((map, user) => {
+                if (user && user._id && user.username) {
+                    map[user._id] = user.username;
+                }
+                return map;
+            }, {} as Record<string, string>);
+
+            const updatedRecipes = recipeData.map((recipe: Recipe) => ({
+                ...recipe,
+                owner: userIdToUsername[recipe.owner] || 'Unknown'
+            }));
+
+            setRecipes(updatedRecipes);
+        } catch (error) {
+            console.error('Error fetching all recipes:', error);
+        }
+    };
+
     const getFilteredPurchasedItems = async () => {
         if (!householdId) return;
-
-        console.log("USER ", user?.id);
 
         try {
             const response = await fetch(`http://localhost:6969/household/${householdId}/purchasedlist`);
@@ -102,32 +172,46 @@ export default function Recipes() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('Purchased Items Data:', data);
-
-            const filteredData = data.filter(item => {
-                return item.category === "Food" && 
-                item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
+            const filteredData = data.filter((item: PurchasedItem) => {
+                return item.category === "Food" &&
+                    item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
             });
 
+
             console.log('Filtered Items Data:', filteredData);
-            setCurrIngredients(filteredData);
+
+            const uniqueFilteredData: { _id: string; name: string }[] = [];
+            const seenItem = new Set<string>();
+
+            for (const item of filteredData) {
+                const lowerCaseName = item.name.toLowerCase();
+                if (!seenItem.has(lowerCaseName)) { 
+                    seenItem.add(lowerCaseName);
+                    uniqueFilteredData.push({
+                        _id: item._id, 
+                        name: lowerCaseName, 
+                    });
+                }
+            }
+            
+            setCurrIngredients(uniqueFilteredData);
+
 
         } catch (error) {
             console.error('Error fetching purchased items:', error);
         }
-        
     };
 
     useEffect(() => {
         getFilteredPurchasedItems();
     }, [user, householdId]);
 
-
     const handleSaveRecipe = (newRecipe: { title: string; ingredients: string; directions: string }) => {
         setRecipes(prevRecipes => [...prevRecipes, { ...newRecipe, tags: [], owner: user?.username || 'Unknown', email: user?.email || '' }]);
-        setIsRecipeModalOpen(false); 
+        setIsRecipeModalOpen(false);
     };
 
+    const filteredRecipes = recipes.filter(recipe => selectedUser ? recipe.owner === selectedUser : true);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -142,24 +226,25 @@ export default function Recipes() {
                 <div className="search-bar-wrapper">
                     <input
                         type="text"
-                        placeholder="Search items..."
+                        placeholder="Search recipes..."
                         className="search-bar"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
                     />
-                    <button className="clear-button">&times;</button>
+                    <button className="clear-button" onClick={() => {
+                        setSearchQuery('');
+                        fetchAllRecipes();
+                    }}>&times;</button>
                 </div>
-                <button className="generate-recipe-btn"
-                /*onClick={() => setIsRecipeModalOpen(true)}*/
-                onClick={() => {
-                    setIsRecipeModalOpen(true);
-                    //console.log("Generate Recipe button clicked"); // Confirm button click
-                }}
-                >GENERATE RECIPE 🍽️</button>
+                <button className="generate-recipe-btn" onClick={() => setIsRecipeModalOpen(true)}>
+                    GENERATE RECIPE 🍽️
+                </button>
             </div>
 
             <div className="recipes-toolbar">
                 <div className="sort-by-dropdown">
                     <label htmlFor="sort">View Recipes By: </label>
-                    <select id="sort">
+                    <select id="sort" onChange={(e) => setSelectedUser(e.target.value)}>
                         <option value="">All Users ...</option>
                         {householdUsers.map(user => (
                             <option key={user._id} value={user.username}>
@@ -171,19 +256,18 @@ export default function Recipes() {
             </div>
 
             <div className="recipe-cards">
-                {recipes.map((recipe, index) => (
-                    <RecipeCard key={index} recipe={recipe} />
-                ))}
+                {filteredRecipes.length > 0 ? (
+                    filteredRecipes.map((recipe, index) => (
+                        <RecipeCard key={index} recipe={recipe} onDelete={handleDeleteRecipe} />
+                    ))
+                ) : (
+                    <div className="no-recipes-message">No recipes</div>
+                )}
             </div>
 
             {isRecipeModalOpen && (
-                <AddRecipeModal onClose={() => setIsRecipeModalOpen(false)} 
-                 onSave={handleSaveRecipe}
-                 filteredIngredients={currIngredients}
-                />
+                <AddRecipeModal onClose={() => setIsRecipeModalOpen(false)} onSave={handleSaveRecipe} filteredIngredients={currIngredients} />
             )}
         </div>
-
-        
     );
 }

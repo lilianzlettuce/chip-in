@@ -1,15 +1,14 @@
-/* Styles for the popup modal */
 .recipe-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);  
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;  
+    z-index: 1000;
 }
 
 .recipeModal {
@@ -25,6 +24,9 @@
     border-radius: 8px;
     z-index: 1000;
     font-family: Arial, sans-serif;
+    max-height: 95vh; 
+    overflow-y: auto; 
+    box-sizing: border-box;
 }
 
 .recipeModal label {
@@ -37,9 +39,13 @@
 
 .recipeModal .checkbox-container {
     display: flex;
-    flex-wrap: wrap; 
-    gap: 10px; 
-    margin: 16px 0; 
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 10px;
+    background-color: #e5ded5;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .recipeModal div {
@@ -61,7 +67,7 @@
     color: #555;
 }
 
-/* Style for the 'Generate' button */
+
 .recipeModal button {
     display: inline-block;
     width: 100%;
@@ -76,38 +82,38 @@
 }
 
 .cancel-recipe-button {
-    background-color: #dc3545; 
+    background-color: #833c39; 
     color: white;
 }
 
 .cancel-recipe-button:hover {
-    background-color: #a71d2b;  
+    background-color: #a71d2b;
 }
 
 
 .generate-recipe-button {
-    background-color: #007bff;  
+    background-color: #be9b7b;  
     color: white;
 }
 
 .generate-recipe-button:hover {
-    background-color: #0056b3;  
+    background-color: #977c62;
 }
 
 
-/* CSS for viewing recipe modal */
 .recipe-details-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);  
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;  
+    z-index: 1000;
 }
+
 .recipe-details-modal {
     background: white;
     padding: 20px;
@@ -116,16 +122,20 @@
     margin: auto;
     text-align: left;
 }
+
 .recipe-details-modal h2 {
     margin-top: 0;
     font-weight: bold;
 }
+
 .recipe-details-modal h3 {
     font-weight: bold;
 }
+
 .recipe-details-modal section {
     margin-bottom: 20px;
 }
+
 .recipe-details-modal button {
     padding: 10px 20px;
     background-color: #007bff;
@@ -137,13 +147,13 @@
 
 .recipe-option-buttons {
     display: flex;
-    justify-content: space-between; 
-    gap: 10px; 
+    justify-content: space-between;
+    gap: 10px;
     margin-top: 20px;
 }
 
 .recipe-option-buttons .save-recipe-button {
-    background-color: #b0add8; 
+    background-color: #b0add8;
     color: white;
     padding: 8px 16px;
     border-radius: 4px;
@@ -156,7 +166,7 @@
 }
 
 .recipe-option-buttons .no-recipe-button {
-    background-color: #dc354688; 
+    background-color: #d23444aa;
     color: white;
     padding: 8px 16px;
     border-radius: 4px;
@@ -165,10 +175,94 @@
 }
 
 .recipe-option-buttons .no-recipe-button:hover {
-    background-color: #ab2b3888; 
+    background-color: #ab2b3888;
 }
 
+/* Styling for adding additional ingredients */
+.fill-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 16px; 
+    padding: 16px;
+    background-color: #e5ded5;
+    border-radius: 16px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
 
+.input-add-container {
+    display: flex;
+    align-items: center; 
+    gap: 12px; 
+    width: 100%; 
+}
 
+.input-add-container input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    
+}
+
+/* Add button styles */
+.input-add-container .add-item-button {
+    padding: 10px 10px;
+    background-color: #5d3005;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0; 
+    white-space: nowrap; 
+    font-size: 14px;
+    max-width: 80px; 
+    margin-top: -0.005px;
+}
+
+.added-ingredients {
+    border: 1px solid #ccc; 
+    border-radius: 12px;
+    padding: 16px;
+    background-color: white;
+    min-height: 100px;
+    min-width: 425px;
+    max-height: 400px;
+    max-width: 425px;
+    /*overflow-y: auto; */
+}
+
+.added-ingredients h4 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start; 
+}
+
+.ingredient-tag {
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
+
+.ingredient-tag button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: -3.5px;
+}
 
 

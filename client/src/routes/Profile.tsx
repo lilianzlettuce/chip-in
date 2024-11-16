@@ -902,7 +902,7 @@ const Stats: React.FC = () => {
   const [totalOwedTo, setTotalOwedTo] = useState(0);
   const [totalOwedBy, setTotalOwedBy] = useState(0);
   const [itemBreakdown, setItemBreakdown] = useState<[string, number][]>([]);
-  const chartRef = useRef<Chart | null>(null);
+  const chartRef = useRef<Chart<'pie'> | null>(null);
   // user stats
   const searchItems = async () => {
     if (!user) return; // Ensure user is available
@@ -981,49 +981,55 @@ const Stats: React.FC = () => {
     }
   };
 
-  useEffect (() => {
+  useEffect(() => {
     if (chartRef.current) {
       chartRef.current.destroy();
     }
+
     if (itemCost.length > 0) {
       const colors = getChartColors(itemCost.length); 
-      const ctx = document.getElementById('itemCostPieChart') as HTMLCanvasElement;
-      chartRef.current = new Chart(ctx, {
-        type: 'pie',
-        data: {
+      const canvas = document.getElementById('itemCostPieChart') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d'); // Get the 2D rendering context
+
+      if (ctx) {
+        chartRef.current = new Chart<'pie'>(ctx, {
+          type: 'pie',
+          data: {
             labels: itemName,
-            datasets: [{
+            datasets: [
+              {
                 label: 'Item Costs',
                 data: itemCost,
                 backgroundColor: colors,
-                hoverBackgroundColor: colors
-                /*backgroundColor: [
-                  '#FF6384', '#36A2EB', '#FFCE56', '#66BB6A', '#FFA726', '#AB47BC', '#42A5F5'
-                ],
-                hoverBackgroundColor: [
-                  '#FF6384', '#36A2EB', '#FFCE56', '#66BB6A', '#FFA726', '#AB47BC', '#42A5F5'
-                ]*/
-            }]
-        } as ChartData,
-        options: {
+                hoverBackgroundColor: colors,
+              },
+            ],
+          } as ChartData<'pie'>,
+          options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'top',
+              legend: {
+                position: 'top',
+              },
+              tooltip: {
+                callbacks: {
+                  label: (tooltipItem) => {
+                    const index = tooltipItem.dataIndex;
+                    return `${itemName[index]}: $${itemCost[index].toFixed(2)}`;
+                  },
                 },
-                tooltip: {
-                    callbacks: {
-                        label: (tooltipItem) => {
-                            return `${itemName[tooltipItem.dataIndex]}: $${itemCost[tooltipItem.dataIndex].toFixed(2)}`;
-                        }
-                    }
-                }
-            }
-        }
-      }) as ChartOptions;
+              },
+            },
+          } as ChartOptions<'pie'>,
+        });
+      }
     }
-  }, [itemCost]);
+ 
+    return () => {
+      chartRef.current?.destroy();
+    };
+  }, [itemCost, itemName]);
   
   return (
     <div className="settings-container">
@@ -1084,7 +1090,8 @@ const Profile: React.FC = () => {
 
           if (profileData.username) setUsername(profileData.username);
           if (profileData.email) setEmail(profileData.email);
-          if (profileData.password) setPassword(profileData.password);
+          //if (profileData.password) setPassword(profileData.password);
+          setPassword('');
           if (profileData.bio) setBio(profileData.bio); // You may want to handle password securely
         } else {
           console.error("Failed to fetch user profile");
