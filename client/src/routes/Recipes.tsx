@@ -20,6 +20,11 @@ interface User {
     username: string;
 }
 
+interface PurchasedItem {
+    category: string;
+    sharedBetween: { username: string }[];
+}
+
 export default function Recipes() {
     const { user } = useUserContext();
     const { householdId } = useParams();
@@ -104,7 +109,7 @@ export default function Recipes() {
             const data = await response.json();
             console.log('Purchased Items Data:', data);
 
-            const filteredData = data.filter(item => {
+            const filteredData = data.filter((item: PurchasedItem) => {
                 return item.category === "Food" && 
                 item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
             });

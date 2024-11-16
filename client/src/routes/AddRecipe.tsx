@@ -13,7 +13,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     const [items, setItems] = useState<string[]>([]);
     const [addIngredients, setAddIngredients] = useState<string[]>([]);
 
-    const [generatedRecipe, setGeneratedRecipe] = useState<{title: string; ingredients: string; directions: string} | null > (null);
+    const [generatedRecipe, setGeneratedRecipe] = useState<{ title: string; ingredients: string; directions: string } | null>(null);
     const [showRecipeModal, setShowRecipeModal] = useState(false);
     const [showItemsModal, setShowItemsModal] = useState(true);
 
@@ -32,19 +32,19 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
             setItems((prevSelected) => [...prevSelected, value]);
         }
         else {
-            setItems((prevSelected) => prevSelected.filter(item => item !== value ));
+            setItems((prevSelected) => prevSelected.filter(item => item !== value));
         }
-    }; 
+    };
 
     const handleGenerateRecipe = async () => {
         try {
             //const response = await fetch(`http://localhost:4200/generate-recipe`, { 
-            const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {  
+            const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ items }), 
+                body: JSON.stringify({ items }),
             });
 
             if (!response.ok) {
@@ -63,32 +63,30 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
         }
     }
 
-    
-
-    const handleSubmit =  async () => {
+    const handleSubmit = async () => {
         const requestBody = {
-            householdId: householdID, 
-            title: generatedRecipe?.title, 
-            ingredients: generatedRecipe?.ingredients, 
-            directions: generatedRecipe?.directions, 
+            householdId: householdID,
+            title: generatedRecipe?.title,
+            ingredients: generatedRecipe?.ingredients,
+            directions: generatedRecipe?.directions,
             owner: user?.id,
         };
 
         try {
             const response = await fetch(`http://localhost:6969/recipes/save-recipe`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(requestBody),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
             });
-      
+
             if (!response.ok) {
-              const errorData = await response.json();
-              console.error('Error details:', errorData);
-              throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json();
+                console.error('Error details:', errorData);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-      
+
             console.log('Recipe added successfully!');
         } catch (error) {
             console.error('Error saving recipe:', error);
@@ -101,50 +99,50 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     return (
         <div>
             {showItemsModal && (
-                <div className = "recipe-modal-overlay">
+                <div className="recipe-modal-overlay">
                     <div className="recipeModal">
-                    <label>Ingredients:</label>
-                    <div className='checkbox-container'>
-                        {filteredIngredients.map((item) => (
-                            <div key={item._id}>
-                            <input
-                                type="checkbox"
-                                value={item.name}
-                                checked={items.includes(item.name)}
-                                onChange={handleCheckboxChange}
-                            />
-                            <label>{item.name}</label>
-                            </div>
-                        ))}
-                    </div>
-                    <button className="generate-recipe-button" onClick={handleGenerateRecipe}>Generate!</button>
-                    <button className="cancel-recipe-button" onClick={onClose}>Cancel</button>
+                        <label>Available Ingredients:</label>
+                        <div className='checkbox-container'>
+                            {filteredIngredients.map((item) => (
+                                <div key={item._id}>
+                                    <input
+                                        type="checkbox"
+                                        value={item.name}
+                                        checked={items.includes(item.name)}
+                                        onChange={handleCheckboxChange}
+                                    />
+                                    <label>{item.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                        <button className="generate-recipe-button" onClick={handleGenerateRecipe}>Generate!</button>
+                        <button className="cancel-recipe-button" onClick={onClose}>Cancel</button>
                     </div>
                 </div>
             )}
-            
+
 
             {showRecipeModal && generatedRecipe && (
-                <div className = "recipe-details-modal-overlay">
-                    <div className = "recipe-details-modal">
+                <div className="recipe-details-modal-overlay">
+                    <div className="recipe-details-modal">
                         <h2>{generatedRecipe.title}</h2>
                         <section>
                             <h3>Ingredients</h3>
                             <ul>{generatedRecipe.ingredients.split('\n')
-                            .filter(line => line.trim() !== ' ')
-                            .map((line, index) => (
-                                <li key={index}>{line}</li>
-                            ))}</ul>
+                                .filter(line => line.trim() !== ' ')
+                                .map((line, index) => (
+                                    <li key={index}>{line}</li>
+                                ))}</ul>
                         </section>
                         <section>
                             <h3>Directions</h3>
                             <ul>{generatedRecipe.directions.split('\n')
-                            .filter(line => line.trim() !== ' ')
-                            .map((line, index) => (
-                                <li key={index}>{line}</li>
-                            ))}</ul>
+                                .filter(line => line.trim() !== ' ')
+                                .map((line, index) => (
+                                    <li key={index}>{line}</li>
+                                ))}</ul>
                         </section>
-                        <div className= "recipe-option-buttons">
+                        <div className="recipe-option-buttons">
                             {/*<button className="save-recipe-button" onClick={() => generatedRecipe && handleSubmit}>Save!</button>*/}
                             <button className="save-recipe-button" onClick={handleSubmit}>Save!</button>
                             {/*<button className="no-recipe-button" onClick={() => setShowRecipeModal(false)}>Not for me</button>*/}
@@ -152,12 +150,11 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                         </div>
                     </div>
                 </div>
-            )} 
-        
+            )}
+
         </div>
-        
+
     );
 };
 
 export default AddRecipeModal;
-
