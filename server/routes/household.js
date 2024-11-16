@@ -385,7 +385,7 @@ router.get("/:id/purchasedlist", async (req, res) => {
   }
 });
 
-// get all itmes in purchase history
+// get all items in purchase history
 router.get("/:id/purchaseHistory", async (req, res) => {
   const id = req.params.id;
 
@@ -398,6 +398,58 @@ router.get("/:id/purchaseHistory", async (req, res) => {
 
     res.status(200).json(household.purchaseHistory);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get expenditure per month
+router.get("/:id/expenditurePerMonth", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    // Process data to group expenditures by month
+    const expenditureByMonth = household.purchaseHistory.reduce((acc, item) => {
+      // Convert purchaseDate to a "YYYY-MM" string
+      const purchaseDate = new Date(item.purchaseDate);
+      const month = `${purchaseDate.getFullYear()}-${String(purchaseDate.getMonth() + 1).padStart(2, '0')}`;
+
+      // Accumulate cost for this month
+      acc[month] = (acc[month] || 0) + (item.cost / 100);
+
+      return acc;
+    }, {});
+
+    // Sort keys chronologically
+    const sortedKeys = Object.keys(expenditureByMonth).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    );
+
+    // Create sorted map from sorted keys
+    const sortedExpenditures = {};
+    sortedKeys.forEach(key => {
+      sortedExpenditures[key] = expenditureByMonth[key];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let labels = Object.keys(sortedExpenditures);
+    let data = Object.values(sortedExpenditures);
+    data = data.map(expense => {
+      return Number(expense).toFixed(2);
+    })
+
+    labels = labels.map(label => {
+      const [year, month] = label.split("-");
+      return new Date(parseInt(year), parseInt(month) - 1).toLocaleString("default", { month: "long", year: "numeric" });
+    });
+
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    console.log(err)
     res.status(500).json({ error: err.message });
   }
 });
