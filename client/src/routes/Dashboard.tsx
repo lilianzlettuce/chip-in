@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../UserContext';
 import { useParams } from 'react-router-dom';
+import { v4 as uuid4 } from 'uuid';
 
 import ItemCard from '../components/ItemCard';
 import ItemModal from '../components/ItemModal';
@@ -14,12 +15,24 @@ import EditGroceryItemModal from './EditGrocery'
 import './Dashboard.css';
 import './AddItem.css';
 
+interface PurchasedItem {
+    name: string,
+    category: string,
+    purchasedBy: string,
+    sharedBetween: string[],
+    splits: { member: string; split: number }[],
+    purchaseDate: string,
+    expirationDate: string,
+    cost: number,
+    archived: boolean
+}
+
 export default function Dashboard() {
     const { user } = useUserContext();
     const { householdId } = useParams();
     const householdID = householdId;
 
-    const [purchasedItems, setPurchasedItems] = useState([]);
+    const [purchasedItems, setPurchasedItems] = useState<PurchasedItem[]>([]);
     const [groceryItems, setGroceryItems] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
@@ -322,6 +335,42 @@ export default function Dashboard() {
         fetchGroceryItems();
     };
 
+    const handleExportDates = () => {
+        // Combine purchased and grocery items into one array if needed
+        const items = purchasedItems;
+        let content = "BEGIN:VCALENDAR\nCALSCALE:GREGORIAN\nVERSION:2.0\nX-APPLE-CALENDAR-COLOR:#f5bf42\nX-WR-CALNAME:Expiration Dates\n";
+
+        content += items.map(item => {
+            const createdDate = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Convert current date to UTC format
+            const expirationDate = new Date(item.expirationDate).toISOString().split('T')[0].replace(/-/g, ''); // Convert expirationDate to YYYYMMDD
+    
+            return `BEGIN:VEVENT
+CREATED:${createdDate}
+DTSTART;VALUE=DATE:${expirationDate}
+SEQUENCE:0
+SUMMARY:${item.name} expires
+TRANSP:TRANSPARENT
+UID:${uuid4()}
+END:VEVENT\n`;
+        }).join("");
+        
+        content += "END:VCALENDAR";
+        // blob for ics file
+        const blob = new Blob([content], { type: "text/calendar" });
+        const url = URL.createObjectURL(blob);
+
+        // temporary link element for downloading file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "expiration_dates.ics";
+        document.body.appendChild(link);
+
+        // simulated click + remove element
+        link.click();
+        document.body.removeChild(link);
+    };
+    
+
 
     const fetchPurchasedItems = async () => {
         if (!householdID) return;
@@ -447,6 +496,7 @@ export default function Dashboard() {
         fetchGroceryItems();
         setIsExpiredMode(false);
         setIsToggled(false);
+        setSearchTerm('');
     };
 
 
@@ -654,6 +704,12 @@ export default function Dashboard() {
                             {isCollapsed ? '▲' : '▼'}
                         </button>
                     </h2>
+                    <button
+                        className="add-item-button"
+                        onClick={() => {handleExportDates()}} // Open the modal when clicked
+                    >
+                        EXPORT EXPIRATION DATES
+                    </button>
                     {/* Add Item Button*/}
                     <button
                         className="add-item-button"
@@ -661,6 +717,7 @@ export default function Dashboard() {
                     >
                         ADD ITEM +
                     </button>
+                    
                 </div>
                 {!isCollapsed && (
                     <ul className="dashboard-item-list">
