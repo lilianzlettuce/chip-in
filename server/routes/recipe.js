@@ -113,4 +113,39 @@ router.delete('/:householdId/:recipeId', async (req, res) => {
     }
 });
 
+// search for recipes by search term
+router.get('/search/:householdId', async (req, res) => {
+    const { householdId } = req.params;
+    const { searchTerm } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(householdId)) {
+        return res.status(400).json({ error: 'Invalid household ID format' });
+    }
+
+    try {
+        const household = await Household.findById(householdId);
+        if (!household) {
+            return res.status(404).json({ error: 'Household not found' });
+        }
+
+        if (!searchTerm) {
+            return res.status(400).json({ error: 'Search term is required' });
+        }
+
+        const lowerCaseSearchTerm = searchTerm.toLowerCase();
+        const matchingRecipes = household.recipes.filter(recipe => {
+            return (
+                (typeof recipe.title === 'string' && recipe.title.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                (typeof recipe.ingredients === 'string' && recipe.ingredients.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                (typeof recipe.directions === 'string' && recipe.directions.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                (Array.isArray(recipe.tags) && recipe.tags.some(tag => typeof tag === 'string' && tag.toLowerCase().includes(lowerCaseSearchTerm)))
+            );
+        });
+
+        res.status(200).json(matchingRecipes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useUserContext } from '../UserContext';
 import { useParams } from 'react-router-dom';
 import './RecipeCard.css';
 
@@ -19,7 +18,6 @@ interface RecipeCardProps {
 }
 
 function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
-    const { user } = useUserContext();
     const { householdId } = useParams();
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -69,7 +67,7 @@ function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
                     <button onClick={handleDelete}>🗑️</button>
                 </div>
             </div>
-            <p className="added-by">Added by {recipe.owner || 'Unknown'}</p>
+            <p className="added-by">Added by {recipe.owner}</p>
             <p className="ingredients-count">
                 {ingredientsArray.length} ingredients
             </p>
