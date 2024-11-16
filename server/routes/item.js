@@ -27,7 +27,6 @@ router.delete('/:listType/:id', async (req, res) => {
 
     res.status(200).json({ message: "Item deleted" });
   } catch (err) {
-    // console.log('err deleting item', err)
     res.status(500).json({ error: err.message });
   }
 });
@@ -123,7 +122,7 @@ router.post('/addtopurchased', async (req, res) => {
       member: userId,
       split: defaultSplit
     }));
-  }  
+  }
 
   console.log(splits)
 
@@ -142,8 +141,6 @@ router.post('/addtopurchased', async (req, res) => {
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-
-    // console.log('divider')
     for (const split of splits) {
       const splitCost = split.split * cost;
       // console.log(splitCost)
@@ -199,33 +196,29 @@ router.get('/search/:id', async (req, res) => {
     let itemCost = [];
     let flag = 0;
     for (let i = 0; i < itemsShared.length; i++) {
-       // it's in purchase list, cost of 0 means it has not been purchased yet
-       if (itemsShared[i].cost != 0) {
-         //console.log("shared item: ", itemsShared[i].name);
-         totalBought += 1;
-         const numberOfSharers = itemsShared[i].sharedBetween.length || 1;
-         realcost += (itemsShared[i].cost / 100) / numberOfSharers;
-         splitCostItems = (itemsShared[i].cost / 100) / numberOfSharers;
+      // it's in purchase list, cost of 0 means it has not been purchased yet
+      if (itemsShared[i].cost != 0) {
+        //console.log("shared item: ", itemsShared[i].name);
+        totalBought += 1;
+        const numberOfSharers = itemsShared[i].sharedBetween.length || 1;
+        realcost += (itemsShared[i].cost / 100) / numberOfSharers;
+        splitCostItems = (itemsShared[i].cost / 100) / numberOfSharers;
 
-         flag = 0;
-         for (let j = 0; j < itemCost.length; j++) {
-            if (itemCost[j][0] === itemsShared[i].name) {
-              itemCost[j][1] += splitCostItems;
-              flag = 1;
-              break;
-            }
-         }
+        flag = 0;
+        for (let j = 0; j < itemCost.length; j++) {
+          if (itemCost[j][0] === itemsShared[i].name) {
+            itemCost[j][1] += splitCostItems;
+            flag = 1;
+            break;
+          }
+        }
 
-         if (flag === 0) {
+        if (flag === 0) {
           itemCost.push([itemsShared[i].name, splitCostItems]);
-         }
-         
-       }
-    }
-    //console.log(itemCost);
+        }
 
-    //let purchasecost = items.reduce((sum, item) => sum + item.cost, 0);
-    //let total = items.length;
+      }
+    }
     res.status(200).send({ totalItems: totalBought, totalCost: realcost, itemBreakdown: itemCost });
   } catch (err) {
     console.log("server db connection error")
