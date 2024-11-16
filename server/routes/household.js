@@ -385,6 +385,23 @@ router.get("/:id/purchasedlist", async (req, res) => {
   }
 });
 
+// get all itmes in purchase history
+router.get("/:id/purchaseHistory", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    res.status(200).json(household.purchaseHistory);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // leave household
 router.post("/leave/:id", async (req, res) => {
   const { userId } = req.body;

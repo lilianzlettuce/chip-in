@@ -17,6 +17,17 @@ export type AlertType = {
     recipients: string[];
     readBy: string[];
 }
+
+export type ItemType = {
+    _id: string;
+    archived: boolean;
+    cost: number;
+    expirationDate: Date;
+    name: string;
+    purchaseDate: Date;
+    purchasedBy: string;
+    sharedBetween: string[];
+}
   
 export type PreferencesType = {
     theme: string;
