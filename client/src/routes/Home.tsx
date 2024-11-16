@@ -27,6 +27,7 @@ export default function Home() {
   const [ purchaseHistory, updatePurchaseHistory ] = useState<ItemType[]>([]);
   const [ totalExpenses, updateTotalExpenses ] = useState<string>("0");
   const [ householdAge, updateHouseholdAge ] = useState(100);
+  const [ avgExpenditure, updateAvgExpenditure ] = useState(100);
 
   // Chart data
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
@@ -182,6 +183,17 @@ export default function Home() {
     }
   }, [purchaseHistory]);
 
+  // Update avg expenditure when per month data fetched
+  useEffect(() => {
+    updateAvgExpenditure(Number(totalExpenses) / expenditurePerMonthData?.labels.length);
+  }, [expenditurePerMonthData]);
+
+  if (!(householdName && householdMembers && purchaseHistory && expenditurePerMonthData)) {
+    return (
+      <div>Loading...</div>
+    );
+  }
+
   return (
     <div>
       <Alerts />
@@ -195,11 +207,14 @@ export default function Home() {
           Total amount spent: ${totalExpenses}
         </div>
         <div>
+          Average expenditure per month: ${avgExpenditure}
+        </div>
+        {/*<div>
           Since {purchaseHistory[0]?.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
         </div>
         <div>
           Over the course of: {householdAge} days
-        </div>
+        </div>*/}
       </div>
       <h1>Members:</h1>
       <div>
