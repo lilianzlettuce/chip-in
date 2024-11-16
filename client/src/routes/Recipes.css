@@ -24,10 +24,10 @@
 }
 
 .recipe-cards {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 16px; 
-    justify-content: left; 
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 .recipes-toolbar {
@@ -117,4 +117,12 @@
 
 .sort-by-dropdown option {
     color: #333;
+}
+
+.no-recipes-message {
+    text-align: center;
+    font-size: 1.2em;
+    color: #118288;
+    font-weight: bold;
+    margin-top: 20px;
 }

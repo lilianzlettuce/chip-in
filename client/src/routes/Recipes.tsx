@@ -13,6 +13,7 @@ interface Recipe {
     email: string;
     ingredients: string;
     directions: string;
+    _id?: string;
 }
 
 interface User {
@@ -34,6 +35,7 @@ export default function Recipes() {
     const [error, setError] = useState<string | null>(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
     const [currIngredients, setCurrIngredients] = useState<{ _id: string; name: string }[]>([]);
+    const [selectedUser, setSelectedUser] = useState<string>(''); // filtering by creator
 
     useEffect(() => {
         if (!householdId) {
@@ -96,6 +98,10 @@ export default function Recipes() {
         fetchData();
     }, [householdId]);
 
+    const handleDeleteRecipe = (id: string) => {
+        setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe._id !== id));
+    };
+
     const getFilteredPurchasedItems = async () => {
         if (!householdId) return;
 
@@ -110,8 +116,8 @@ export default function Recipes() {
             console.log('Purchased Items Data:', data);
 
             const filteredData = data.filter((item: PurchasedItem) => {
-                return item.category === "Food" && 
-                item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
+                return item.category === "Food" &&
+                    item.sharedBetween.some(sharedWith => sharedWith.username === user?.username);
             });
 
             console.log('Filtered Items Data:', filteredData);
@@ -120,19 +126,21 @@ export default function Recipes() {
         } catch (error) {
             console.error('Error fetching purchased items:', error);
         }
-        
+
     };
 
     useEffect(() => {
         getFilteredPurchasedItems();
     }, [user, householdId]);
 
-
     const handleSaveRecipe = (newRecipe: { title: string; ingredients: string; directions: string }) => {
         setRecipes(prevRecipes => [...prevRecipes, { ...newRecipe, tags: [], owner: user?.username || 'Unknown', email: user?.email || '' }]);
-        setIsRecipeModalOpen(false); 
+        setIsRecipeModalOpen(false);
     };
 
+    const filteredRecipes = selectedUser
+        ? recipes.filter(recipe => recipe.owner === selectedUser)
+        : recipes;
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -153,18 +161,16 @@ export default function Recipes() {
                     <button className="clear-button">&times;</button>
                 </div>
                 <button className="generate-recipe-btn"
-                /*onClick={() => setIsRecipeModalOpen(true)}*/
-                onClick={() => {
-                    setIsRecipeModalOpen(true);
-                    //console.log("Generate Recipe button clicked"); // Confirm button click
-                }}
+                    onClick={() => {
+                        setIsRecipeModalOpen(true);
+                    }}
                 >GENERATE RECIPE 🍽️</button>
             </div>
 
             <div className="recipes-toolbar">
                 <div className="sort-by-dropdown">
                     <label htmlFor="sort">View Recipes By: </label>
-                    <select id="sort">
+                    <select id="sort" onChange={(e) => setSelectedUser(e.target.value)}>
                         <option value="">All Users ...</option>
                         {householdUsers.map(user => (
                             <option key={user._id} value={user.username}>
@@ -176,19 +182,25 @@ export default function Recipes() {
             </div>
 
             <div className="recipe-cards">
-                {recipes.map((recipe, index) => (
-                    <RecipeCard key={index} recipe={recipe} />
-                ))}
+                {filteredRecipes.length > 0 ? (
+                    filteredRecipes.map((recipe, index) => (
+                        <RecipeCard
+                            key={index}
+                            recipe={recipe}
+                            onDelete={handleDeleteRecipe}
+                        />
+                    ))
+                ) : (
+                    <div className="no-recipes-message">No recipes</div>
+                )}
             </div>
 
             {isRecipeModalOpen && (
-                <AddRecipeModal onClose={() => setIsRecipeModalOpen(false)} 
-                 onSave={handleSaveRecipe}
-                 filteredIngredients={currIngredients}
+                <AddRecipeModal onClose={() => setIsRecipeModalOpen(false)}
+                    onSave={handleSaveRecipe}
+                    filteredIngredients={currIngredients}
                 />
             )}
         </div>
-
-        
     );
 }

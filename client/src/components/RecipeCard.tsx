@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useUserContext } from '../UserContext';
+import { useParams } from 'react-router-dom';
 import './RecipeCard.css';
 
 interface Recipe {
@@ -8,17 +10,39 @@ interface Recipe {
     email?: string;
     ingredients: string;
     directions: string;
+    _id?: string;
 }
 
 interface RecipeCardProps {
     recipe: Recipe;
+    onDelete: (id: string) => void;
 }
 
-function RecipeCard({ recipe }: RecipeCardProps) {
+function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
+    const { user } = useUserContext();
+    const { householdId } = useParams();
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);
+    };
+
+    const handleDelete = async () => {
+        if (!recipe._id) return;
+
+        try {
+            const response = await fetch(`http://localhost:6969/recipes/${householdId}/${recipe._id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                onDelete(recipe._id);
+            } else {
+                console.error('Failed to delete the recipe');
+            }
+        } catch (error) {
+            console.error('Error deleting the recipe:', error);
+        }
     };
 
     const ingredientsArray = recipe.ingredients
@@ -42,7 +66,7 @@ function RecipeCard({ recipe }: RecipeCardProps) {
                 <h3 className="recipe-card-title">{recipe.title || 'Untitled'}</h3>
                 <div className="recipe-actions">
                     <button>✏️</button>
-                    <button>🗑️</button>
+                    <button onClick={handleDelete}>🗑️</button>
                 </div>
             </div>
             <p className="added-by">Added by {recipe.owner || 'Unknown'}</p>
