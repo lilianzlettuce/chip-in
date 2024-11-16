@@ -1025,7 +1025,7 @@ const Stats: React.FC = () => {
         });
       }
     }
-
+ 
     return () => {
       chartRef.current?.destroy();
     };
