@@ -536,10 +536,19 @@ router.get("/:id/expensesByItem", async (req, res) => {
     });
 
     // Separate data into Chart.js compatible arrays
-    let labels = sortedExpenses.map(exp => exp[0]);
-    let data = sortedExpenses.map(exp => exp[1]);
+    let expenseLabels = sortedExpenses.map(exp => exp[0]);
+    let expenseData = sortedExpenses.map(exp => exp[1]);
 
-    res.status(200).json({ labels, data });
+    res.status(200).json({ 
+      expenses: {
+        labels: expenseLabels, 
+        data: expenseData
+      },
+      /*frequencies: {
+        labels: freqLabels, 
+        data: freqData
+      },*/
+    });
   } catch (err) {
     console.log(err)
     res.status(500).json({ error: err.message });

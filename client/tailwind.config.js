@@ -13,7 +13,8 @@ export default {
         },
         navy: "#325374",
         emerald: "#006D77",
-        black: "#171414"
+        black: "#171414",
+        light: "#FFF9F1"
       },
       boxShadow: {
         "auth-card": "0 4px 12px rgba(0, 0, 0, 0.1)",

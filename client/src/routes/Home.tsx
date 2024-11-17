@@ -38,6 +38,7 @@ export default function Home() {
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
   const [ expensesByCategory, setExpensesByCategory ] = useState<any>();
   const [ expensesByItem, setExpensesByItem ] = useState<any>();
+  const [ numBarsDisplayed ] = useState(20);
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -216,16 +217,16 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json();
         
-        console.log(data.labels)
-        console.log(data.data)
+        console.log(data.expenses.labels)
+        console.log(data.expenses.data)
 
         // Intialize chart data
         setExpensesByItem({
-          labels: data.labels, 
+          labels: data.expenses.labels.slice(0, numBarsDisplayed), 
           datasets: [
             {
               label: "Expenditure",
-              data: data.data,
+              data: data.expenses.data.slice(0, numBarsDisplayed),
               backgroundColor: [
                 "rgba(75,192,192,1)",
                 "#ecf0f1",
@@ -498,11 +499,11 @@ export default function Home() {
                 <div>
                   {item.name}
                 </div>
-                <div className="w-fit bg-navy text-white text-sm p-2 py-1 rounded-full">
+                <div className="w-fit bg-light text-black text-sm p-2 py-1 rounded-full">
                   ${Number(item.cost / 100).toFixed(2)}
                 </div>
               </div>
-              <div className="text-neutral-200 text-sm font-medium">
+              <div className="bg-navy text-white text-sm font-medium p-2 py-1 rounded">
                 {item.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
               </div>
               <div className="min-w-[400px] flex gap-1 justify-end">
