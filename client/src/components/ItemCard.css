@@ -175,19 +175,18 @@
   opacity: 1;
 }
 
-/* Specific tooltip colors */
 .tooltip-red {
-  background-color: #f87171; /* Red hover color */
+  background-color: #f87171; 
 }
 
 .tooltip-green {
-  background-color: #84a59d; /* Green hover color */
+  background-color: #84a59d; 
 }
 
 .tooltip-blue {
-  background-color: #60a5fa; /* Blue hover color */
+  background-color: #60a5fa; 
 }
 
 .tooltip-yellow {
-  background-color: #edc058; /* Yellow hover color */
+  background-color: #edc058; 
 }

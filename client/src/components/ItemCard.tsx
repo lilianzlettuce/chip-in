@@ -146,7 +146,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
                             onClick={isShared ? onReturn : () => { }}>
                             <FontAwesomeIcon icon={faRotateLeft} className="text-white text-lg" />
                         </button>
-                        <div className="tooltip tooltip-yellow">Return</div>
+                        <div className="tooltip tooltip-yellow">Returned</div>
                     </div>
                 )}
             </div>
