@@ -17,6 +17,23 @@ export type AlertType = {
     recipients: string[];
     readBy: string[];
 }
+
+export type ItemType = {
+    _id: string;
+    archived: boolean;
+    cost: number;
+    expirationDate: Date;
+    name: string;
+    purchaseDate: Date;
+    purchasedBy: {
+        _id: string;
+        username: string;
+    };
+    sharedBetween: {
+        _id: string;
+        username: string;
+    }[];
+}
   
 export type PreferencesType = {
     theme: string;
@@ -33,6 +50,7 @@ export type UserContextType = {
 
 export type UserType = {
     id: string,
+    _id?: string,
     username: string,
     email: string,
     households: string[],
@@ -40,5 +58,5 @@ export type UserType = {
         expirationNotif: "all" | "relevant" | "none",
         paymentNotif:  "all" | "relevant" | "none",
     },
-    //preferences:  boolean[],
+    pfp: string,
 }

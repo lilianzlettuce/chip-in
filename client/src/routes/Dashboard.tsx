@@ -737,7 +737,7 @@ END:VEVENT\n`;
                             </>
                         ) : (
                             purchasedItems.map((item: any) => (
-                                <li key={item['_id']}>
+                                <li className="w-[31%]" key={item['_id']}>
                                     <ItemCard
                                         id={item['_id']}
                                         category={item['category'] || 'Unknown'}
@@ -826,7 +826,7 @@ END:VEVENT\n`;
                             )
                         ) : (
                             groceryItems.map((item: any) => (
-                                <li key={item['_id']}>
+                                <li className="w-[31%]" key={item['_id']}>
                                     <ItemCard
                                         id={item['_id']}
                                         category={item['category']}

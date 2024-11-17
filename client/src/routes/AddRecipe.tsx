@@ -145,6 +145,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                         <div className="fill-container">
                             <div className="input-add-container">
                                 <input
+                                    className="text-white"
                                     type="text"
                                     placeholder="Ingredient"
                                     value={addIngredients}

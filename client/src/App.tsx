@@ -49,7 +49,7 @@ export default function App({ message }: AppProps) {
       <UserProvider>
         <div className="flex justify-between items-start">
           <Navbar />
-          <div className="w-4/5 min-h-screen p-4 flex flex-col justify-between">
+          <div className="w-4/5 min-h-screen pt-4 pr-12 flex flex-col justify-between">
             <Outlet />
             <div>
               <a target="_blank">

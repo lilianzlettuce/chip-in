@@ -385,6 +385,204 @@ router.get("/:id/purchasedlist", async (req, res) => {
   }
 });
 
+// get all items in purchase history
+router.get("/:id/purchaseHistory", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate({
+      path: 'purchaseHistory',
+      populate: [
+        {
+          path: 'purchasedBy',
+          select: 'username'
+        },
+        {
+          path: 'sharedBetween',
+          select: 'username'
+        }
+      ]
+    });
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    // Sort items in ascending order by date
+    household.purchaseHistory.sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
+
+    res.status(200).json(household.purchaseHistory);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get expenditure per month
+router.get("/:id/expenditurePerMonth", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    // Process data to group expenditures by month
+    const expenditureByMonth = household.purchaseHistory.reduce((acc, item) => {
+      // Convert purchaseDate to a "YYYY-MM" string
+      const purchaseDate = new Date(item.purchaseDate);
+      const month = `${purchaseDate.getFullYear()}-${String(purchaseDate.getMonth() + 1).padStart(2, '0')}`;
+
+      // Accumulate cost for this month
+      acc[month] = (acc[month] || 0) + (item.cost / 100);
+
+      return acc;
+    }, {});
+
+    // Sort keys chronologically
+    const sortedKeys = Object.keys(expenditureByMonth).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    );
+
+    // Create sorted map from sorted keys
+    const sortedExpenditures = {};
+    sortedKeys.forEach(key => {
+      sortedExpenditures[key] = expenditureByMonth[key];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let labels = Object.keys(sortedExpenditures);
+    let data = Object.values(sortedExpenditures);
+
+    // Reformat labels
+    labels = labels.map(label => {
+      const [year, month] = label.split("-");
+      return new Date(parseInt(year), parseInt(month) - 1).toLocaleString("default", { month: "long", year: "numeric" });
+    });
+
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get expenses by category
+router.get("/:id/expensesByCategory", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    // Process data to group expenditures by category
+    const expensesByCategory = household.purchaseHistory.reduce((acc, item) => {
+      const category = item.category;
+
+      // Accumulate cost for this category
+      acc[category] = (acc[category] || 0) + (item.cost / 100);
+
+      return acc;
+    }, {});
+
+    // Create array sorted by expense value 
+    let sortedExpenses = [];
+    for (let cat in expensesByCategory) {
+      sortedExpenses.push([cat, expensesByCategory[cat]]);
+    }
+    sortedExpenses.sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let labels = sortedExpenses.map(exp => exp[0]);
+    let data = sortedExpenses.map(exp => exp[1]);
+
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get expenses by item
+router.get("/:id/expensesByItem", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    /* Expenses */
+
+    // Process data to group expenses by item name
+    const expensesByItem = household.purchaseHistory.reduce((acc, item) => {
+      // Convert to lower case
+      const name = item.name.toLowerCase().trim();
+
+      // Accumulate cost for this item
+      acc[name] = (acc[name] || 0) + (item.cost / 100);
+      return acc;
+    }, {});
+
+    // Create array sorted by expense value 
+    let sortedExpenses = [];
+    for (let item in expensesByItem) {
+      sortedExpenses.push([item, expensesByItem[item]]);
+    }
+    sortedExpenses.sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let expenseLabels = sortedExpenses.map(exp => exp[0]);
+    let expenseData = sortedExpenses.map(exp => exp[1]);
+
+    /* Frequencies */
+
+    // Process data to group frequencies by item name
+    const freqsByItem = household.purchaseHistory.reduce((acc, item) => {
+      // Convert to lower case
+      const name = item.name.toLowerCase().trim();
+
+      // Accumulate cost for this item
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Create array sorted by expense value 
+    let sortedFreqs = [];
+    for (let item in freqsByItem) {
+      sortedFreqs.push([item, freqsByItem[item]]);
+    }
+    sortedFreqs.sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let freqLabels = sortedFreqs.map(freq => freq[0]);
+    let freqData = sortedFreqs.map(freq => freq[1]);
+
+    // Format data to send as result
+    res.status(200).json({ 
+      expenses: {
+        labels: expenseLabels, 
+        data: expenseData
+      },
+      frequencies: {
+        labels: freqLabels, 
+        data: freqData
+      },
+    });
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // leave household
 router.post("/leave/:id", async (req, res) => {
   const { userId } = req.body;
