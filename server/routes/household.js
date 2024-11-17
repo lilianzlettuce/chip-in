@@ -516,7 +516,9 @@ router.get("/:id/expensesByItem", async (req, res) => {
       return res.status(404).json({ message: 'Household not found' });
     }
 
-    // Process data to group expenditures by item name
+    /* Expenses */
+
+    // Process data to group expenses by item name
     const expensesByItem = household.purchaseHistory.reduce((acc, item) => {
       // Convert to lower case
       const name = item.name.toLowerCase().trim();
@@ -539,15 +541,41 @@ router.get("/:id/expensesByItem", async (req, res) => {
     let expenseLabels = sortedExpenses.map(exp => exp[0]);
     let expenseData = sortedExpenses.map(exp => exp[1]);
 
+    /* Frequencies */
+
+    // Process data to group frequencies by item name
+    const freqsByItem = household.purchaseHistory.reduce((acc, item) => {
+      // Convert to lower case
+      const name = item.name.toLowerCase().trim();
+
+      // Accumulate cost for this item
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Create array sorted by expense value 
+    let sortedFreqs = [];
+    for (let item in freqsByItem) {
+      sortedFreqs.push([item, freqsByItem[item]]);
+    }
+    sortedFreqs.sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let freqLabels = sortedFreqs.map(freq => freq[0]);
+    let freqData = sortedFreqs.map(freq => freq[1]);
+
+    // Format data to send as result
     res.status(200).json({ 
       expenses: {
         labels: expenseLabels, 
         data: expenseData
       },
-      /*frequencies: {
+      frequencies: {
         labels: freqLabels, 
         data: freqData
-      },*/
+      },
     });
   } catch (err) {
     console.log(err)

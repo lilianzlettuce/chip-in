@@ -38,7 +38,8 @@ export default function Home() {
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
   const [ expensesByCategory, setExpensesByCategory ] = useState<any>();
   const [ expensesByItem, setExpensesByItem ] = useState<any>();
-  const [ numBarsDisplayed ] = useState(20);
+  const [ frequenciesByItem, setFrequenciesByItem ] = useState<any>();
+  const [ numBarsDisplayed ] = useState(15);
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -219,14 +220,38 @@ export default function Home() {
         
         console.log(data.expenses.labels)
         console.log(data.expenses.data)
+        console.log(data.frequencies.labels)
+        console.log(data.frequencies.data)
 
-        // Intialize chart data
+        // Intialize expenses chart data
         setExpensesByItem({
           labels: data.expenses.labels.slice(0, numBarsDisplayed), 
           datasets: [
             {
               label: "Expenditure",
               data: data.expenses.data.slice(0, numBarsDisplayed),
+              backgroundColor: [
+                "rgba(75,192,192,1)",
+                "#ecf0f1",
+                "#2a71d0",
+                "#325374",
+                "#f3ba2f",
+                "#f28482",
+                "#96c7bbad",
+              ],
+              borderColor: "black",
+              borderWidth: 2
+            }
+          ]
+        });
+
+        // Intialize frequencies chart data
+        setFrequenciesByItem({
+          labels: data.frequencies.labels.slice(0, numBarsDisplayed), 
+          datasets: [
+            {
+              label: "Expenditure",
+              data: data.frequencies.data.slice(0, numBarsDisplayed),
               backgroundColor: [
                 "rgba(75,192,192,1)",
                 "#ecf0f1",
@@ -468,13 +493,47 @@ export default function Home() {
                     text: "Expenses By Item"
                   },
                   legend: {
-                    display: true
+                    display: false
                   },
                   tooltip: {
                     callbacks: {
                       label: function (context) {
                         const value = context.raw as number; // get raw value
                         return `$${Number(value).toFixed(2)}`; // currency format
+                      }
+                    }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+          </div>
+        :
+          <div>Loading...</div>
+        }
+      </div>
+
+      <div className="w-fit flex flex-col">
+        <div>Purchase Frequencies By Item</div>
+        {frequenciesByItem ? 
+          <div className="w-[1000px] h-[300px]">
+            <Bar
+              data={frequenciesByItem}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenses By Item"
+                  },
+                  legend: {
+                    display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.raw as number; // get raw value
+                        return `${value} purchases`; // currency format
                       }
                     }
                   }
