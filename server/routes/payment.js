@@ -8,28 +8,121 @@ import mongoose from 'mongoose';
 const router = express.Router();
 
 //get debts
-router.get('/debts/:id', async (req, res) => {
+// router.get('/debts/:id', async (req, res) => {
+//     const householdId = req.params.id;
+
+//     try {
+//         const household = await Household.findById(householdId).populate({
+//             path: 'debts',
+//             populate: [
+//                 {
+//                     path: 'owedBy',
+//                     select: 'username'
+//                 },
+//                 {
+//                     path: 'owedTo',
+//                     select: 'username'
+//                 }
+//             ]
+//         });
+//         if (!household) {
+//             return res.status(404).json({ message: "Household not found" });
+//         }
+//         res.status(200).json(household.debts);
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+// get debts
+router.patch('/debts/:id', async (req, res) => {
     const householdId = req.params.id;
 
     try {
         const household = await Household.findById(householdId).populate({
             path: 'debts',
             populate: [
-                {
-                    path: 'owedBy',
-                    select: 'username'
-                },
-                {
-                    path: 'owedTo',
-                    select: 'username'
-                }
+                { path: 'owedBy', select: 'username' },
+                { path: 'owedTo', select: 'username' }
             ]
         });
+
         if (!household) {
             return res.status(404).json({ message: "Household not found" });
         }
-        res.status(200).json(household.debts);
+        const debtsMap = new Map();
+        household.debts.forEach((debt) => {
+            const owedById = debt.owedBy._id.toString();
+            const owedToId = debt.owedTo._id.toString();
+            const debtKey = `${owedById}-${owedToId}`;
+            debtsMap.set(debtKey, debt);
+        });
+
+        const processedKeys = new Set();
+
+        // Iterate over each debt to balance
+        for (let debt of household.debts) {
+            const owedById = debt.owedBy._id.toString();
+            const owedToId = debt.owedTo._id.toString();
+            const debtKey = `${owedById}-${owedToId}`;
+            const reverseDebtKey = `${owedToId}-${owedById}`;
+
+            if (processedKeys.has(debtKey) || processedKeys.has(reverseDebtKey)) {
+                continue;
+            }
+            const reverseDebt = debtsMap.get(reverseDebtKey);
+
+            if (reverseDebt) {
+                const amountDifference = debt.amount - reverseDebt.amount;
+
+                console.log("Processing debts between:", owedById, "and", owedToId);
+                console.log("Original debt amounts:", debt.amount, reverseDebt.amount);
+                console.log("Amount difference:", amountDifference);
+
+                let debtAmount = 0;
+                let reverseDebtAmount = 0;
+
+                if (amountDifference > 0) {
+                    debtAmount = amountDifference;
+                    reverseDebtAmount = 0;
+                } else if (amountDifference < 0) {
+                    debtAmount = 0;
+                    reverseDebtAmount = -amountDifference;
+                }
+
+                await Household.findOneAndUpdate(
+                    { _id: householdId },
+                    {
+                        $set: {
+                            "debts.$[debt].amount": debtAmount,
+                            "debts.$[reverseDebt].amount": reverseDebtAmount
+                        }
+                    },
+                    {
+                        arrayFilters: [
+                            { "debt.owedBy": new mongoose.Types.ObjectId(owedById), "debt.owedTo": new mongoose.Types.ObjectId(owedToId) },
+                            { "reverseDebt.owedBy": new mongoose.Types.ObjectId(owedToId), "reverseDebt.owedTo": new mongoose.Types.ObjectId(owedById) }
+                        ],
+                        new: true,
+                        useFindAndModify: false
+                    }
+                );
+
+                processedKeys.add(debtKey);
+                processedKeys.add(reverseDebtKey);
+            }
+        }
+        const updatedHousehold = await Household.findById(householdId).populate({
+            path: 'debts',
+            populate: [
+                { path: 'owedBy', select: 'username' },
+                { path: 'owedTo', select: 'username' }
+            ]
+        });
+        console.log("Updated debts:", updatedHousehold.debts);
+        res.status(200).json(updatedHousehold.debts);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -45,27 +138,29 @@ router.patch('/payall/:id', async (req, res) => {
 
         let household = await Household.findOneAndUpdate(
             {
-              _id: householdId
+                _id: householdId
             },
             {
-              $set: { "debts.$[elem].amount": 0 },
-              $push: { alerts: {
-                category: 'Payment',
-                content: `${owedBy.username} paid ${owedTo.username} back in full!`,
-                recipients: [owedToId],
-                date: new Date()
-              }}
+                $set: { "debts.$[elem].amount": 0 },
+                $push: {
+                    alerts: {
+                        category: 'Payment',
+                        content: `${owedBy.username} paid ${owedTo.username} back in full!`,
+                        recipients: [owedToId],
+                        date: new Date()
+                    }
+                }
             },
             {
-              arrayFilters: [
-                { "elem.owedBy": owedById, "elem.owedTo": owedToId }
-              ],
-              new: true,
-              useFindAndModify: false
+                arrayFilters: [
+                    { "elem.owedBy": owedById, "elem.owedTo": owedToId }
+                ],
+                new: true,
+                useFindAndModify: false
             }
-        ); 
+        );
         if (!household) {
-          return res.status(404).json({ message: "Household not found" });
+            return res.status(404).json({ message: "Household not found" });
         }
         res.status(200).json(household.debts);
     } catch (err) {
@@ -88,12 +183,14 @@ router.patch('/partialpay/:id', async (req, res) => {
             },
             {
                 $inc: { "debts.$[elem].amount": -amount },
-                $push: { alerts: {
-                  category: 'Payment',
-                  content: `${owedBy.username} paid ${owedTo.username} back \$${(amount / 100).toFixed(2)}!`,
-                  recipients: [owedToId],
-                  date: new Date()
-                }}
+                $push: {
+                    alerts: {
+                        category: 'Payment',
+                        content: `${owedBy.username} paid ${owedTo.username} back \$${(amount / 100).toFixed(2)}!`,
+                        recipients: [owedToId],
+                        date: new Date()
+                    }
+                }
             },
             {
                 arrayFilters: [
@@ -102,9 +199,9 @@ router.patch('/partialpay/:id', async (req, res) => {
                 new: true,
                 useFindAndModify: false
             }
-        ); 
+        );
         if (!household) {
-          return res.status(404).json({ message: "Household not found" });
+            return res.status(404).json({ message: "Household not found" });
         }
         res.status(200).json(household.debts);
     } catch (err) {
