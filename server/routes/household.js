@@ -391,10 +391,12 @@ router.get("/:id/purchaseHistory", async (req, res) => {
 
   try {
     const household = await Household.findById(id).populate('purchaseHistory');
-
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
+
+    // Sort items in ascending order by date
+    household.purchaseHistory.sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
 
     res.status(200).json(household.purchaseHistory);
   } catch (err) {

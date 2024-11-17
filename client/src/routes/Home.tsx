@@ -32,6 +32,7 @@ export default function Home() {
   // Chart data
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
   const [ expensesByCategory, setexpensesByCategory ] = useState<any>();
+  const [ expensesByItem, setexpensesByItem ] = useState<any>();
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -182,12 +183,52 @@ export default function Home() {
               label: "Expenditure",
               data: data.data,
               backgroundColor: [
-                "#96c7bbad",
+                "rgba(75,192,192,1)",
                 "#ecf0f1",
+                "#2a71d0",
                 "#325374",
                 "#f3ba2f",
-                "#2a71d0",
+                "#f28482",
+                "#96c7bbad",
+              ],
+              borderColor: "black",
+              borderWidth: 2
+            }
+          ]
+        });
+      } else {
+        console.log("Failed to fetch purchase history")
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+    }
+
+    // Expenses by item
+    try {
+      // GET request to server
+      const url = `http://localhost:6969/household/${householdId}/expensesByItem`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        
+        console.log(data.labels)
+        console.log(data.data)
+
+        // Intialize chart data
+        setexpensesByCategory({
+          labels: data.labels, 
+          datasets: [
+            {
+              label: "Expenditure",
+              data: data.data,
+              backgroundColor: [
                 "rgba(75,192,192,1)",
+                "#ecf0f1",
+                "#2a71d0",
+                "#325374",
+                "#f3ba2f",
+                "#f28482",
+                "#96c7bbad",
               ],
               borderColor: "black",
               borderWidth: 2
@@ -337,7 +378,7 @@ export default function Home() {
       <div className="w-fit flex flex-col">
         <div>Expenses By Category</div>
         {expensesByCategory ? 
-          <div className="w-[400px] h-[400px]">
+          <div className="w-[300px] h-[300px]">
             <Pie
               data={expensesByCategory}
               options={{
@@ -366,6 +407,26 @@ export default function Home() {
         :
           <div>Loading...</div>
         }
+      </div>
+
+      <div>
+        <h1>Entire purchase history</h1>
+        <div className="flex flex-col gap-2">
+          {[...purchaseHistory].reverse().map((item, i) => (
+            <div className="flex gap-2 items-center pb-2 border-solid border-black border-b-2"
+                key={i}>
+              <div>
+                {item.name}
+              </div>
+              <div className="w-fit bg-navy text-white p-2 py-1 rounded">
+                ${Number(item.cost / 100).toFixed(2)}
+              </div>
+              <div>
+                {item.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
