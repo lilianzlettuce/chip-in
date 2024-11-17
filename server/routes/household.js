@@ -390,7 +390,19 @@ router.get("/:id/purchaseHistory", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const household = await Household.findById(id).populate('purchaseHistory');
+    const household = await Household.findById(id).populate({
+      path: 'purchaseHistory',
+      populate: [
+        {
+          path: 'purchasedBy',
+          select: 'username'
+        },
+        {
+          path: 'sharedBetween',
+          select: 'username'
+        }
+      ]
+    });
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
@@ -466,10 +478,9 @@ router.get("/:id/expensesByCategory", async (req, res) => {
 
     // Process data to group expenditures by category
     const expensesByCategory = household.purchaseHistory.reduce((acc, item) => {
-      // Convert purchaseDate to a "YYYY-MM" string
       const category = item.category;
 
-      // Accumulate cost for this month
+      // Accumulate cost for this category
       acc[category] = (acc[category] || 0) + (item.cost / 100);
 
       return acc;
@@ -479,6 +490,46 @@ router.get("/:id/expensesByCategory", async (req, res) => {
     let sortedExpenses = [];
     for (let cat in expensesByCategory) {
       sortedExpenses.push([cat, expensesByCategory[cat]]);
+    }
+    sortedExpenses.sort((a, b) => {
+      return b[1] - a[1];
+    });
+
+    // Separate data into Chart.js compatible arrays
+    let labels = sortedExpenses.map(exp => exp[0]);
+    let data = sortedExpenses.map(exp => exp[1]);
+
+    res.status(200).json({ labels, data });
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// get expenses by item
+router.get("/:id/expensesByItem", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const household = await Household.findById(id).populate('purchaseHistory');
+    if (!household) {
+      return res.status(404).json({ message: 'Household not found' });
+    }
+
+    // Process data to group expenditures by item name
+    const expensesByItem = household.purchaseHistory.reduce((acc, item) => {
+      // Convert to lower case
+      const name = item.name.toLowerCase().trim();
+
+      // Accumulate cost for this item
+      acc[name] = (acc[name] || 0) + (item.cost / 100);
+      return acc;
+    }, {});
+
+    // Create array sorted by expense value 
+    let sortedExpenses = [];
+    for (let item in expensesByItem) {
+      sortedExpenses.push([item, expensesByItem[item]]);
     }
     sortedExpenses.sort((a, b) => {
       return b[1] - a[1];

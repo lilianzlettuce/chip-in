@@ -9,9 +9,13 @@ import { UserType, ItemType } from '../types';
 
 import { Line, Pie, Bar } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, 
-  PieController, ArcElement, Tooltip, Legend, ChartOptions, ChartData } from 'chart.js';
+  PieController, ArcElement, Tooltip, Legend, 
+  BarElement } from 'chart.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretDown, faCaretUp, faCrown } from '@fortawesome/free-solid-svg-icons';
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, 
-  PieController, ArcElement, Tooltip, Legend);
+  PieController, ArcElement, Tooltip, Legend,
+  BarElement);
 
 export default function Home() {
   const { householdId } = useParams();
@@ -22,17 +26,18 @@ export default function Home() {
   const userId = user?.id;
 
   // Household info variables
-  const [ householdName, updateHouseholdName ] = useState("");
-  const [ householdMembers, updateHouseholdMembers ] = useState<UserType[]>([]);
-  const [ purchaseHistory, updatePurchaseHistory ] = useState<ItemType[]>([]);
-  const [ totalExpenses, updateTotalExpenses ] = useState<string>("0");
-  const [ householdAge, updateHouseholdAge ] = useState(100);
-  const [ avgExpenditure, updateAvgExpenditure ] = useState(100);
+  const [ householdName, setHouseholdName ] = useState("");
+  const [ householdMembers, setHouseholdMembers ] = useState<UserType[]>([]);
+  const [ purchaseHistory, setPurchaseHistory ] = useState<ItemType[]>([]);
+  const [ historyDisplayedLength, setHistoryDisplayedLength ] = useState(0);
+  const [ totalExpenses, setTotalExpenses ] = useState<string>("0");
+  const [ householdAge, setHouseholdAge ] = useState(100);
+  const [ avgExpenditure, setAvgExpenditure ] = useState(100);
 
   // Chart data
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
-  const [ expensesByCategory, setexpensesByCategory ] = useState<any>();
-  const [ expensesByItem, setexpensesByItem ] = useState<any>();
+  const [ expensesByCategory, setExpensesByCategory ] = useState<any>();
+  const [ expensesByItem, setExpensesByItem ] = useState<any>();
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -54,7 +59,7 @@ export default function Home() {
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
-        updateHouseholdName(data.name);
+        setHouseholdName(data.name);
       } else {
         console.log("Failed to fetch household info")
       }
@@ -68,7 +73,7 @@ export default function Home() {
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
-        updateHouseholdMembers(data);
+        setHouseholdMembers(data);
       } else {
         console.log("Failed to fetch household info")
       }
@@ -116,7 +121,7 @@ export default function Home() {
           ...item,
           purchaseDate: new Date(item.purchaseDate),
         }));
-        updatePurchaseHistory(parsedData);
+        setPurchaseHistory(parsedData);
         console.log(parsedData);
       } else {
         console.log("Failed to fetch purchase history")
@@ -158,7 +163,7 @@ export default function Home() {
           ]
         });
       } else {
-        console.log("Failed to fetch purchase history")
+        console.log("Failed to fetch expenses per month")
       }
     } catch (error) {
       console.error('Error making request:', error);
@@ -176,7 +181,7 @@ export default function Home() {
         console.log(data.data)
 
         // Intialize chart data
-        setexpensesByCategory({
+        setExpensesByCategory({
           labels: data.labels, 
           datasets: [
             {
@@ -197,7 +202,7 @@ export default function Home() {
           ]
         });
       } else {
-        console.log("Failed to fetch purchase history")
+        console.log("Failed to fetch expenses by category")
       }
     } catch (error) {
       console.error('Error making request:', error);
@@ -215,7 +220,7 @@ export default function Home() {
         console.log(data.data)
 
         // Intialize chart data
-        setexpensesByCategory({
+        setExpensesByItem({
           labels: data.labels, 
           datasets: [
             {
@@ -236,7 +241,7 @@ export default function Home() {
           ]
         });
       } else {
-        console.log("Failed to fetch purchase history")
+        console.log("Failed to fetch expenses by item")
       }
     } catch (error) {
       console.error('Error making request:', error);
@@ -250,8 +255,14 @@ export default function Home() {
 
   // Update when purchase history fetched
   useEffect(() => {
+    // Set history displayed length
+    setHistoryDisplayedLength((purchaseHistory.length >= 10) ? 10 : purchaseHistory.length);
+
+    // Calculate total expenses
     let expenses = purchaseHistory.reduce((sum, item) => sum + (item.cost || 0), 0);
-    updateTotalExpenses((expenses / 100).toFixed(2));
+    setTotalExpenses((expenses / 100).toFixed(2));
+
+    // Calculate household age
     if (purchaseHistory[0]) {
       const creationDate = purchaseHistory[0].purchaseDate;
       const currentDate = new Date(); // Current date
@@ -261,13 +272,13 @@ export default function Home() {
 
       // Convert the difference to days
       const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
-      updateHouseholdAge(differenceInDays);
+      setHouseholdAge(differenceInDays);
     }
   }, [purchaseHistory]);
 
   // Update avg expenditure when per month data fetched
   useEffect(() => {
-    updateAvgExpenditure(Number(totalExpenses) / expenditurePerMonthData?.labels.length);
+    setAvgExpenditure(Number(totalExpenses) / expenditurePerMonthData?.labels.length);
   }, [expenditurePerMonthData]);
 
   if (!(householdName && householdMembers && purchaseHistory && expenditurePerMonthData)) {
@@ -277,7 +288,7 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="">
       <Alerts />
       <h1 className="text-xl font-bold">{householdName}</h1>
       <h1>Aggregate data:</h1>
@@ -291,12 +302,12 @@ export default function Home() {
         <div>
           Average expenditure per month: ${avgExpenditure}
         </div>
-        {/*<div>
+        <div>
           Since {purchaseHistory[0]?.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
         </div>
         <div>
           Over the course of: {householdAge} days
-        </div>*/}
+        </div>
       </div>
       <h1>Members:</h1>
       <div>
@@ -409,24 +420,134 @@ export default function Home() {
         }
       </div>
 
-      <div>
-        <h1>Entire purchase history</h1>
-        <div className="flex flex-col gap-2">
-          {[...purchaseHistory].reverse().map((item, i) => (
-            <div className="flex gap-2 items-center pb-2 border-solid border-black border-b-2"
+      <div className="w-fit flex flex-col">
+        <div>Expenses By Category</div>
+        {expensesByCategory ? 
+          <div className="w-[300px] h-[300px]">
+            <Bar
+              data={expensesByCategory}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenses By Item"
+                  },
+                  legend: {
+                    display: true
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.raw as number; // get raw value
+                        return `$${Number(value).toFixed(2)}`; // currency format
+                      }
+                    }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+          </div>
+        :
+          <div>Loading...</div>
+        }
+      </div>
+
+      <div className="w-fit flex flex-col">
+        <div>Expenses By Item</div>
+        {expensesByItem ? 
+          <div className="w-[1000px] h-[300px]">
+            <Bar
+              data={expensesByItem}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenses By Item"
+                  },
+                  legend: {
+                    display: true
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.raw as number; // get raw value
+                        return `$${Number(value).toFixed(2)}`; // currency format
+                      }
+                    }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+          </div>
+        :
+          <div>Loading...</div>
+        }
+      </div>
+
+      <div className="w-full bg-black p-10 px-12 text-white rounded">
+        <h1 className="font-bold text-xl mb-8">Purchase History</h1>
+        <div className="w-full flex flex-col gap-2">
+          {[...purchaseHistory].reverse().slice(0, historyDisplayedLength).map((item, i) => (
+            <div className="w-full flex gap-2 justify-between items-center pb-2 border-solid border-neutral-400 border-b-[1px]"
                 key={i}>
-              <div>
-                {item.name}
+              <div className="min-w-[260px] font-semibold flex gap-4 justify-start items-center">
+                <div>
+                  {item.name}
+                </div>
+                <div className="w-fit bg-navy text-white text-sm p-2 py-1 rounded-full">
+                  ${Number(item.cost / 100).toFixed(2)}
+                </div>
               </div>
-              <div className="w-fit bg-navy text-white p-2 py-1 rounded">
-                ${Number(item.cost / 100).toFixed(2)}
-              </div>
-              <div>
+              <div className="text-neutral-200 text-sm font-medium">
                 {item.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
+              </div>
+              <div className="min-w-[400px] flex gap-1 justify-end">
+                <div className="flex gap-1 items-center text-green-300 font-medium">
+                  <FontAwesomeIcon icon={faCrown} className="fa-regular text-xs" />
+                  {item.purchasedBy.username}
+                </div>
+                <div className="flex">
+                  {item.sharedBetween.map((user, i) => (
+                    user.username !== item.purchasedBy.username ? 
+                      <div className="mr-2"
+                          key={i}>
+                        {user.username}
+                      </div>
+                    :
+                      <div></div>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
         </div>
+        {purchaseHistory.length > 10 &&
+          <button className="p-2 pt-1 mt-4 font-bold border-solid border-gray-300 border-2 rounded"
+            onClick={() => {
+              if (historyDisplayedLength < purchaseHistory.length) {
+                setHistoryDisplayedLength(purchaseHistory.length);
+              } else {
+                setHistoryDisplayedLength(10);
+              }
+            }}
+          >
+            {historyDisplayedLength < purchaseHistory.length?
+              <span className="flex items-center gap-2 ">
+                <div>See More</div>
+                <FontAwesomeIcon icon={faCaretDown} className="fa-regular text-lg" />
+              </span>
+            :
+            <span className="flex items-center gap-2 ">
+              <div>See Less</div>
+              <FontAwesomeIcon icon={faCaretUp} className="fa-regular text-lg" />
+            </span>
+            }
+          </button>
+        }
       </div>
     </div>
   );

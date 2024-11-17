@@ -25,8 +25,14 @@ export type ItemType = {
     expirationDate: Date;
     name: string;
     purchaseDate: Date;
-    purchasedBy: string;
-    sharedBetween: string[];
+    purchasedBy: {
+        _id: string;
+        username: string;
+    };
+    sharedBetween: {
+        _id: string;
+        username: string;
+    }[];
 }
   
 export type PreferencesType = {
