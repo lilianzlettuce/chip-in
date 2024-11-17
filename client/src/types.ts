@@ -57,5 +57,5 @@ export type UserType = {
         expirationNotif: "all" | "relevant" | "none",
         paymentNotif:  "all" | "relevant" | "none",
     },
-    //preferences:  boolean[],
+    pfp: string,
 }
