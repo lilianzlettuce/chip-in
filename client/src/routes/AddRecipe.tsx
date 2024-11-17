@@ -19,6 +19,8 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     const [showRecipeModal, setShowRecipeModal] = useState(false);
     const [showItemsModal, setShowItemsModal] = useState(true);
 
+    const [loading, setLoading] = useState(false);
+
     const { householdId } = useParams();
     const householdID = householdId;
     const { user } = useUserContext();
@@ -39,6 +41,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     };
 
     const handleGenerateRecipe = async () => {
+        setLoading(true);
         const items = [...checkedItems, ...newItems];
         try {
             const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {
@@ -62,6 +65,8 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
 
         } catch (error) {
             console.error('Error generating recipe:', error);
+        } finally {
+            setLoading(false);
         }
     }
        
@@ -161,9 +166,20 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                             </div>
                         </div>
 
-                        <button className="generate-recipe-button" onClick={handleGenerateRecipe}>Generate!</button>
+                        <button className="generate-recipe-button" onClick={handleGenerateRecipe} disabled={loading}
+                        >{loading ? 'Generating...' : 'Generate!'}</button>
                         <button className="cancel-recipe-button" onClick={onClose}>Cancel</button>
                     </div>
+                </div>
+            )}
+
+            {loading && (
+                <div className="spinner-overlay">
+                    <img
+                        className="image"
+                        src="https://i.postimg.cc/kMwkrtbv/chipinlogo.png"
+                        alt="Loading"
+                    />
                 </div>
             )}
 
