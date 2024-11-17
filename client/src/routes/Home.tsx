@@ -404,9 +404,11 @@ export default function Home() {
             <div className="flex flex-col items-start">
               <div className="font-semibold flex gap-2 items-center">
                 {member.username}
-                <a href={`mailto:${member.email}`}>
-                  <FontAwesomeIcon icon={faEnvelope} className="fa-regular text-lg" />
-                </a>
+                {member._id !== userId &&
+                  <a href={`mailto:${member.email}`}>
+                    <FontAwesomeIcon icon={faEnvelope} className="fa-regular text-lg" />
+                  </a>
+                }
               </div>
               <div>
                 {member.email}

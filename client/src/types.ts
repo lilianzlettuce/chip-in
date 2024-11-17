@@ -50,6 +50,7 @@ export type UserContextType = {
 
 export type UserType = {
     id: string,
+    _id?: string,
     username: string,
     email: string,
     households: string[],
