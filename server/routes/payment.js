@@ -214,7 +214,7 @@ router.patch('/return/:id', async (req, res) => {
     console.log('return')
     const householdId = req.params.id;
     const { itemId } = req.body;
-
+    console.log(itemId)
     try {
         const item = await Item.findById(itemId);
         if (!item) {
