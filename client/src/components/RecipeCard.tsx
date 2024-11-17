@@ -62,7 +62,6 @@ function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
             <div className="recipe-card-header">
                 <h3 className="recipe-card-title">{recipe.title || 'Untitled'}</h3>
                 <div className="recipe-actions">
-                    <button>✏️</button>
                     <button onClick={handleDelete}>🗑️</button>
                 </div>
             </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, ChangeEvent, useRef } from 'react';
 import bcrypt from 'bcryptjs';
 import { useNavigate } from "react-router-dom";
 
-import './Profile.css'; // Import CSS for styling
+import './Profile.css';
 
 import { useUserContext } from '../UserContext';
 import { Confirm } from '../components/Confirm';
@@ -26,25 +26,19 @@ interface ProfileSummaryProps {
   refreshProfile: number
 }
 
-// const UploadImage : 
-
 const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
 
-  // START UPLOAD PICTURE
-  //const [profileImage, setProfileImage] = useState<string>(imageUrl || lettuce); // State to handle profile image
   const [username, setUsername] = useState<string>('');
   const [bio, setBio] = useState<String>(' ');
-  const [profileImage, setProfileImage] = useState<string>(defaultPFP); // State to handle profile image
+  const [profileImage, setProfileImage] = useState<string>(defaultPFP); 
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  //effect to retrieve user profile from backend
   const { user } = useUserContext();
 
   const fetchUserProfile = async () => {
     try {
-      // Fetch user profile details based on the user ID
       const profileResponse = await fetch(`http://localhost:6969/user/${user?.id}`);
 
       if (profileResponse.ok) {
@@ -226,7 +220,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const [tempPassword, setTempPassword] = useState(password);
   const [tempBio, setTempBio] = useState(bio);
 
-  // state variable to track whether input fields are editable
+  // State variable to track whether input fields are editable
   const [isEditing, setIsEditing] = useState(false);
 
   // Toggle confirmation modal for account deletion
@@ -248,8 +242,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const openPasswordModal = () => setIsPasswordModalOpen(true);
   const closePasswordModal = () => setIsPasswordModalOpen(false);
 
-
-  //update disply fields when props state change
   useEffect(() => {
     setDisplayName(email || '');
     setDisplayUsername(username || '');
@@ -267,7 +259,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   // Event handler function for the button click
   const handleChangeNameClick = async () => {
     setDisplayName(tempName);
-    // alert(`${tempName} has been changed successfully`);
     setIsSuccessOpen(true);
     setSuccessMessage(`${tempName} has been changed successfully`);
 
@@ -641,10 +632,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
           <label className="profile-label">Bio</label>
           {/* Change input type based on isEditing state 
            type="password": This input type is specifically designed to hide user input, showing only a series of * */}
-          <input type={isEditing ? "text" : "bio"} // Use "password" type when not editing
+          <input type={isEditing ? "text" : "bio"}
             className="profile-input"
             value={isEditing ? tempBio : displayBio}
-            readOnly={!isEditing} // doesn't allow users to change text field
+            readOnly={!isEditing}
             onChange={(e) => setTempBio(e.target.value)} />
           {isEditing && (
             <button className="change-button" onClick={handleChangeBioClick}>CHANGE BIO</button>
@@ -895,7 +886,7 @@ const Settings: React.FC = () => {
 const Stats: React.FC = () => {
   //effect to retrieve user profile from backend
   const { user } = useUserContext();
-  
+
   // states for user stats
   const [totalItem, setTotalItem] = useState(0);
   const [totalCost, setTotalCost] = useState(0);
@@ -912,7 +903,7 @@ const Stats: React.FC = () => {
       const itemResponse = await fetch(`http://localhost:6969/item/search/${user?.id}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
       });
 
@@ -921,7 +912,7 @@ const Stats: React.FC = () => {
         setTotalItem(itemData.totalItems);
         setTotalCost(itemData.totalCost);
         setItemBreakdown(itemData.itemBreakdown);
-        console.log("Total items bought", totalItem, "$",totalCost)
+        console.log("Total items bought", totalItem, "$", totalCost)
       } else {
         console.log("Failed to search for Items")
       }
@@ -934,7 +925,7 @@ const Stats: React.FC = () => {
       const OweResponse = await fetch(`http://localhost:6969/household/owed/${user?.id}`, {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
       });
 
@@ -942,7 +933,7 @@ const Stats: React.FC = () => {
         const OweData = await OweResponse.json();
         setTotalOwedTo(OweData.totalOwedTo);
         setTotalOwedBy(OweData.totalOwedBy);
-        console.log("Total Owed", totalOwedTo, "$",totalOwedBy)
+        console.log("Total Owed", totalOwedTo, "$", totalOwedBy)
       } else {
         console.log("Failed to search for Items")
       }
@@ -969,14 +960,14 @@ const Stats: React.FC = () => {
     }
     return color;
   };
-  
+
   const getChartColors = (count: number) => {
     const storedColors = localStorage.getItem('pieChartColors');
     if (storedColors) {
-      return JSON.parse(storedColors);  // Retrieve stored colors from localStorage
+      return JSON.parse(storedColors);
     } else {
       const newColors = Array.from({ length: count }, () => generateRandomColor());
-      localStorage.setItem('pieChartColors', JSON.stringify(newColors));  // Store colors in localStorage
+      localStorage.setItem('pieChartColors', JSON.stringify(newColors));
       return newColors;
     }
   };
@@ -1060,7 +1051,7 @@ const Stats: React.FC = () => {
       <div className="chart-container">
         <canvas id="itemCostPieChart" width="450" height="450"></canvas>
       </div>
- 
+
     </div>
   );
 
@@ -1090,7 +1081,6 @@ const Profile: React.FC = () => {
 
           if (profileData.username) setUsername(profileData.username);
           if (profileData.email) setEmail(profileData.email);
-          //if (profileData.password) setPassword(profileData.password);
           setPassword('');
           if (profileData.bio) setBio(profileData.bio); // You may want to handle password securely
         } else {
@@ -1101,13 +1091,10 @@ const Profile: React.FC = () => {
       }
     };
 
-    // Trigger fetch when user is available
     if (user?.id) {
       fetchUserProfile();
     }
   }, [user?.id, refreshProfile]);
-
-  // if (!user) return <div>Loading...</div>;
 
   const profileSettingsProps = {
     id: user?.id,
@@ -1124,7 +1111,7 @@ const Profile: React.FC = () => {
       <ProfileSummary refreshProfile={refreshProfile} />
       <ProfileSettings {...profileSettingsProps} />
       <Settings />
-      <Stats/>
+      <Stats />
     </div>
   );
 };

@@ -343,7 +343,7 @@ export default function Dashboard() {
         content += items.map(item => {
             const createdDate = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; // Convert current date to UTC format
             const expirationDate = new Date(item.expirationDate).toISOString().split('T')[0].replace(/-/g, ''); // Convert expirationDate to YYYYMMDD
-    
+
             return `BEGIN:VEVENT
 CREATED:${createdDate}
 DTSTART;VALUE=DATE:${expirationDate}
@@ -353,23 +353,18 @@ TRANSP:TRANSPARENT
 UID:${uuid4()}
 END:VEVENT\n`;
         }).join("");
-        
+
         content += "END:VCALENDAR";
-        // blob for ics file
         const blob = new Blob([content], { type: "text/calendar" });
         const url = URL.createObjectURL(blob);
-
-        // temporary link element for downloading file
         const link = document.createElement("a");
         link.href = url;
         link.download = "expiration_dates.ics";
         document.body.appendChild(link);
-
-        // simulated click + remove element
         link.click();
         document.body.removeChild(link);
     };
-    
+
 
 
     const fetchPurchasedItems = async () => {
@@ -706,7 +701,7 @@ END:VEVENT\n`;
                     </h2>
                     <button
                         className="add-item-button"
-                        onClick={() => {handleExportDates()}} // Open the modal when clicked
+                        onClick={() => { handleExportDates() }} // Open the modal when clicked
                     >
                         EXPORT EXPIRATION DATES
                     </button>
@@ -717,7 +712,7 @@ END:VEVENT\n`;
                     >
                         ADD ITEM +
                     </button>
-                    
+
                 </div>
                 {!isCollapsed && (
                     <ul className="dashboard-item-list">
@@ -756,11 +751,11 @@ END:VEVENT\n`;
                                             split: split.split || 0
                                         }))}
                                         purchasedBy={item['purchasedBy']?.username || 'Unknown'}
-                                        expiryDate = {
+                                        expiryDate={
                                             item['expirationDate']
                                                 ? new Date(item['expirationDate']).toLocaleDateString('en-US', { timeZone: 'UTC' })
                                                 : 'N/A'
-                                        }                                        
+                                        }
                                         isExpiringSoon={
                                             item['expirationDate'] && isExpiringSoon(item['expirationDate'])
                                         }

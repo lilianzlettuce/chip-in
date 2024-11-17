@@ -46,21 +46,49 @@ export default function MyExpenses() {
         }
     }, [user, householdId]);
 
+    // const fetchDebts = async () => {
+    //     if (!householdId || !user) return;
+
+    //     try {
+    //         const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`);
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
+    //         const data = await response.json();
+
+    //         const e = calculateExpenses(data, user.id)
+    //         setExpenses(e);
+
+    //     } catch (error) {
+    //         console.error('Error fetching debts:', error);
+    //     }
+    // };
+
     const fetchDebts = async () => {
         if (!householdId || !user) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`);
+            // Make a PATCH request to update debts
+            const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({}) // Include an empty body or relevant data if needed
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+
             const data = await response.json();
 
-            const e = calculateExpenses(data, user.id)
+            // Calculate expenses based on the updated data
+            const e = calculateExpenses(data, user.id);
             setExpenses(e);
 
         } catch (error) {
-            console.error('Error fetching debts:', error);
+            console.error('Error fetching and updating debts:', error);
         }
     };
 
@@ -98,17 +126,6 @@ export default function MyExpenses() {
                 expensesMap[owedBy._id].owesYou += parseFloat((amount / 100).toFixed(2));
             }
 
-        });
-
-        Object.values(expensesMap).forEach((entry) => {
-            const debtDiff = entry.owesYou - entry.youOwe;
-            if (debtDiff > 0) {
-                entry.owesYou = debtDiff;
-                entry.youOwe = 0;
-            } else if (debtDiff < 0) {
-                entry.owesYou = 0;
-                entry.youOwe = -debtDiff;
-            }
         });
 
         return Object.values(expensesMap);
