@@ -209,4 +209,64 @@ router.patch('/partialpay/:id', async (req, res) => {
     }
 });
 
+//return item
+router.patch('/return/:id', async (req, res) => {
+    console.log('return')
+    const householdId = req.params.id;
+    const { itemId } = req.body;
+    console.log(itemId)
+    try {
+        const item = await Item.findById(itemId);
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+        console.log('purchasedby', item.purchasedBy);
+
+        for (const split of item.splits) {
+            const splitCost = split.split * item.cost;
+            // console.log(splitCost)
+            // console.log('split.member', split.member)
+            // console.log('purchasedby', purchasedBy)
+            if (split.member === item.purchasedBy) { continue; }
+      
+            let newHousehold = await Household.findOneAndUpdate(
+                {
+                    _id: householdId
+                },
+                {
+                    $inc: { "debts.$[elem].amount": splitCost }
+                },
+                {
+                    arrayFilters: [
+                    { "elem.owedBy": item.purchasedBy, "elem.owedTo": split.member }
+                    ],
+                    new: true,
+                    useFindAndModify: false
+                }
+            );
+        }
+
+        let household = await Household.findByIdAndUpdate(
+            householdId,
+            {
+                $pull: {
+                    purchasedList: itemId,
+                    purchaseHistory: itemId,
+                },
+            },
+            { new: true }
+        );
+
+        if (!household) {
+            return res.status(404).json({ message: "Household not found" });
+        }
+
+        await Item.findByIdAndDelete(itemId);
+
+        res.status(200).json(household.debts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 export default router;

@@ -601,6 +601,27 @@ END:VEVENT\n`;
         }
     };
 
+    const handleReturn = async (id: string) => {
+        try {
+            const response = await fetch(`http://localhost:6969/payment/return/${householdID}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json', // Add this line
+                },
+                body: JSON.stringify({ itemId: id })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setPurchasedItems((prevItems) => prevItems.filter((item: any) => item._id !== id));
+
+            console.log('Item successfully returned');
+        } catch (error) {
+            console.error('Error returning item:', error);
+        }
+    };
+
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -760,6 +781,7 @@ END:VEVENT\n`;
                                             item['expirationDate'] && isExpiringSoon(item['expirationDate'])
                                         }
                                         onDelete={() => handleDelete(item['_id'], 'purchased')}
+                                        onReturn={() => handleReturn(item['_id'])}
                                         onMove={() => {
                                             moveItem(
                                                 {
@@ -855,6 +877,7 @@ END:VEVENT\n`;
                                             setEditItemId(item['_id']);
                                             setEditGroceryModalOpen(true);
                                         }}
+                                        onReturn={() => handleReturn(item['_id'])}
                                         listType="grocery"
                                         splits={[]}
                                     />

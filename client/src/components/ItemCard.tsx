@@ -1,7 +1,7 @@
 import React from 'react';
 import { useUserContext } from '../UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashAlt, faCartPlus, faPencil, faStore} from '@fortawesome/free-solid-svg-icons';
+import { faTrashAlt, faCartPlus, faPencil, faStore, faRotateLeft} from '@fortawesome/free-solid-svg-icons';
 import './ItemCard.css';
 
 
@@ -18,6 +18,7 @@ interface ItemCardProps {
     onDelete: () => void;
     onMove: () => void;
     onEdit: () => void;
+    onReturn: () => void;
     listType: string;
 }
 
@@ -33,6 +34,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
     onDelete,
     onMove,
     onEdit,
+    onReturn,
     listType
 }) => {
     const { user } = useUserContext();
@@ -110,22 +112,43 @@ const ItemCard: React.FC<ItemCardProps> = ({
             </div>
             */}
             <div className="actions">
-                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
-                    onClick={isShared ? onDelete : () => { }}>
-                    <FontAwesomeIcon icon={faTrashAlt} className="text-white text-lg" />
-                </button>
-                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
-                    onClick={isShared ? onMove : () => { }}>
-                    {listType === 'grocery' ? (
-                        <FontAwesomeIcon icon={faStore} className="text-white text-lg" title="Purchase" />
-                    ) : (
-                        <FontAwesomeIcon icon={faCartPlus} className="text-white text-lg" title="Repurchase" />
-                    )}
-                </button>
-                <button className={`px-4 py-2 bg-gray-600 rounded-md ${isShared ? 'hover:bg-blue-400' : 'hover:cursor-default'}`}
-                    onClick={isShared ? onEdit : () => { }}>
-                    <FontAwesomeIcon icon={faPencil} className="text-white text-lg" />
-                </button>
+                <div className='button-with-tooltip'>
+                    <button className={`px-2 py-1 bg-gray-600 rounded-md text-sm ${isShared ? 'hover:bg-red-400' : 'hover:cursor-default'}`}
+                        onClick={isShared ? onDelete : () => { }}>
+                        <FontAwesomeIcon icon={faTrashAlt} className="text-white text-lg" />
+                    </button>
+                    <div className="tooltip tooltip-red">Delete</div>
+                </div>
+                <div className='button-with-tooltip'>
+                    <button className={`px-2 py-1 bg-gray-600 rounded-md text-sm ${isShared ? 'hover:bg-green-400' : 'hover:cursor-default'}`}
+                        onClick={isShared ? onMove : () => { }}>
+                        {listType === 'grocery' ? (
+                            <FontAwesomeIcon icon={faStore} className="text-white text-lg" title="Purchase" />
+                        ) : (
+                            <FontAwesomeIcon icon={faCartPlus} className="text-white text-lg" title="Repurchase" />
+                        )}
+                    </button>
+                    <div className="tooltip tooltip-green">
+                        {listType === 'grocery' ? 'Purchased' : 'Repurchased'}
+                    </div>
+                </div>
+                <div className='button-with-tooltip'>
+                    <button className={`px-2 py-1 bg-gray-600 rounded-md text-sm ${isShared ? 'hover:bg-blue-400' : 'hover:cursor-default'}`}
+                        onClick={isShared ? onEdit : () => { }}>
+                        <FontAwesomeIcon icon={faPencil} className="text-white text-lg" />
+                    </button>
+                    <div className="tooltip tooltip-blue">Edit</div>
+                </div>
+                
+                {listType === 'purchased' && (
+                    <div className='button-with-tooltip'>
+                        <button className={`px-2 py-1 bg-gray-600 rounded-md text-sm ${isShared ? 'hover:bg-yellow-400' : 'hover:cursor-default'}`}
+                            onClick={isShared ? onReturn : () => { }}>
+                            <FontAwesomeIcon icon={faRotateLeft} className="text-white text-lg" />
+                        </button>
+                        <div className="tooltip tooltip-yellow">Return</div>
+                    </div>
+                )}
             </div>
             
         </div>
