@@ -7,7 +7,7 @@ import {InviteHousehold , Modal2}  from './InviteHousehold'
 
 import { UserType, ItemType } from '../types';
 
-import { Line, Pie, Bar } from 'react-chartjs-2';
+import { Line, Pie, Doughnut, Bar } from 'react-chartjs-2';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, 
   PieController, ArcElement, Tooltip, Legend, 
   BarElement } from 'chart.js';
@@ -370,245 +370,215 @@ export default function Home() {
         </div> 
       </div>
 
-      <div className="w-fit flex flex-col">
-        <div>Expenses Over Time</div>
-        {expenditurePerMonthData ? 
-          <div className="w-[500px] h-[200px]">
-            <Line
-              data={expenditurePerMonthData}
-              options={{
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Expenditure Over Time"
-                  },
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw as number; // get raw value
-                        return `$${Number(value).toFixed(2)}`; // currency format
+      {/* Purchase History and Stats */}
+      
+      {purchaseHistory.length > 0 &&
+        <div>
+          {(expenditurePerMonthData && expenditurePerMonthData.labels.length > 1) && 
+            <div className="w-fit flex flex-col">
+              <div>Expenses Over Time</div>
+              <div className="w-[500px] h-[200px]">
+                <Line
+                  data={expenditurePerMonthData}
+                  options={{
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Expenditure Over Time"
+                      },
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const value = context.raw as number; // get raw value
+                            return `$${Number(value).toFixed(2)}`; // currency format
+                          }
+                        }
                       }
-                    }
-                  }
-                },
-                scales: {
-                  y: {
-                    ticks: {
-                      callback: function (value) {
-                        return `$${Number(value).toFixed(2)}`; // currency format
+                    },
+                    scales: {
+                      y: {
+                        ticks: {
+                          callback: function (value) {
+                            return `$${Number(value).toFixed(2)}`; // currency format
+                          }
+                        }
                       }
-                    }
-                  }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-        :
-          <div>Loading...</div>
-        }
-      </div>
-      <div className="w-fit flex flex-col">
-        <div>Expenses By Category</div>
-        {expensesByCategory ? 
-          <div className="w-[300px] h-[300px]">
-            <Pie
-              data={expensesByCategory}
-              options={{
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Expenses By Category"
-                  },
-                  legend: {
-                    display: true
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw as number; // get raw value
-                        return `$${Number(value).toFixed(2)}`; // currency format
-                      }
-                    }
-                  }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-        :
-          <div>Loading...</div>
-        }
-      </div>
-
-      <div className="w-fit flex flex-col">
-        <div>Expenses By Category</div>
-        {expensesByCategory ? 
-          <div className="w-[300px] h-[300px]">
-            <Bar
-              data={expensesByCategory}
-              options={{
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Expenses By Item"
-                  },
-                  legend: {
-                    display: true
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw as number; // get raw value
-                        return `$${Number(value).toFixed(2)}`; // currency format
-                      }
-                    }
-                  }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-        :
-          <div>Loading...</div>
-        }
-      </div>
-
-      <div className="w-fit flex flex-col">
-        <div>Expenses By Item</div>
-        {expensesByItem ? 
-          <div className="w-[1000px] h-[300px]">
-            <Bar
-              data={expensesByItem}
-              options={{
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Expenses By Item"
-                  },
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw as number; // get raw value
-                        return `$${Number(value).toFixed(2)}`; // currency format
-                      }
-                    }
-                  }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-        :
-          <div>Loading...</div>
-        }
-      </div>
-
-      <div className="w-fit flex flex-col">
-        <div>Purchase Frequencies By Item</div>
-        {frequenciesByItem ? 
-          <div className="w-[1000px] h-[300px]">
-            <Bar
-              data={frequenciesByItem}
-              options={{
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Expenses By Item"
-                  },
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw as number; // get raw value
-                        return `${value} purchases`; // currency format
-                      }
-                    }
-                  }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-        :
-          <div>Loading...</div>
-        }
-      </div>
-
-      <div className="w-full bg-black p-10 px-12 text-white rounded">
-        <h1 className="font-bold text-xl mb-8">Purchase History</h1>
-        <div className="w-full flex flex-col gap-2">
-          {[...purchaseHistory].reverse().slice(0, historyDisplayedLength).map((item, i) => (
-            <div className="w-full flex gap-2 justify-between items-center pb-2 border-solid border-neutral-400 border-b-[1px]"
-                key={i}>
-              <div className="min-w-[260px] font-semibold flex gap-4 justify-start items-center">
-                <div>
-                  {item.name}
-                </div>
-                <div className="w-fit bg-light text-black text-sm p-2 py-1 rounded-full">
-                  ${Number(item.cost / 100).toFixed(2)}
-                </div>
-              </div>
-              <div className="bg-navy text-white text-sm font-medium p-2 py-1 rounded">
-                {item.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
-              </div>
-              <div className="min-w-[400px] flex gap-1 justify-end">
-                <div className="flex gap-1 items-center text-green-300 font-medium">
-                  <FontAwesomeIcon icon={faCrown} className="fa-regular text-xs" />
-                  {item.purchasedBy.username}
-                </div>
-                <div className="flex">
-                  {item.sharedBetween.map((user, i) => (
-                    user.username !== item.purchasedBy.username ? 
-                      <div className="mr-2"
-                          key={i}>
-                        {user.username}
-                      </div>
-                    :
-                      <div></div>
-                  ))}
-                </div>
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                  }}
+                />
               </div>
             </div>
-          ))}
-        </div>
-        {purchaseHistory.length > 10 &&
-          <button className="p-2 pt-1 mt-4 font-bold border-solid border-gray-300 border-2 rounded"
-            onClick={() => {
-              if (historyDisplayedLength < purchaseHistory.length) {
-                setHistoryDisplayedLength(purchaseHistory.length);
-              } else {
-                setHistoryDisplayedLength(10);
-              }
-            }}
-          >
-            {historyDisplayedLength < purchaseHistory.length?
-              <span className="flex items-center gap-2 ">
-                <div>See More</div>
-                <FontAwesomeIcon icon={faCaretDown} className="fa-regular text-lg" />
-              </span>
+          }
+          <div className="w-fit flex flex-col">
+            <div>Expenses By Category</div>
+            {expensesByCategory ? 
+              <div className="w-[300px] h-[300px]">
+                <Doughnut
+                  data={expensesByCategory}
+                  options={{
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Expenses By Category"
+                      },
+                      legend: {
+                        display: true
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const value = context.raw as number; // get raw value
+                            return `$${Number(value).toFixed(2)} (${(value / Number(totalExpenses) * 100).toFixed(2)}%)`; // currency format
+                          }
+                        }
+                      }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                  }}
+                />
+              </div>
             :
-            <span className="flex items-center gap-2 ">
-              <div>See Less</div>
-              <FontAwesomeIcon icon={faCaretUp} className="fa-regular text-lg" />
-            </span>
+              <div>Loading...</div>
             }
-          </button>
-        }
-      </div>
+          </div>
+
+          <div className="w-fit flex flex-col">
+            <div>Top {numBarsDisplayed} Expenses By Item</div>
+            {expensesByItem ? 
+              <div className="w-[400px] h-[300px]">
+                <Bar
+                  data={expensesByItem}
+                  options={{
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Expenses By Item"
+                      },
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const value = context.raw as number; // get raw value
+                            return `$${Number(value).toFixed(2)}`; // currency format
+                          }
+                        }
+                      }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                  }}
+                />
+              </div>
+            :
+              <div>Loading...</div>
+            }
+          </div>
+
+          <div className="w-fit flex flex-col">
+            <div>Top {numBarsDisplayed} Most Purchased Items</div>
+            {frequenciesByItem ? 
+              <div className="w-[1000px] h-[300px]">
+                <Bar
+                  data={frequenciesByItem}
+                  options={{
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: "Expenses By Item"
+                      },
+                      legend: {
+                        display: false
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const value = context.raw as number; // get raw value
+                            return `${value} purchases`; // currency format
+                          }
+                        }
+                      }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                  }}
+                />
+              </div>
+            :
+              <div>Loading...</div>
+            }
+          </div>
+
+          <div className="w-full bg-black p-10 px-12 text-white rounded">
+            <h1 className="font-bold text-xl mb-8">Purchase History</h1>
+            <div className="w-full flex flex-col gap-2">
+              {[...purchaseHistory].reverse().slice(0, historyDisplayedLength).map((item, i) => (
+                <div className="w-full flex gap-2 justify-between items-center pb-2 border-solid border-neutral-400 border-b-[1px]"
+                    key={i}>
+                  <div className="min-w-[260px] font-semibold flex gap-4 justify-start items-center">
+                    <div>
+                      {item.name}
+                    </div>
+                    <div className="w-fit bg-light text-black text-sm p-1 py-0 rounded-full">
+                      ${Number(item.cost / 100).toFixed(2)}
+                    </div>
+                  </div>
+                  <div className="bg-navy text-white text-sm font-medium p-1 py-0 rounded">
+                    {item.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
+                  </div>
+                  <div className="min-w-[400px] flex gap-1 justify-end">
+                    <div className="flex gap-1 items-center text-green-300 font-medium">
+                      <FontAwesomeIcon icon={faCrown} className="fa-regular text-xs" />
+                      {item.purchasedBy.username}
+                    </div>
+                    <div className="flex">
+                      {item.sharedBetween.map((user, i) => (
+                        user.username !== item.purchasedBy.username ? 
+                          <div className="mr-2"
+                              key={i}>
+                            {user.username}
+                          </div>
+                        :
+                          <div></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {purchaseHistory.length > 10 &&
+              <button className="p-2 pt-1 mt-4 font-bold border-solid border-gray-300 border-2 rounded"
+                onClick={() => {
+                  if (historyDisplayedLength < purchaseHistory.length) {
+                    setHistoryDisplayedLength(purchaseHistory.length);
+                  } else {
+                    setHistoryDisplayedLength(10);
+                  }
+                }}
+              >
+                {historyDisplayedLength < purchaseHistory.length?
+                  <span className="flex items-center gap-2 ">
+                    <div>See More</div>
+                    <FontAwesomeIcon icon={faCaretDown} className="fa-regular text-lg" />
+                  </span>
+                :
+                <span className="flex items-center gap-2 ">
+                  <div>See Less</div>
+                  <FontAwesomeIcon icon={faCaretUp} className="fa-regular text-lg" />
+                </span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
     </div>
   );
 }
