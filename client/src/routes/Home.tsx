@@ -377,26 +377,28 @@ export default function Home() {
       </div>
 
       <h1 className="mt-12 mb-6 text-3xl text-left font-bold">Household Summary</h1>
-      <div className="bg-black text-white p-12 flex rounded-xl">
+      <div className="bg-black text-white p-12 flex gap-2 justify-between rounded-xl">
         <div className="flex gap-2 items-end">
           <div className="text-3xl font-medium">{purchaseHistory.length}</div>
           <div className="text-sm">items purchased</div>
         </div>
-        <div>
-          Total amount spent: ${totalExpenses}
+        <div className="flex gap-2 items-end">
+          <div className="text-3xl font-medium">${totalExpenses}</div>
+          <div className="text-sm">spent in total</div>
         </div>
-        <div>
-          Average expenditure per month: ${avgExpenditure}
+        <div className="flex gap-2 items-end">
+          <div className="text-3xl font-medium">${avgExpenditure}</div>
+          <div className="text-sm">average per month</div>
         </div>
-        <div>
-          Over the course of: {householdAge} days
+        <div className="flex gap-2 items-end">
+          <div className="text-3xl font-medium">{householdAge}</div>
+          <div className="text-sm">paid back</div>
         </div>
       </div>
 
       {/* Purchase History and Stats */}
-      
       {purchaseHistory.length > 0 &&
-        <div>
+        <div className="p-4 flex gap-4 gap-y-12 flex-wrap justify-between items-center">
           {(expenditurePerMonthData && expenditurePerMonthData.labels.length > 1) && 
             <div className="w-fit flex flex-col">
               <div>Expenses Over Time</div>
@@ -437,7 +439,7 @@ export default function Home() {
               </div>
             </div>
           }
-          <div className="w-fit flex flex-col">
+          <div className="w-fit flex flex-col mr-12">
             <div>Expenses By Category</div>
             {expensesByCategory ? 
               <div className="w-[300px] h-[300px]">
@@ -474,7 +476,7 @@ export default function Home() {
           <div className="w-fit flex flex-col">
             <div>Top {numBarsDisplayed} Expenses By Item</div>
             {expensesByItem ? 
-              <div className="w-[400px] h-[300px]">
+              <div className="w-[450px] h-[300px]">
                 <Bar
                   data={expensesByItem}
                   options={{
@@ -508,7 +510,7 @@ export default function Home() {
           <div className="w-fit flex flex-col">
             <div>Top {numBarsDisplayed} Most Purchased Items</div>
             {frequenciesByItem ? 
-              <div className="w-[1000px] h-[300px]">
+              <div className="w-[450px] h-[300px]">
                 <Bar
                   data={frequenciesByItem}
                   options={{
