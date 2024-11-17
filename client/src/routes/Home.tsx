@@ -18,6 +18,18 @@ Chart.register(CategoryScale, LinearScale, PointElement, LineElement,
   PieController, ArcElement, Tooltip, Legend,
   BarElement);
 
+
+interface User {
+  _id: string;
+  username: string;
+}
+
+interface Debt {
+  owedBy: User;
+  owedTo: User;
+  amount: number;
+}
+
 export default function Home() {
   const { householdId } = useParams();
   const navigate = useNavigate();
@@ -32,7 +44,9 @@ export default function Home() {
   const [ householdMembers, setHouseholdMembers ] = useState<UserType[]>([]);
   const [ purchaseHistory, setPurchaseHistory ] = useState<ItemType[]>([]);
   const [ historyDisplayedLength, setHistoryDisplayedLength ] = useState(0);
+  const [ debts, setDebts ] = useState<Debt[]>([]);
   const [ totalExpenses, setTotalExpenses ] = useState<string>("0");
+  const [ totalPaid, setTotalPaid ] = useState<string>("0");
   const [ householdAge, setHouseholdAge ] = useState(100);
   const [ avgExpenditure, setAvgExpenditure ] = useState(100);
 
@@ -126,7 +140,6 @@ export default function Home() {
           purchaseDate: new Date(item.purchaseDate),
         }));
         setPurchaseHistory(parsedData);
-        console.log(parsedData);
       } else {
         console.log("Failed to fetch purchase history")
       }
@@ -143,9 +156,6 @@ export default function Home() {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        
-        console.log(data.labels)
-        console.log(data.data)
 
         // Intialize chart data
         setExpenditurePerMonthData({
@@ -180,9 +190,6 @@ export default function Home() {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        
-        console.log(data.labels)
-        console.log(data.data)
 
         // Intialize chart data
         setExpensesByCategory({
@@ -219,11 +226,6 @@ export default function Home() {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
-        
-        console.log(data.expenses.labels)
-        console.log(data.expenses.data)
-        console.log(data.frequencies.labels)
-        console.log(data.frequencies.data)
 
         // Intialize expenses chart data
         setExpensesByItem({
@@ -276,9 +278,35 @@ export default function Home() {
     }
   };
 
+  // Get debts
+  const fetchDebts = async () => {
+    if (!householdId || !user) return;
+
+    try {
+        // Make a PATCH request to update debts
+        const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({}) // Include an empty body or relevant data if needed
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: Debt[] = await response.json();
+        setDebts(data);
+    } catch (error) {
+        console.error('Error fetching and updating debts:', error);
+    }
+  };
+
   useEffect(() => {
     getHouseholdInfo();
     getPurchaseHistory();
+    fetchDebts();
   }, [householdId]);
 
   // Update when purchase history fetched
@@ -308,6 +336,18 @@ export default function Home() {
   useEffect(() => {
     setAvgExpenditure(Number(totalExpenses) / expenditurePerMonthData?.labels.length);
   }, [expenditurePerMonthData]);
+
+  useEffect(() => {
+    // Calculate total debt
+    let allDebts = 0;
+    for (let debt of debts) {
+      allDebts += debt.amount / 100;
+      console.log(debt.amount)
+    }
+    console.log("alldebts: ", allDebts)
+    console.log("total exp: ", totalExpenses)
+    setTotalPaid((Number(totalExpenses) - allDebts).toFixed(2));
+  }, [debts, totalExpenses])
 
   if (!(householdName && householdMembers && purchaseHistory && expenditurePerMonthData)) {
     return (
@@ -383,15 +423,15 @@ export default function Home() {
           <div className="text-sm">items purchased</div>
         </div>
         <div className="flex gap-2 items-end">
+          <div className="text-3xl font-medium">${avgExpenditure.toFixed(2)}</div>
+          <div className="text-sm">average per month</div>
+        </div>
+        <div className="flex gap-2 items-end">
           <div className="text-3xl font-medium">${totalExpenses}</div>
           <div className="text-sm">spent in total</div>
         </div>
         <div className="flex gap-2 items-end">
-          <div className="text-3xl font-medium">${avgExpenditure}</div>
-          <div className="text-sm">average per month</div>
-        </div>
-        <div className="flex gap-2 items-end">
-          <div className="text-3xl font-medium">{householdAge}</div>
+          <div className="text-3xl font-medium">${totalPaid}</div>
           <div className="text-sm">paid back</div>
         </div>
       </div>
@@ -571,7 +611,7 @@ export default function Home() {
                             {user.username}
                           </div>
                         :
-                          <div></div>
+                          <div key={i}></div>
                       ))}
                     </div>
                   </div>
