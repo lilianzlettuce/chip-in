@@ -31,6 +31,7 @@ export default function Home() {
 
   // Chart data
   const [ expenditurePerMonthData, setExpenditurePerMonthData ] = useState<any>();
+  const [ expensesByCategory, setexpensesByCategory ] = useState<any>();
 
   // Toggle confirmation modal for account deletion
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -123,7 +124,9 @@ export default function Home() {
       console.error('Error making request:', error);
     }
 
-    // Get chart data (expenditure per month)
+    /* Get chart data */
+
+    // Expenditure per month
     try {
       // GET request to server
       const url = `http://localhost:6969/household/${householdId}/expenditurePerMonth`;
@@ -147,6 +150,44 @@ export default function Home() {
                 "#50AF95",
                 "#f3ba2f",
                 "#2a71d0"
+              ],
+              borderColor: "black",
+              borderWidth: 2
+            }
+          ]
+        });
+      } else {
+        console.log("Failed to fetch purchase history")
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+    }
+
+    // Expenses by category
+    try {
+      // GET request to server
+      const url = `http://localhost:6969/household/${householdId}/expensesByCategory`;
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        
+        console.log(data.labels)
+        console.log(data.data)
+
+        // Intialize chart data
+        setexpensesByCategory({
+          labels: data.labels, 
+          datasets: [
+            {
+              label: "Expenditure",
+              data: data.data,
+              backgroundColor: [
+                "#96c7bbad",
+                "#ecf0f1",
+                "#325374",
+                "#f3ba2f",
+                "#2a71d0",
+                "rgba(75,192,192,1)",
               ],
               borderColor: "black",
               borderWidth: 2
@@ -249,50 +290,82 @@ export default function Home() {
           <br></br>
           <br></br>
         </div> 
+      </div>
 
-        <div className="w-full flex flex-col">
-          <div>Expenses Over Time</div>
-          {expenditurePerMonthData ? 
-            <div className="w-[500px] h-[200px]">
-              <Line
-                data={expenditurePerMonthData}
-                options={{
-                  plugins: {
-                    title: {
-                      display: true,
-                      text: "Recent Purchase History"
-                    },
-                    legend: {
-                      display: false
-                    },
-                    tooltip: {
-                      callbacks: {
-                        label: function (context) {
-                          const value = context.raw as number; // get raw value
-                          return `$${Number(value).toFixed(2)}`; // currency format
-                        }
+      <div className="w-fit flex flex-col">
+        <div>Expenses Over Time</div>
+        {expenditurePerMonthData ? 
+          <div className="w-[500px] h-[200px]">
+            <Line
+              data={expenditurePerMonthData}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenditure Over Time"
+                  },
+                  legend: {
+                    display: false
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.raw as number; // get raw value
+                        return `$${Number(value).toFixed(2)}`; // currency format
                       }
                     }
-                  },
-                  scales: {
-                    y: {
-                      ticks: {
-                        callback: function (value) {
-                          return `$${Number(value).toFixed(2)}`; // currency format
-                        }
+                  }
+                },
+                scales: {
+                  y: {
+                    ticks: {
+                      callback: function (value) {
+                        return `$${Number(value).toFixed(2)}`; // currency format
                       }
                     }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+          </div>
+        :
+          <div>Loading...</div>
+        }
+      </div>
+      <div className="w-fit flex flex-col">
+        <div>Expenses By Category</div>
+        {expensesByCategory ? 
+          <div className="w-[400px] h-[400px]">
+            <Pie
+              data={expensesByCategory}
+              options={{
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Expenses By Category"
                   },
-                  responsive: true,
-                  maintainAspectRatio: false,
-                }}
-              />
-            </div>
-          :
-            <div>Loading...</div>
-          }
-        </div>
-
+                  legend: {
+                    display: true
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const value = context.raw as number; // get raw value
+                        return `$${Number(value).toFixed(2)}`; // currency format
+                      }
+                    }
+                  }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+          </div>
+        :
+          <div>Loading...</div>
+        }
       </div>
     </div>
   );
