@@ -75,9 +75,9 @@ router.patch('/debts/:id', async (req, res) => {
             if (reverseDebt) {
                 const amountDifference = debt.amount - reverseDebt.amount;
 
-                console.log("Processing debts between:", owedById, "and", owedToId);
-                console.log("Original debt amounts:", debt.amount, reverseDebt.amount);
-                console.log("Amount difference:", amountDifference);
+                // console.log("Processing debts between:", owedById, "and", owedToId);
+                // console.log("Original debt amounts:", debt.amount, reverseDebt.amount);
+                // console.log("Amount difference:", amountDifference);
 
                 let debtAmount = 0;
                 let reverseDebtAmount = 0;
@@ -119,7 +119,7 @@ router.patch('/debts/:id', async (req, res) => {
                 { path: 'owedTo', select: 'username' }
             ]
         });
-        console.log("Updated debts:", updatedHousehold.debts);
+        // console.log("Updated debts:", updatedHousehold.debts);
         res.status(200).json(updatedHousehold.debts);
     } catch (err) {
         console.error(err);
