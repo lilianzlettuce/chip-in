@@ -111,7 +111,7 @@ router.post('/addtopurchased', async (req, res) => {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
-  console.log('Request Body:', req.body);
+  // console.log('Request Body:', req.body);
 
   if (!splits || !Array.isArray(splits) || splits.length === 0) {
     if (!sharedBetween || sharedBetween.length === 0) {
@@ -124,7 +124,7 @@ router.post('/addtopurchased', async (req, res) => {
     }));
   }
 
-  console.log(splits)
+  // console.log(splits)
 
   cost *= 100;
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
