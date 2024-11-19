@@ -104,6 +104,7 @@ router.post('/addtogrocery', async (req, res) => {
   }
 });
 
+//create item and add to purchased list
 router.post('/addtopurchased', async (req, res) => {
   let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits } = req.body;
 
@@ -111,14 +112,12 @@ router.post('/addtopurchased', async (req, res) => {
     return res.status(400).json({ message: 'Fields must be populated' });
   }
 
-  // If splits are not provided or empty, generate default splits
   if (!splits || !Array.isArray(splits) || splits.length === 0) {
     if (!sharedBetween || sharedBetween.length === 0) {
       return res.status(400).json({ message: 'sharedBetween cannot be empty' });
     }
     const defaultSplit = 1 / sharedBetween.length;
     splits = sharedBetween.map(userId => {
-      // Validate and convert to ObjectId
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         return res.status(400).json({ message: `Invalid ObjectId: ${userId}` });
       }
@@ -128,7 +127,6 @@ router.post('/addtopurchased', async (req, res) => {
       };
     });
   } else {
-    // Validate and convert each split's member to ObjectId
     splits = splits.map(split => {
       if (!mongoose.Types.ObjectId.isValid(split.member)) {
         throw new Error(`Invalid ObjectId: ${split.member}`);
@@ -140,17 +138,12 @@ router.post('/addtopurchased', async (req, res) => {
     });
   }
 
-  // Convert cost to cents (assuming cost is stored as cents)
   cost *= 100;
 
-  // Create the new item
   const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
 
   try {
-    // Save the new item
     const item = await newItem.save();
-
-    // Update the household
     const household = await Household.findByIdAndUpdate(
       householdId,
       { $push: { purchasedList: item._id, purchaseHistory: item._id } },
@@ -160,8 +153,6 @@ router.post('/addtopurchased', async (req, res) => {
     if (!household) {
       return res.status(404).json({ message: 'Household not found' });
     }
-
-    // Update debts for each split
     for (const split of splits) {
       const splitCost = split.split * cost;
       if (split.member.toString() === purchasedBy) {
@@ -185,73 +176,6 @@ router.post('/addtopurchased', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-//create item and add to purchased list
-/*
-router.post('/addtopurchased', async (req, res) => {
-  let { householdId, name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits } = req.body;
-
-  if (!name || !category || !purchasedBy || !purchaseDate || cost === undefined || cost === null) {
-    return res.status(400).json({ message: 'Fields must be populated' });
-  }
-
-  if (!splits || !Array.isArray(splits) || splits.length === 0) {
-    if (!sharedBetween || sharedBetween.length === 0) {
-      return res.status(400).json({ message: 'sharedBetween cannot be empty' });
-    }
-    const defaultSplit = 1 / sharedBetween.length;
-    splits = sharedBetween.map(userId => ({
-      member: mongoose.Types.ObjectId(userId),
-      split: defaultSplit
-    }));
-  }
-
-  // console.log(splits)
-
-  cost *= 100;
-  const newItem = new Item({ name, category, purchasedBy, sharedBetween, purchaseDate, expirationDate, cost, splits });
-
-  try {
-    const item = await newItem.save();
-
-    const household = await Household.findByIdAndUpdate(
-      householdId,
-      { $push: { purchasedList: item._id, purchaseHistory: item._id } },
-      { new: true, useFindandModify: false }
-    );
-
-    if (!household) {
-      return res.status(404).json({ message: 'Household not found' });
-    }
-    for (const split of splits) {
-      const splitCost = split.split * cost;
-      // console.log(splitCost)
-      // console.log('split.member', split.member)
-      // console.log('purchasedby', purchasedBy)
-      //if (split.member === purchasedBy) { continue; }
-      if (split.member.toString() === purchasedBy) {
-        continue;
-      }
-
-      let newHousehold = await Household.findOneAndUpdate(
-        { _id: householdId },
-        { $inc: { "debts.$[elem].amount": splitCost } },
-        {
-          arrayFilters: [{ "elem.owedBy": split.member, "elem.owedTo": purchasedBy }],
-          new: true,
-          useFindAndModify: false
-        }
-      );
-    }
-
-    res.status(201).json(item);
-  } catch (err) {
-    // console.log('error adding item', err)
-    res.status(500).json({ error: err.message });
-  }
-});
-*/
 
 router.get('/search/:id', async (req, res) => {
   console.log("search request accepted")
