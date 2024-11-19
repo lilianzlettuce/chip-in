@@ -22,9 +22,9 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
         const totalPercentage = Object.values(roommatePerc)
             .map((value) => parseFloat(value) || 0)
             .reduce((sum, value) => sum + value, 0);
-    
+
         const allEmpty = Object.values(roommatePerc).every((value) => !value);
-    
+
         if (selectedRoommates.length > 1 && allEmpty) {
             setErrorMessage('Price will be split evenly');
         } else if (selectedRoommates.length > 1 && totalPercentage !== 100) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './AddItem.css';
 
@@ -16,38 +16,79 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   const [purchaseDate, setPurchaseDate] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
   const [cost, setCost] = useState<number>(0);
+  const [roommatePerc, setRoommatePerc] = useState<{ [key: string]: string }>({});
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { householdId } = useParams();
 
+  useEffect(() => {
+    const totalPercentage = Object.values(roommatePerc)
+      .map((value) => parseFloat(value) || 0)
+      .reduce((sum, value) => sum + value, 0);
+
+    const allEmpty = Object.values(roommatePerc).every((value) => !value);
+
+    if (sharedBetween.length > 1 && allEmpty) {
+      setErrorMessage('Cost will be split evenly');
+    } else if (sharedBetween.length > 1 && totalPercentage !== 100) {
+      setErrorMessage('The total percentage must add up to 100%');
+    } else {
+      setErrorMessage('');
+    }
+  }, [roommatePerc, sharedBetween]);
+
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    setSharedBetween((prev) =>
-      checked ? [...prev, value] : prev.filter((roommate) => roommate !== value)
-    );
+    if (checked) {
+      setSharedBetween((prev) => [...prev, value]);
+      setRoommatePerc((prev) => ({ ...prev, [value]: '' }));
+    } else {
+      setSharedBetween((prev) => prev.filter((roommate) => roommate !== value));
+      setRoommatePerc((prev) => {
+        const updated = { ...prev };
+        delete updated[value];
+        return updated;
+      });
+    }
+  };
+
+  const handleRoommateSplit = (roommateId: string, newPercentage: string) => {
+    const value = parseFloat(newPercentage);
+    setRoommatePerc((prev) => ({
+      ...prev,
+      [roommateId]: isNaN(value) ? '' : newPercentage,
+    }));
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedRoommate = e.target.value;
-
     setPurchasedBy(selectedRoommate);
   };
 
   const handleSubmit = async () => {
+    if (errorMessage && errorMessage !== 'Cost will be split evenly') return;
+
     const purchasedId = roommates.find((roommate) => roommate.name === purchasedBy)?._id || null;
-    const sharedIdsArray = sharedBetween.map((name) => {
-      const roommate = roommates.find((roommate) => roommate.name === name);
+    const sharedIdsArray = sharedBetween.map((id) => {
+      const roommate = roommates.find((roommate) => roommate._id === id);
       return roommate ? roommate._id : null;
     }).filter((id) => id !== null);
 
+    const splits = Object.entries(roommatePerc).map(([roommateId, percentage]) => ({
+      member: roommateId,
+      split: parseFloat(percentage) / 100,
+    }));
+
     const requestBody = {
-      householdId: householdId,
-      name: name,
-      category: category,
+      householdId,
+      name,
+      category,
       purchasedBy: purchasedId,
       sharedBetween: sharedIdsArray,
-      purchaseDate: purchaseDate,
-      expirationDate: expirationDate,
-      cost: cost,
+      purchaseDate,
+      expirationDate,
+      cost,
+      splits,
     };
 
     try {
@@ -73,6 +114,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
     onSave(requestBody);
     onClose();
   };
+
+  const sharedByNames = sharedBetween
+    .map((id) => {
+      const roommate = roommates.find((roommate) => roommate._id === id);
+      return roommate ? roommate.name : null;
+    })
+    .filter((name) => name !== null);
 
   return (
     <div className="modal-overlay">
@@ -117,11 +165,20 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
             <div key={roommate._id}>
               <input
                 type="checkbox"
-                value={roommate.name}
-                checked={sharedBetween.includes(roommate.name)}
+                value={roommate._id}
+                checked={sharedBetween.includes(roommate._id)}
                 onChange={handleCheckboxChange}
               />
               <label>{roommate.name}</label>
+              {sharedBetween.includes(roommate._id) && (
+                <input
+                  type="number"
+                  placeholder="Enter custom split %"
+                  value={roommatePerc[roommate._id] || ''}
+                  onChange={(e) => handleRoommateSplit(roommate._id, e.target.value)}
+                  className="split-input"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -135,8 +192,20 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
         </div>
         <div className="input-group">
           <label>Cost:</label>
-          <input type="number" value={cost} onChange={(e) => setCost(parseFloat(e.target.value))} />
+          <input
+            type="number"
+            value={cost || ''}
+            onChange={(e) => {
+              const value = parseFloat(e.target.value);
+              setCost(isNaN(value) ? 0 : value);
+            }}
+          />
         </div>
+
+        {/* Display Shared By Names */}
+        <p>Shared by: {sharedByNames.length > 0 ? sharedByNames.join(' and ') : 'No one'}</p>
+
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
 
         {/* Submit Button */}
         <button className="submit-button" onClick={handleSubmit}>Save Item</button>

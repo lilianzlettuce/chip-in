@@ -131,8 +131,13 @@ h2 {
   border-radius: 5px;
   align-self: center;
   font-size: 14px;
+  margin-top: 10px;
 }
 
 .submit-button:hover {
   background-color: #1a5cb8;
+}
+
+.split-input {
+  margin-left: 10px;
 }
