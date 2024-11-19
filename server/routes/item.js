@@ -133,7 +133,7 @@ router.post('/addtopurchased', async (req, res) => {
       }
       return {
         member: new mongoose.Types.ObjectId(split.member),
-        split: split.split,
+        split: split.split !== undefined && split.split !== null ? split.split : 0,
       };
     });
   }
