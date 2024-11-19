@@ -106,7 +106,16 @@ const ItemModal: React.FC<ItemModalProps> = ({ item, listType, roommates, curren
                     ))}
                 </div>
 
-                {errorMessage && <div className="error-message">{errorMessage}</div>}
+                {errorMessage && (
+                    <div
+                        className="error-message"
+                        style={{
+                            color: errorMessage === 'Price will be split evenly' ? 'green' : 'red',
+                        }}
+                    >
+                        {errorMessage}
+                    </div>
+                )}
 
                 <button onClick={handleSave} disabled={!!errorMessage && errorMessage !== 'Price will be split evenly'}>Save</button>
                 <button onClick={onClose}>Cancel</button>

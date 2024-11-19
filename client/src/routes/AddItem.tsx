@@ -66,6 +66,22 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   };
 
   const handleSubmit = async () => {
+    const allEmpty = Object.values(roommatePerc).every((value) => !value || parseFloat(value) === 0);
+
+    let splits;
+    if (allEmpty && sharedBetween.length > 0) {
+      const defaultSplit = 1 / sharedBetween.length;
+      splits = sharedBetween.map((id) => ({
+        member: id,
+        split: defaultSplit,
+      }));
+    } else {
+      splits = Object.entries(roommatePerc).map(([roommateId, percentage]) => ({
+        member: roommateId,
+        split: parseFloat(percentage) / 100,
+      }));
+    }
+
     if (errorMessage && errorMessage !== 'Cost will be split evenly') return;
 
     const purchasedId = roommates.find((roommate) => roommate.name === purchasedBy)?._id || null;
@@ -73,11 +89,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
       const roommate = roommates.find((roommate) => roommate._id === id);
       return roommate ? roommate._id : null;
     }).filter((id) => id !== null);
-
-    const splits = Object.entries(roommatePerc).map(([roommateId, percentage]) => ({
-      member: roommateId,
-      split: parseFloat(percentage) / 100,
-    }));
 
     const requestBody = {
       householdId,
@@ -170,7 +181,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
                 onChange={handleCheckboxChange}
               />
               <label>{roommate.name}</label>
-              {sharedBetween.includes(roommate._id) && (
+              {/* Only show percentage input boxes if more than one roommate is selected */}
+              {sharedBetween.length > 1 && sharedBetween.includes(roommate._id) && (
                 <input
                   type="number"
                   placeholder="Enter custom split %"
@@ -201,11 +213,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
             }}
           />
         </div>
-
         {/* Display Shared By Names */}
         <p>Shared by: {sharedByNames.length > 0 ? sharedByNames.join(' and ') : 'No one'}</p>
 
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {errorMessage && (
+          <div
+            className="error-message"
+            style={{
+              color: errorMessage === 'Cost will be split evenly' ? 'green' : 'red',
+            }}
+          >
+            {errorMessage}
+          </div>
+        )}
 
         {/* Submit Button */}
         <button className="submit-button" onClick={handleSubmit}>Save Item</button>
