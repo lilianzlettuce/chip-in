@@ -129,7 +129,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
                         )}
                     </button>
                     <div className="tooltip tooltip-green">
-                        {listType === 'grocery' ? 'Purchased' : 'Repurchased'}
+                        {listType === 'grocery' ? 'Purchase' : 'Repurchase'}
                     </div>
                 </div>
                 <div className='button-with-tooltip'>
