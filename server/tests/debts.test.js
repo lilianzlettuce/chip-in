@@ -10,11 +10,9 @@ import cron from 'node-cron'
 
 const api = supertest(app);
 
-let user1Id;
-let user2Id;
-let user3Id;
+let user1Id, user2Id, user3Id;
 let householdId;
-let itemId;
+let item1Id, item2Id, item3Id, item4Id;
 
 before(async () => {
     await User.deleteMany({});
@@ -94,7 +92,7 @@ describe('balancing debts', () => {
             .expect(201)
         
         let household = await Household.findById(householdId);
-        itemId = household.purchasedList[0];
+        item1Id = household.purchasedList[0];
 
         let debt = household.debts.find(
            (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
@@ -120,7 +118,8 @@ describe('balancing debts', () => {
             .send(payload)
             .expect(201)
         
-        
+        item2Id = response.body._id;
+
         response = await api
             .patch(`/payment/debts/${householdId}`)
             .expect(200)
@@ -137,7 +136,7 @@ describe('balancing debts', () => {
 
     })
 
-    test('user2 buys item expensive enought to cancel out debt', async () => {
+    test('user2 buys item expensive enough to cancel out debt', async () => {
         let payload = {
             "name": "beef",
             "category": "Food",
@@ -153,8 +152,40 @@ describe('balancing debts', () => {
             .send(payload)
             .expect(201)
 
-        itemId = response.body._id;
-        console.log('item id', itemId);
+        item3Id = response.body._id;
+        response = await api
+            .patch(`/payment/debts/${householdId}`)
+            .expect(200)
+        
+        let balancedDebts = response.body;
+        let debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user1Id.toString() && d.owedTo._id.toString() === user2Id.toString()
+        );
+        assert.strictEqual(debt.amount, 750);
+        debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 0);
+
+    })
+
+    test('purchasing zero cost item', async () => {
+        let payload = {
+            "name": "pencils",
+            "category": "Other",
+            "purchasedBy": user2Id,
+            "sharedBetween": [user1Id, user2Id],
+            "purchaseDate": "2024-10-12T10:00:00.000+00:00",
+            "expirationDate": "2024-11-28T10:00:00.000+00:00",
+            "cost": "0",
+            "householdId": householdId
+        }
+        let response = await api
+            .post(`/item/addtopurchased/`)
+            .send(payload)
+            .expect(201)
+
+        item4Id = response.body._id;
         response = await api
             .patch(`/payment/debts/${householdId}`)
             .expect(200)
@@ -175,7 +206,7 @@ describe('balancing debts', () => {
 describe('returning items', () => {
     test('user2 returns item', async () => {
         let payload = {
-            "itemId": itemId,
+            "itemId": item3Id,
         }
         let response = await api
             .patch(`/payment/return/${householdId}`)
@@ -185,7 +216,7 @@ describe('returning items', () => {
         response = await api
             .patch(`/payment/debts/${householdId}`)
             .expect(200)
-        console.log(response.body)
+        // console.log(response.body)
         let balancedDebts = response.body;
         let debt = balancedDebts.find(
             (d) => d.owedBy._id.toString() === user1Id.toString() && d.owedTo._id.toString() === user2Id.toString()
@@ -195,8 +226,79 @@ describe('returning items', () => {
             (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
         );
         assert.strictEqual(debt.amount, 750);
-
     })
+
+    test('returning item that does not exist', async () => {
+        let payload = {
+            "itemId": 'akslfwklefjklwfe',
+        }
+        let response = await api
+            .patch(`/payment/return/${householdId}`)
+            .send(payload)
+            .expect(500)
+    })
+
+    
+    test('return item after debts are paid', async () => {
+        let payload = {
+            "owedById": user2Id,
+            "owedToId": user1Id
+        }
+        let response = await api
+            .patch(`/payment/payall/${householdId}`)
+            .send(payload)
+            .expect(200)
+        
+        payload = {
+            "itemId": item2Id,
+        }
+        response = await api
+            .patch(`/payment/return/${householdId}`)
+            .send(payload)
+            .expect(200)
+        
+        response = await api
+            .patch(`/payment/debts/${householdId}`)
+            .expect(200)
+        // console.log(response.body)
+        let balancedDebts = response.body;
+        let debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user1Id.toString() && d.owedTo._id.toString() === user2Id.toString()
+        );
+        assert.strictEqual(debt.amount, 0);
+        debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 250);
+    })
+
+    test('returning zero cost item', async () => {
+        let payload = {
+            "itemId": item4Id,
+        }
+        let response = await api
+            .patch(`/payment/return/${householdId}`)
+            .send(payload)
+            .expect(200)
+        
+        response = await api
+            .patch(`/payment/debts/${householdId}`)
+            .expect(200)
+        // console.log(response.body)
+        let balancedDebts = response.body;
+        let debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user1Id.toString() && d.owedTo._id.toString() === user2Id.toString()
+        );
+        assert.strictEqual(debt.amount, 0);
+        debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 250);
+        const household = await Household.findById(householdId);
+        assert.strictEqual(household.purchasedList.length, 1);
+        assert.strictEqual(household.purchaseHistory.length, 1);
+    })
+
 })
 
 
