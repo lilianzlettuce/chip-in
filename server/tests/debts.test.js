@@ -199,6 +199,48 @@ describe('balancing debts', () => {
             (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
         );
         assert.strictEqual(debt.amount, 0);
+    })
+    
+    test('buying item with uneven split', async () => {
+        let payload = {
+            "name": "oreos",
+            "category": "Food",
+            "purchasedBy": user1Id,
+            "sharedBetween": [user1Id, user2Id, user3Id],
+            "purchaseDate": "2024-10-12T10:00:00.000+00:00",
+            "expirationDate": "2024-11-28T10:00:00.000+00:00",
+            "cost": "5",
+            "splits": [{"member": user1Id, "split": 0.2}, {"member": user2Id, "split": 0.3}, {"member": user3Id, "split": 0.4}],
+            "householdId": householdId
+        }
+        let response = await api
+            .post(`/item/addtopurchased/`)
+            .send(payload)
+            .expect(201)
+        
+        const household = await Household.findById(householdId);
+        let debt = household.debts.find(
+            (d) => d.owedBy.toString() === user3Id.toString() && d.owedTo.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 200);
+        debt = household.debts.find(
+            (d) => d.owedBy.toString() === user2Id.toString() && d.owedTo.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 150);
+
+        response = await api
+            .patch(`/payment/debts/${householdId}`)
+            .expect(200)
+        
+        let balancedDebts = response.body;
+        debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user1Id.toString() && d.owedTo._id.toString() === user2Id.toString()
+        );
+        assert.strictEqual(debt.amount, 600);
+        debt = balancedDebts.find(
+            (d) => d.owedBy._id.toString() === user3Id.toString() && d.owedTo._id.toString() === user1Id.toString()
+        );
+        assert.strictEqual(debt.amount, 200);
 
     })
 })
@@ -225,7 +267,7 @@ describe('returning items', () => {
         debt = balancedDebts.find(
             (d) => d.owedBy._id.toString() === user2Id.toString() && d.owedTo._id.toString() === user1Id.toString()
         );
-        assert.strictEqual(debt.amount, 750);
+        assert.strictEqual(debt.amount, 900);
     })
 
     test('returning item that does not exist', async () => {
@@ -295,8 +337,8 @@ describe('returning items', () => {
         );
         assert.strictEqual(debt.amount, 250);
         const household = await Household.findById(householdId);
-        assert.strictEqual(household.purchasedList.length, 1);
-        assert.strictEqual(household.purchaseHistory.length, 1);
+        assert.strictEqual(household.purchasedList.length, 2);
+        assert.strictEqual(household.purchaseHistory.length, 2);
     })
 
 })
