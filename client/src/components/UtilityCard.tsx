@@ -26,7 +26,7 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
     const [newAmount, setNewAmount] = useState<string>(amount.toString());
 
     const handleUpdateAmount = () => {
-        const validAmount = parseFloat(newAmount) || 0; // Default to 0 if input is empty
+        const validAmount = parseFloat(newAmount) || 0;
         onUpdateUtility(category, validAmount);
         setIsEditing(false);
     };
@@ -77,15 +77,18 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
             <div className="utility-amount">Amount due: ${amount.toFixed(2)}</div>
             {isEditing && (
                 <div className="utility-edit">
-                    <input
-                        type="text"
-                        value={newAmount}
-                        onChange={(e) => setNewAmount(e.target.value)}
-                        className="utility-input"
-                    />
-                    <button onClick={handleUpdateAmount} className="utility-button">
-                        ✓
-                    </button>
+                    <p className="utility-edit-text">Enter monthly bill for this utility:</p>
+                    <div className="utility-edit-row">
+                        <input
+                            type="text"
+                            value={newAmount}
+                            onChange={(e) => setNewAmount(e.target.value)}
+                            className="utility-input"
+                        />
+                        <button onClick={handleUpdateAmount} className="utility-button">
+                            ✓
+                        </button>
+                    </div>
                 </div>
             )}
             <div className="utility-bottom-content">

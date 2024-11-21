@@ -100,35 +100,28 @@ router.patch('/reset/:householdId', async (req, res) => {
     }
 });
 
-// update amount of utility bill
+// update amount of utility bill for all users
 router.patch('/update-amount/:householdId', async (req, res) => {
     const { householdId } = req.params;
-    const { userId, category, amount } = req.body;
+    const { category, amount } = req.body;
 
-    if (!userId || !category || amount === undefined) {
-        return res.status(400).json({ message: 'userId, category, and amount are required' });
+    if (!category || amount === undefined) {
+        return res.status(400).json({ message: 'Category and amount are required' });
     }
-
     try {
         const household = await Household.findById(householdId);
         if (!household) {
             return res.status(404).json({ message: 'Household not found' });
         }
-
-        const utility = household.utilities.find(
-            (utility) => utility.owedBy.toString() === userId && utility.category === category
-        );
-
-        if (!utility) {
-            return res.status(404).json({ message: 'Utility not found for the user and category' });
-        }
-
-        utility.amount = amount;
+        household.utilities.forEach((utility) => {
+            if (utility.category === category) {
+                utility.amount = amount;
+            }
+        });
         await household.save();
-
-        res.status(200).json({ message: 'Utility amount updated' });
+        res.status(200).json({ message: `Utility amounts for category "${category}" updated to ${amount} for all users` });
     } catch (error) {
-        console.error('Error updating utility amount:', error);
+        console.error('Error updating utility amounts:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
