@@ -186,4 +186,27 @@ router.patch('/view/:householdId', async (req, res) => {
     }
 });
 
+// get usernames who have not paid bill
+router.get('/unpaid/:householdId/:category', async (req, res) => {
+    const { householdId, category } = req.params;
+
+    try {
+        const household = await Household.findById(householdId).populate('members');
+        if (!household) {
+            return res.status(404).json({ message: 'Household not found' });
+        }
+        const unpaidUtilities = household.utilities.filter(
+            (utility) => utility.category === category && !utility.paid
+        );
+        const unpaidUserIds = unpaidUtilities.map((utility) => utility.owedBy);
+        const unpaidUsers = await User.find({ _id: { $in: unpaidUserIds } }, 'username');
+        const unpaidUsernames = unpaidUsers.map((user) => user.username);
+
+        res.status(200).json(unpaidUsernames);
+    } catch (error) {
+        console.error('Error fetching unpaid usernames:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 export default router;

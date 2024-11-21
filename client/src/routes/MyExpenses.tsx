@@ -15,6 +15,7 @@ export default function MyExpenses() {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [totalSpent, setTotalSpent] = useState(0);
     const [utilities, setUtilities] = useState<Utility[]>([]);
+    const [householdMembers, setHouseholdMembers] = useState<User[]>([]);
 
     interface User {
         _id: string;
@@ -34,6 +35,7 @@ export default function MyExpenses() {
         view: boolean;
         owedBy: string;
         _id: string;
+        unpaidUsernames?: string[];
     }
 
     interface Expense {
@@ -44,20 +46,25 @@ export default function MyExpenses() {
     }
 
     useEffect(() => {
-        if (householdId) {
+        if (householdId && user) {
+            fetchHouseholdMembers();
+            fetchUtilities();
             fetchDebts();
-            if (user?.id) {
-                fetchUtilities();
-            }
         }
-
         // Retrieve total spent specific to this user
         const storageKey = `totalSpent_${user?.id}_${householdId}`;
         const savedTotalSpent = localStorage.getItem(storageKey);
         if (savedTotalSpent) {
             setTotalSpent(parseFloat(savedTotalSpent));
         }
-    }, [user, householdId]);
+    }, [householdId, user]);
+
+    useEffect(() => {
+        if (utilities.length > 0 && householdMembers.length > 0) {
+            fetchUtilitiesWithUnpaidUsernames();
+        }
+    }, [utilities, householdMembers]);
+
 
     // const fetchDebts = async () => {
     //     if (!householdId || !user) return;
@@ -77,17 +84,31 @@ export default function MyExpenses() {
     //     }
     // };
 
+    const fetchHouseholdMembers = async () => {
+        if (!householdId) return;
+
+        try {
+            const response = await fetch(`http://localhost:6969/household/members/${householdId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch household members');
+            }
+            const data: User[] = await response.json();
+            setHouseholdMembers(data);
+        } catch (error) {
+            console.error('Error fetching household members:', error);
+        }
+    };
+
     const fetchDebts = async () => {
         if (!householdId || !user) return;
 
         try {
-            // Make a PATCH request to update debts
             const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({}) // Include an empty body or relevant data if needed
+                body: JSON.stringify({})
             });
 
             if (!response.ok) {
@@ -95,8 +116,6 @@ export default function MyExpenses() {
             }
 
             const data = await response.json();
-
-            // Calculate expenses based on the updated data
             const e = calculateExpenses(data, user.id);
             setExpenses(e);
 
@@ -142,7 +161,6 @@ export default function MyExpenses() {
             const isOwedByCurrentUser = owedBy._id === currentUserId;
             const isOwedToCurrentUser = owedTo._id === currentUserId;
 
-            // Determine the roommate and category (owesYou or youOwe)
             if (isOwedByCurrentUser) {
                 if (!expensesMap[owedTo._id]) {
                     expensesMap[owedTo._id] = {
@@ -240,6 +258,31 @@ export default function MyExpenses() {
         }
     };
 
+    const fetchUtilitiesWithUnpaidUsernames = async () => {
+        if (!householdId || utilities.length === 0 || householdMembers.length === 0) return;
+
+        try {
+            const updatedUtilities = await Promise.all(
+                utilities.map(async (utility) => {
+                    const response = await fetch(
+                        `http://localhost:6969/utilities/unpaid/${householdId}/${utility.category}`
+                    );
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch unpaid usernames');
+                    }
+                    const unpaidUsernames: string[] = await response.json();
+                    return { ...utility, unpaidUsernames };
+                })
+            );
+
+            if (JSON.stringify(updatedUtilities) !== JSON.stringify(utilities)) {
+                setUtilities(updatedUtilities);
+            }
+        } catch (error) {
+            console.error('Error fetching utilities with unpaid usernames:', error);
+        }
+    };
+
     const handleResetUtility = async (category: string) => {
         if (!user || !householdId) return;
 
@@ -292,11 +335,12 @@ export default function MyExpenses() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            setUtilities((prev) =>
-                prev.map((u) =>
-                    u.category === category && u.owedBy === user.id
-                        ? { ...u, view: !currentView }
-                        : u
+
+            setUtilities((prevUtilities) =>
+                prevUtilities.map((utility) =>
+                    utility.category === category
+                        ? { ...utility, view: !currentView }
+                        : utility
                 )
             );
         } catch (error) {
@@ -338,6 +382,7 @@ export default function MyExpenses() {
                             amount={utility.amount}
                             paid={utility.paid}
                             view={utility.view}
+                            unpaidUsernames={utility.unpaidUsernames || []}
                             onUpdateUtility={handleUpdateUtility}
                             onPayUtility={handlePayUtility}
                             onResetUtility={handleResetUtility}
@@ -345,7 +390,9 @@ export default function MyExpenses() {
                         />
                     ))
                 ) : (
-                    <p>No utilities available for this household.</p>
+                    <div className="no-utilities-message">
+                        No utilities available for this household.
+                    </div>
                 )}
             </div>
         </div>

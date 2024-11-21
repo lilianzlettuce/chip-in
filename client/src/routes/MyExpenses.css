@@ -14,3 +14,21 @@
   justify-content: center;
   margin-bottom: 1rem;
 }
+
+.utility-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  margin-top: 30px;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 300px;
+}
+
+.no-utilities-message {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: #ff8482;
+  margin: auto;
+}

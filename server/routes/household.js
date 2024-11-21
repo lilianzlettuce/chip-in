@@ -594,6 +594,31 @@ router.get("/:id/expensesByItem", async (req, res) => {
   }
 });
 
+// get users who haven't paid a bill
+router.get('/:householdId/utilities/unpaid/:category', async (req, res) => {
+  const { householdId, category } = req.params;
+
+  try {
+      const household = await Household.findById(householdId).populate('members');
+      if (!household) {
+          return res.status(404).json({ message: 'Household not found' });
+      }
+      const unpaidUtilities = household.utilities.filter(
+          (utility) => utility.category === category && !utility.paid
+      );
+      const unpaidUsernames = unpaidUtilities.map((utility) => {
+          const member = household.members.find((m) => m._id.toString() === utility.owedBy.toString());
+          return member ? member.username : 'Unknown User';
+      });
+
+      res.status(200).json(unpaidUsernames);
+  } catch (err) {
+      console.error('Error fetching unpaid members:', err.message);
+      res.status(500).json({ error: err.message });
+  }
+});
+
+
 // leave household
 router.post("/leave/:id", async (req, res) => {
   const { userId } = req.body;

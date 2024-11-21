@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import './UtilityCard.css';
 
 interface UtilityCardProps {
@@ -6,17 +6,19 @@ interface UtilityCardProps {
     amount: number;
     paid: boolean;
     view: boolean;
+    unpaidUsernames: string[];
     onUpdateUtility: (category: string, newAmount: number) => void;
     onPayUtility: (category: string) => void;
     onResetUtility: (category: string) => void;
     onToggleView: (category: string, currentView: boolean) => void;
 }
 
-const UtilityCard: React.FC<UtilityCardProps> = ({
+const UtilityCard: React.FC<UtilityCardProps> = memo(({
     category,
     amount,
     paid,
     view,
+    unpaidUsernames,
     onUpdateUtility,
     onPayUtility,
     onResetUtility,
@@ -25,28 +27,38 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [newAmount, setNewAmount] = useState<string>(amount.toString());
     const [displayAmount, setDisplayAmount] = useState<number>(amount);
+    const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!paid) {
-            setDisplayAmount(amount);
-        }
+        setShowConfirmation(false);
+    }, [view]);    
+
+    useEffect(() => {
+        setDisplayAmount(paid ? 0 : amount);
     }, [amount, paid]);
 
     const handleUpdateAmount = () => {
         const validAmount = parseFloat(newAmount) || 0;
-        setDisplayAmount(validAmount);
         onUpdateUtility(category, validAmount);
         setIsEditing(false);
     };
 
     const handlePayOrReset = () => {
         if (paid) {
-            onResetUtility(category);
-            setDisplayAmount(amount);
+            setShowConfirmation(true);
         } else {
-            setDisplayAmount(0);
             onPayUtility(category);
+            setDisplayAmount(0);
         }
+    };
+
+    const confirmReset = () => {
+        onResetUtility(category);
+        setShowConfirmation(false);
+    };
+
+    const cancelReset = () => {
+        setShowConfirmation(false);
     };
 
     const handleToggleView = () => {
@@ -54,7 +66,7 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
     };
 
     return (
-        <div className={`utility-card ${!view ? 'utility-hidden' : ''}`}>
+        <div className={`utility-card ${view ? '' : 'utility-hidden'}`}>
             <div className="utility-actions">
                 <button
                     onClick={() => setIsEditing(!isEditing)}
@@ -75,7 +87,8 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
                 <button
                     onClick={handleToggleView}
                     className="utility-button"
-                    title={view ? 'Hide this utility' : 'Show this utility'}
+                    title={view ? 'Do not track utility' : 'Track utility'}
+                    disabled={!view && showConfirmation}
                 >
                     👁️‍🗨️
                 </button>
@@ -103,6 +116,37 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
                     </div>
                 </div>
             )}
+            {showConfirmation && (
+                <div className="utility-confirmation">
+                    <p className="confirmation-message">
+                        {unpaidUsernames.length > 0 ? (
+                            <>
+                                Not all roommates have paid the bill yet:{' '}
+                                <span className="unpaid-usernames">
+                                    {unpaidUsernames.join(', ')}
+                                </span>{' '}
+                                need to pay. Do you still want to reset the bill?
+                            </>
+                        ) : (
+                            'All roommates have paid the bill. Do you want to reset the bill?'
+                        )}
+                    </p>
+                    <div className="utility-confirm-buttons">
+                        <button
+                            onClick={confirmReset}
+                            className="utility-confirm-button confirm-yes"
+                        >
+                            ✓
+                        </button>
+                        <button
+                            onClick={cancelReset}
+                            className="utility-confirm-button confirm-no"
+                        >
+                            ｘ
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className="utility-bottom-content">
                 {category === 'Water' && <span role="img" aria-label="Water">💧</span>}
                 {category === 'Electricity' && <span role="img" aria-label="Electricity">⚡</span>}
@@ -110,6 +154,6 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default UtilityCard;
