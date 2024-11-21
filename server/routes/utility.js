@@ -53,7 +53,6 @@ router.patch('/pay/:householdId', async (req, res) => {
         if (!utility) {
             return res.status(404).json({ message: 'Utility not found for the user and category' });
         }
-        utility.amount = 0;
         utility.paid = true;
 
         await household.save();
@@ -68,10 +67,10 @@ router.patch('/pay/:householdId', async (req, res) => {
 // reset utility bill
 router.patch('/reset/:householdId', async (req, res) => {
     const { householdId } = req.params;
-    const { userId, category } = req.body;
+    const { category } = req.body;
 
-    if (!userId || !category) {
-        return res.status(400).json({ message: 'userId and category are required' });
+    if (!category) {
+        return res.status(400).json({ message: 'Category is required' });
     }
 
     try {
@@ -80,22 +79,17 @@ router.patch('/reset/:householdId', async (req, res) => {
             return res.status(404).json({ message: 'Household not found' });
         }
 
-        const utility = household.utilities.find(
-            (utility) => utility.owedBy.toString() === userId && utility.category === category
-        );
-
-        if (!utility) {
-            return res.status(404).json({ message: 'Utility not found for the user and category' });
-        }
-
-        utility.paid = false;
-        utility.amount = 0;
+        household.utilities.forEach((utility) => {
+            if (utility.category === category) {
+                utility.paid = false;
+            }
+        });
 
         await household.save();
 
-        res.status(200).json({ message: 'Utility reset successfully' });
+        res.status(200).json({ message: 'Utilities reset successfully for all users' });
     } catch (error) {
-        console.error('Error resetting utility:', error);
+        console.error('Error resetting utilities:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });

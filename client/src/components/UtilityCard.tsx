@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './UtilityCard.css';
 
 interface UtilityCardProps {
@@ -24,9 +24,17 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
 }) => {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [newAmount, setNewAmount] = useState<string>(amount.toString());
+    const [displayAmount, setDisplayAmount] = useState<number>(amount);
+
+    useEffect(() => {
+        if (!paid) {
+            setDisplayAmount(amount);
+        }
+    }, [amount, paid]);
 
     const handleUpdateAmount = () => {
         const validAmount = parseFloat(newAmount) || 0;
+        setDisplayAmount(validAmount);
         onUpdateUtility(category, validAmount);
         setIsEditing(false);
     };
@@ -34,7 +42,9 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
     const handlePayOrReset = () => {
         if (paid) {
             onResetUtility(category);
+            setDisplayAmount(amount);
         } else {
+            setDisplayAmount(0);
             onPayUtility(category);
         }
     };
@@ -74,7 +84,9 @@ const UtilityCard: React.FC<UtilityCardProps> = ({
             <div className={`utility-status ${paid ? 'paid' : 'unpaid'}`}>
                 Status: {paid ? 'Paid' : 'Unpaid'}
             </div>
-            <div className="utility-amount">Amount due: ${amount.toFixed(2)}</div>
+            <p className="utility-amount">
+                Amount due: ${displayAmount.toFixed(2)}
+            </p>
             {isEditing && (
                 <div className="utility-edit">
                     <p className="utility-edit-text">Enter monthly bill for this utility:</p>

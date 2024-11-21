@@ -232,7 +232,7 @@ export default function MyExpenses() {
 
             setUtilities((prev) =>
                 prev.map((utility) =>
-                    utility.category === category ? { ...utility, paid: true, amount: 0 } : utility
+                    utility.category === category ? { ...utility, paid: true } : utility
                 )
             );
         } catch (error) {
@@ -260,11 +260,10 @@ export default function MyExpenses() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Update the utility state after resetting
             setUtilities((prev) =>
                 prev.map((utility) =>
                     utility.category === category && utility.owedBy === user.id
-                        ? { ...utility, paid: false, amount: 0 }
+                        ? { ...utility, paid: false }
                         : utility
                 )
             );
