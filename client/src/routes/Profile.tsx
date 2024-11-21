@@ -1040,7 +1040,7 @@ const Stats: React.FC = () => {
             <span className="summary-value">${totalOwedTo.toFixed(2)}</span> owed from roommates
           </p>
           <p className="summary-item">
-            <span className="summary-value">{totalItem}</span> items bought and shared
+            <span className="summary-value">{totalItem}</span> items currently shared
           </p>
           <p className="summary-item">
             <span className="summary-value">${totalOwedBy.toFixed(2)}</span> owed to roommates
