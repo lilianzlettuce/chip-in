@@ -47,7 +47,6 @@ router.get('/:householdId/search', async (req, res) => {
   }
 });
 
-
 // // POST route to update household members
 // router.patch('/updateMembers/:id', async (req, res) => {
 //   const { userId } = req.body; // Expect _id of household and userId to add
@@ -142,7 +141,7 @@ router.patch('/purchase', async (req, res) => {
       // console.log(splitCost)
       // console.log('split.member', split.member)
       // console.log('purchasedby', purchasedBy)
-      if (split.member === purchasedBy) {continue;}
+      if (split.member === purchasedBy) { continue; }
       let newHousehold = await Household.findOneAndUpdate(
         {
           _id: householdId
@@ -157,7 +156,7 @@ router.patch('/purchase', async (req, res) => {
           new: true,
           useFindAndModify: false
         }
-      );   
+      );
     }
 
     if (!household) {
@@ -235,6 +234,7 @@ router.patch("/:id", async (req, res) => {
     if (!household) {
       return res.status(404).json({ message: "Household not found" });
     }
+
     res.status(200).json(household);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -299,13 +299,24 @@ router.post("/addUser/:id", async (req, res) => {
         amount: 0
       });
     }
-    
+
+    const utilityCategories = ['Water', 'Electricity', 'Internet'];
+    let newUtilities = utilityCategories.map(category => ({
+      category: category,
+      amount: 0,
+      paid: false,
+      view: true,
+      owedBy: userId
+    }));
+
     const newHousehold = await Household.findByIdAndUpdate(
       householdId,
-      { $push: { 
+      {
+        $push: {
           members: userId,
-          debts: { $each: newDebts }
-        } 
+          debts: { $each: newDebts },
+          utilities: { $each: newUtilities }
+        }
       },
       { new: true, useFindAndModify: false }
     );
@@ -567,13 +578,13 @@ router.get("/:id/expensesByItem", async (req, res) => {
     let freqData = sortedFreqs.map(freq => freq[1]);
 
     // Format data to send as result
-    res.status(200).json({ 
+    res.status(200).json({
       expenses: {
-        labels: expenseLabels, 
+        labels: expenseLabels,
         data: expenseData
       },
       frequencies: {
-        labels: freqLabels, 
+        labels: freqLabels,
         data: freqData
       },
     });
@@ -605,16 +616,16 @@ router.post("/leave/:id", async (req, res) => {
 
     await Household.updateOne(
       { _id: householdId },
-      { 
-        $pull: { 
+      {
+        $pull: {
           members: userId,
-          debts: { 
-            $or: [ 
-              { owedBy: userId }, 
-              { owedTo: userId } 
-            ] 
+          debts: {
+            $or: [
+              { owedBy: userId },
+              { owedTo: userId }
+            ]
           }
-        } 
+        }
       }
     );
 
@@ -648,11 +659,11 @@ router.get('/owed/:id', async (req, res) => {
     let totalOwedTo = 0;
     let totalOwedBy = 0;
     for (let i = 0; i < households.length; i++) {
-      for (let j = 0; j < households[i].debts.length; j++){
-        if (households[i].debts[j].owedBy == userId){
+      for (let j = 0; j < households[i].debts.length; j++) {
+        if (households[i].debts[j].owedBy == userId) {
           totalOwedBy += households[i].debts[j].amount;
         }
-        if (households[i].debts[j].owedTo == userId){
+        if (households[i].debts[j].owedTo == userId) {
           totalOwedTo += households[i].debts[j].amount;
           //console.log("Total owed to Amount:", totalOwedTo);
         }

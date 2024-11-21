@@ -1,26 +1,128 @@
 .utility-card {
-    background-color: #dfe6e9;
-    padding: 15px;
+    border: 1px solid #ffffff;
     border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-    width: 150px;
-    margin: 10px;
+    padding: 16px;
+    margin: 8px;
+    margin-top: 65px;
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    text-align: left;
+    color: #dff3ff;
+    width: 250px;
+    height:200px;
+    transition: transform 0.2s, background-color 0.2s;
+    position: relative;
 }
 
-.utility-icon {
-    font-size: 2rem;
-    margin-bottom: 5px;
+.utility-card:hover {
+    background-color: #333333;
+    transform: scale(1.05);
 }
 
-.utility-name {
-    font-size: 1.2rem;
+.utility-category {
+    font-size: 20px;
     font-weight: bold;
-    margin: 5px 0;
+    margin-bottom: 8px;
+    color: #d7f1ff;
 }
 
 .utility-status {
-    font-size: 0.9rem;
-    color: #636e72;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.utility-status.paid {
+    color: #a4fcb8;
+}
+
+.utility-status.unpaid {
+    color: #fdff9f;
+}
+
+
+.utility-amount {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.utility-actions {
+    position: absolute;
+    top: 14px;
+    right: 13px;
+    display: flex;
+    gap: 8px;
+}
+
+.utility-button {
+    padding: 10px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #bbe4e2;
+    color: #1a1a1a;
+    font-size: 16px;
+    font-weight: bold;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.utility-button:hover {
+    background-color: #fdff9f;
+    color: #000000;
+}
+
+.utility-input {
+    margin-left: 8px;
+    padding: 6px;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    background-color: #262626;
+    color: #ffffff;
+    font-size: 14px;
+    width: 50%;
+}
+
+.utility-edit {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.utility-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+}
+
+.utility-card.utility-hidden {
+    background-color: #555555;
+    opacity: 0.5;
+}
+
+.utility-card .utility-button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed; 
+}
+
+.utility-card.utility-hidden .utility-actions {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.utility-bottom-content {
+    margin-top: 10px;
+    text-align: center;
+    padding-top: 8px;
+    font-size: 30px;
+    color: #ffffff;
+    border-radius: 4px;
 }

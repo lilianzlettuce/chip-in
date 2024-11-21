@@ -11,6 +11,7 @@ import alerts from "./routes/alert.js"
 import notes from "./routes/note.js"
 import payments from "./routes/payment.js"
 import recipes from "./routes/recipe.js"
+import utilities from "./routes/utility.js"
 
 import "./cronjobs/cronjobs.js"
 
@@ -22,7 +23,7 @@ app.use(express.json());
 
 console.log('hello');
 
-//Item route
+// Item route
 app.use("/item", items);
 app.use("/user", users);
 app.use("/household", households);
@@ -31,6 +32,7 @@ app.use("/alert", alerts)
 app.use("/note", notes)
 app.use("/payment", payments)
 app.use("/recipes", recipes)
+app.use("/utilities", utilities)
 
 // Auth route
 app.use("/auth", auth);

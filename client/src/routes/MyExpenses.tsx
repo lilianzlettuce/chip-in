@@ -14,6 +14,7 @@ export default function MyExpenses() {
     const { user } = useUserContext();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [totalSpent, setTotalSpent] = useState(0);
+    const [utilities, setUtilities] = useState<Utility[]>([]);
 
     interface User {
         _id: string;
@@ -26,6 +27,15 @@ export default function MyExpenses() {
         amount: number;
     }
 
+    interface Utility {
+        category: string;
+        amount: number;
+        paid: boolean;
+        view: boolean;
+        owedBy: string;
+        _id: string;
+    }
+
     interface Expense {
         roommateId: string;
         roommateName: string;
@@ -36,6 +46,9 @@ export default function MyExpenses() {
     useEffect(() => {
         if (householdId) {
             fetchDebts();
+            if (user?.id) {
+                fetchUtilities();
+            }
         }
 
         // Retrieve total spent specific to this user
@@ -92,6 +105,32 @@ export default function MyExpenses() {
         }
     };
 
+    const fetchUtilities = async () => {
+        if (!householdId || !user) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:6969/utilities/${householdId}/${user.id}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data: Utility[] = await response.json();
+            setUtilities(data);
+        } catch (error) {
+            console.error('Error fetching utilities:', error);
+            setUtilities([]);
+        }
+    };
+
     const calculateExpenses = (debts: Debt[], currentUserId: string): Expense[] => {
         const expensesMap: Record<string, Expense> = {};
 
@@ -135,10 +174,134 @@ export default function MyExpenses() {
         const updatedTotalSpent = totalSpent + amount;
         setTotalSpent(updatedTotalSpent);
 
-        // Save the updated total spent to local storage with a user & household key
         if (user?.id && householdId) {
             const storageKey = `totalSpent_${user.id}_${householdId}`;
             localStorage.setItem(storageKey, updatedTotalSpent.toString());
+        }
+    };
+
+    const handleUpdateUtility = async (category: string, newAmount: number) => {
+        if (!user || !householdId) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:6969/utilities/update-amount/${householdId}`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        category: category,
+                        amount: newAmount,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            setUtilities((prev) =>
+                prev.map((u) =>
+                    u.category === category && u.owedBy === user.id
+                        ? { ...u, amount: newAmount }
+                        : u
+                )
+            );
+        } catch (error) {
+            console.error('Error updating utility:', error);
+        }
+    };
+
+    const handlePayUtility = async (category: string) => {
+        if (!householdId || !user) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:6969/utilities/pay/${householdId}`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, category }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            setUtilities((prev) =>
+                prev.map((utility) =>
+                    utility.category === category ? { ...utility, paid: true, amount: 0 } : utility
+                )
+            );
+        } catch (error) {
+            console.error('Error paying utility:', error);
+        }
+    };
+
+    const handleResetUtility = async (category: string) => {
+        if (!user || !householdId) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:6969/utilities/reset/${householdId}`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        category: category,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Update the utility state after resetting
+            setUtilities((prev) =>
+                prev.map((utility) =>
+                    utility.category === category && utility.owedBy === user.id
+                        ? { ...utility, paid: false, amount: 0 }
+                        : utility
+                )
+            );
+        } catch (error) {
+            console.error('Error resetting utility:', error);
+        }
+    };
+
+    const handleToggleView = async (category: string, currentView: boolean) => {
+        if (!user || !householdId) return;
+
+        const endpoint = currentView
+            ? `http://localhost:6969/utilities/hide/${householdId}`
+            : `http://localhost:6969/utilities/view/${householdId}`;
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    category: category,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setUtilities((prev) =>
+                prev.map((u) =>
+                    u.category === category && u.owedBy === user.id
+                        ? { ...u, view: !currentView }
+                        : u
+                )
+            );
+        } catch (error) {
+            console.error('Error toggling utility view:', error);
         }
     };
 
@@ -161,16 +324,30 @@ export default function MyExpenses() {
                         youOwe={expense.youOwe}
                         onPaymentSuccess={(amount) => {
                             fetchDebts();
-                            handlePayment(amount);  // Update total spent
+                            handlePayment(amount);
                         }}
                     />
                 ))}
             </div>
-            {/* Utility Cards Section */}
-            <div className="flex flex-wrap justify-between gap-4 mt-6">
-                <UtilityCard name="Water" status="Running" icon="💧" />
-                <UtilityCard name="Electricity" status="Active" icon="⚡" />
-                <UtilityCard name="WiFi" status="Connected" icon="📶" />
+
+            <div className="utility-container">
+                {utilities.length > 0 ? (
+                    utilities.map((utility) => (
+                        <UtilityCard
+                            key={utility._id}
+                            category={utility.category}
+                            amount={utility.amount}
+                            paid={utility.paid}
+                            view={utility.view}
+                            onUpdateUtility={handleUpdateUtility}
+                            onPayUtility={handlePayUtility}
+                            onResetUtility={handleResetUtility}
+                            onToggleView={handleToggleView}
+                        />
+                    ))
+                ) : (
+                    <p>No utilities available for this household.</p>
+                )}
             </div>
         </div>
     );
