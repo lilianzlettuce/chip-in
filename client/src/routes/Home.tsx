@@ -334,7 +334,12 @@ export default function Home() {
 
   // Update avg expenditure when per month data fetched
   useEffect(() => {
-    setAvgExpenditure(Number(totalExpenses) / expenditurePerMonthData?.labels.length);
+    console.log("exp per month: ", expenditurePerMonthData)
+
+    let numDataPoints = expenditurePerMonthData?.labels.length;
+    let val = numDataPoints > 0 ? Number(totalExpenses) / numDataPoints : 0;
+
+    setAvgExpenditure(val);
   }, [expenditurePerMonthData]);
 
   useEffect(() => {
@@ -342,10 +347,7 @@ export default function Home() {
     let allDebts = 0;
     for (let debt of debts) {
       allDebts += debt.amount / 100;
-      console.log(debt.amount)
     }
-    console.log("alldebts: ", allDebts)
-    console.log("total exp: ", totalExpenses)
     setTotalPaid((Number(totalExpenses) - allDebts).toFixed(2));
   }, [debts, totalExpenses])
 
@@ -516,7 +518,7 @@ export default function Home() {
           </div>
 
           <div className="w-fit flex flex-col">
-            <div>Top {numBarsDisplayed} Expenses By Item</div>
+            <div>Top Expenses By Item</div>
             {expensesByItem ? 
               <div className="w-[450px] h-[300px]">
                 <Bar
@@ -550,7 +552,7 @@ export default function Home() {
           </div>
 
           <div className="w-fit flex flex-col">
-            <div>Top {numBarsDisplayed} Most Purchased Items</div>
+            <div>Most Purchased Items</div>
             {frequenciesByItem ? 
               <div className="w-[450px] h-[300px]">
                 <Bar
