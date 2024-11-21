@@ -1,5 +1,6 @@
 import React, { useEffect, useState, memo } from 'react';
 import './UtilityCard.css';
+import './ItemCard.css'
 
 interface UtilityCardProps {
     category: string;
@@ -68,30 +69,39 @@ const UtilityCard: React.FC<UtilityCardProps> = memo(({
     return (
         <div className={`utility-card ${view ? '' : 'utility-hidden'}`}>
             <div className="utility-actions">
-                <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="utility-button"
-                    title="Edit bill amount"
-                    disabled={!view}
-                >
-                    ✏️
-                </button>
-                <button
-                    onClick={handlePayOrReset}
-                    className="utility-button"
-                    title={paid ? 'Reset bill' : 'Pay bill'}
-                    disabled={!view}
-                >
-                    {paid ? '🔄' : '💰'}
-                </button>
-                <button
-                    onClick={handleToggleView}
-                    className="utility-button"
-                    title={view ? 'Do not track utility' : 'Track utility'}
-                    disabled={!view && showConfirmation}
-                >
-                    👁️‍🗨️
-                </button>
+                <div className="button-with-tooltip">
+                    <button
+                        onClick={() => setIsEditing(!isEditing)}
+                        className="utility-button"
+                        title="Edit bill amount"
+                        disabled={!view}
+                    >
+                        ✏️
+                    </button>
+                    <span className="tooltip tooltip-teal">Edit bill amount</span>
+                </div>
+                <div className="button-with-tooltip">
+                    <button
+                        onClick={handlePayOrReset}
+                        className="utility-button"
+                        title={paid ? 'Reset bill' : 'Pay bill'}
+                        disabled={!view}
+                    >
+                        {paid ? '🔄' : '💰'}
+                    </button>
+                    <span className="tooltip tooltip-teal">{paid ? 'Reset bill' : 'Pay bill'}</span>
+                </div>
+                <div className="button-with-tooltip">
+                    <button
+                        onClick={handleToggleView}
+                        className="utility-button"
+                        title={view ? 'Do not track utility' : 'Track utility'}
+                        disabled={!view && showConfirmation}
+                    >
+                        👁️‍🗨️
+                    </button>
+                    <span className="tooltip tooltip-teal">{view ? 'Do not track utility' : 'Track utility'}</span>
+                </div>
             </div>
             <h3 className="utility-category">{category}</h3>
             <div className={`utility-status ${paid ? 'paid' : 'unpaid'}`}>

@@ -153,14 +153,14 @@
 
 .tooltip {
   visibility: hidden;
-  background-color: #333; /* Default background color */
+  background-color: #333; 
   color: #fff;
   text-align: center;
   padding: 4px 8px;
   border-radius: 4px;
   position: absolute;
   z-index: 10;
-  bottom: 100%; /* Position above the button */
+  bottom: 100%; 
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -189,4 +189,8 @@
 
 .tooltip-yellow {
   background-color: #edc058; 
+}
+
+.tooltip-teal {
+  background-color: #63b7b2; 
 }
