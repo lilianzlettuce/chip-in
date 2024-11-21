@@ -195,25 +195,38 @@ router.get('/search/:id', async (req, res) => {
     let flag = 0;
     for (let i = 0; i < itemsShared.length; i++) {
       // it's in purchase list, cost of 0 means it has not been purchased yet
-      if (itemsShared[i].cost != 0 && itemsShared[i].archived == false) {
+      if (itemsShared[i].cost != 0 ) { //&& itemsShared[i].archived == false) {
         //console.log("shared item: ", itemsShared[i].name);
         //totalBought += 1;
-        const numberOfSharers = itemsShared[i].sharedBetween.length || 1;
-        realcost += (itemsShared[i].cost / 100) / numberOfSharers;
-        splitCostItems = (itemsShared[i].cost / 100) / numberOfSharers;
+        // uneven splits
+        let myShare = 0;
+        if (itemsShared[i].splits){
+          const matchingSplit = itemsShared[i].splits.find(split => split.member.toString() === userId);
+          myShare = matchingSplit ? matchingSplit.split : 0;
+        }
+        else {
+          myShare = 1/(itemsShared[i].sharedBetween.length || 1);
+        }
+        //const numberOfSharers = itemsShared[i].sharedBetween.length || 1;
+        realcost += (itemsShared[i].cost / 100) * myShare;
+        if (itemsShared[i].archived == false) {
+          splitCostItems = (itemsShared[i].cost / 100) * myShare;
 
-        flag = 0;
-        for (let j = 0; j < itemCost.length; j++) {
-          if (itemCost[j][0] === itemsShared[i].name) {
-            itemCost[j][1] += splitCostItems;
-            flag = 1;
-            break;
+          flag = 0;
+          for (let j = 0; j < itemCost.length; j++) {
+            if (itemCost[j][0] === itemsShared[i].name) {
+              itemCost[j][1] += splitCostItems;
+              flag = 1;
+              break;
+            }
+          }
+
+          if (flag === 0) {
+            itemCost.push([itemsShared[i].name, splitCostItems]);
           }
         }
-
-        if (flag === 0) {
-          itemCost.push([itemsShared[i].name, splitCostItems]);
-        }
+        
+        
 
       }
     }
