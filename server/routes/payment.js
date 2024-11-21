@@ -211,16 +211,16 @@ router.patch('/partialpay/:id', async (req, res) => {
 
 //return item
 router.patch('/return/:id', async (req, res) => {
-    console.log('return')
+    // console.log('return')
     const householdId = req.params.id;
     const { itemId } = req.body;
-    console.log(itemId)
+    // console.log(itemId)
     try {
         const item = await Item.findById(itemId);
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
         }
-        console.log('purchasedby', item.purchasedBy);
+        // console.log('purchasedby', item.purchasedBy);
 
         for (const split of item.splits) {
             const splitCost = split.split * item.cost;
