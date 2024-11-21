@@ -160,6 +160,8 @@ describe('updating debts', () => {
         );
         assert.strictEqual(debt.amount, 0);
     })
+
+    
 })
 
 describe('editing items', () => {

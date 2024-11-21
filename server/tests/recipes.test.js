@@ -77,19 +77,19 @@ describe('recipe tests', () => {
             .send(payload)
             .expect(201)
             .expect('Content-Type', /application\/json/)
-        
-        recipeId = response.body.recipe._id;
         let household = await Household.findById(householdId);
         assert.strictEqual(household.recipes.length, 1);
     })
 
     test('deleting a recipe', async () => {
+        let household = await Household.findById(householdId);
+        recipeId = household.recipes[0]._id;
         let response = await api
-            .delete(`/${householdId}/${recipeId}`)
+            .delete(`/recipes/${householdId}/${recipeId}`)
             .expect(200)
             .expect('Content-Type', /application\/json/)
         
-        let household = await Household.findById(householdId);
+        household = await Household.findById(householdId);
         assert.strictEqual(household.recipes.length, 0);
     })
 
