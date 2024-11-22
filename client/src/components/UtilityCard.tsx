@@ -32,7 +32,7 @@ const UtilityCard: React.FC<UtilityCardProps> = memo(({
 
     useEffect(() => {
         setShowConfirmation(false);
-    }, [view]);    
+    }, [view]);
 
     useEffect(() => {
         setDisplayAmount(paid ? 0 : amount);
@@ -115,10 +115,17 @@ const UtilityCard: React.FC<UtilityCardProps> = memo(({
                     <p className="utility-edit-text">Enter monthly bill for this utility:</p>
                     <div className="utility-edit-row">
                         <input
-                            type="text"
+                            type="number"
                             value={newAmount}
-                            onChange={(e) => setNewAmount(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*\.?\d*$/.test(value)) {
+                                    setNewAmount(value);
+                                }
+                            }}
                             className="utility-input"
+                            min="0.01"
+                            step="0.01"
                         />
                         <button onClick={handleUpdateAmount} className="utility-button">
                             ✓
