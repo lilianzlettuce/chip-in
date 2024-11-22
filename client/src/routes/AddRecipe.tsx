@@ -117,9 +117,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
             setNewItems((prevItems) => [...prevItems, addIngredients.trim()]);
             setAddIngredients('');  // clear field for next additional item
         }
-        else if (isInFilteredIngredients || newItems.includes(trimmedIngredient) || checkedItems.includes(trimmedIngredient)){
-            console.log("FAILED");
-            
+        else if (isInFilteredIngredients || newItems.includes(trimmedIngredient) || checkedItems.includes(trimmedIngredient)){            
             setTooltipMessage('Item already in purchased list');
             setShowTooltip(true);
 

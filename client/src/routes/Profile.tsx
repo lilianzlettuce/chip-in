@@ -1073,7 +1073,6 @@ const Profile: React.FC = () => {
   const [refreshProfile, setRefreshProfile] = useState<number>(0);
 
   useEffect(() => {
-    // Scroll to the top of the page when the component mounts or updates
     window.scrollTo(0, 0);
   }, []);
   useEffect(() => {
