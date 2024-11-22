@@ -122,6 +122,23 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
       console.error('Error adding item:', error);
     }
 
+    try {
+      // Make a PATCH request to update debts
+      const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+          method: 'PATCH',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({}) 
+      });
+      
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      } catch (error) {
+          console.error('Error fetching and updating debts:', error);
+    }
+
     onSave(requestBody);
     onClose();
   };
