@@ -369,7 +369,10 @@ export default function Home() {
               {householdMembers.length} Member{householdMembers.length > 1 && "s"}
             </h1>
             <div className="text-lg font-semibold ">
-              Created {purchaseHistory[0]?.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})}
+              {
+                purchaseHistory[0] &&
+                  "Created " + purchaseHistory[0]?.purchaseDate.toLocaleDateString('en-US', {timeZone: 'UTC'})
+              }
             </div>
           </div>
         </div>
