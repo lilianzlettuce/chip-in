@@ -208,10 +208,10 @@
 }
 
 /* Add button styles */
-.input-add-container .add-item-button {
+.input-add-container .additem-button-container .add-item-button {
     padding: 10px 10px;
     background-color: #5d3005;
-    color: white;
+    color: rgb(255, 255, 255);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -306,4 +306,34 @@
         transform: rotate(360deg);
     }
 }
+
+.additem-button-container {
+    position: relative; 
+    display: inline-block; 
+    transform: translateX(-20px);
+}
+
+/* Tooltip styling */
+.add-tooltip {
+    position: absolute; 
+    top: 100%; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background-color: #333; 
+    color: white; 
+    padding: 5px 10px; 
+    border-radius: 4px; 
+    font-size: 12px; 
+    white-space: nowrap; 
+    z-index: 10; 
+    margin-top: 5px; 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+.add-tooltip.hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+
 
