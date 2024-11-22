@@ -662,6 +662,12 @@ router.post("/leave/:id", async (req, res) => {
     household = await Household.findById(householdId);
     // If the last member leaves, delete the household
     if (household.members.length === 0) {
+      for (const itemId of household.purchaseHistory) {
+        await Item.findByIdAndDelete(itemId);
+      }
+      for (const itemId of household.groceryList) {
+        await Item.findByIdAndDelete(itemId);
+      }
       await Household.findByIdAndDelete(householdId);
       return res.status(200).json({ message: 'Household deleted as the last member left' });
     } else {
