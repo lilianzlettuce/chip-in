@@ -195,7 +195,7 @@ export default function Dashboard() {
         }
     };
 
-
+    // Purchasing item from grocery list
     const handleModalSave = async (updatedItem: any) => {
         setIsLoading(true);
 
