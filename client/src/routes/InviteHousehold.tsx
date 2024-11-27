@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './InviteHousehold.css'; 
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faX} from '@fortawesome/free-solid-svg-icons';
 import { useUserContext } from '../UserContext';
 
   // Get server url
@@ -18,10 +19,10 @@ export const Modal2: React.FC<ModalProps> = ({ show, onClose, children }) => {
   if (!show) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>
-          X
+    <div className="invite-modal-overlay">
+      <div className="invite-modal-content">
+        <button className="invite-close-button" onClick={onClose}>
+        <FontAwesomeIcon icon={faX} className="text-black text-sm" />
         </button>
         {children}
       </div>
@@ -130,26 +131,26 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
       
   
     return (
-      <div className="modal-body">
-        <h3 style={{ color: 'black', display: 'block', fontSize: '16px'  }}>Household ID: {householdId}</h3>
-        <div className="input-group">
-          <label className="label-text">Please enter email address for the invitation</label>
+      <div className="invite-modal-body">
+        <h3 style={{ color: 'black', display: 'block', fontSize: '16px', fontWeight: 'bold'  }}>Household ID: {householdId}</h3>
+        <div className="invite-input-group">
+          <label className="label-text">Please enter user's email address to invite!</label>
         </div>
-        <div className="input-group">
+        <div className="invite-input-group">
           <input
             type="text"
-            className="input-field"
+            className="invite-input-field"
             value={EmailAddress}
             onChange={(e) => setEmailAddress(e.target.value)}
-            placeholder="Enter email address"
+            placeholder="Email address"
           />
         </div>
-        <div className="input-group">
-          <button className="submit-button" onClick={handleInvite}>Invite</button>
+        <div className="invite-input-group">
+          <button className="invite-submit-button" onClick={handleInvite}>Invite</button>
 
            {/* Notification UI */}
           {notification.show && (
-            <div className={`notification-card ${notification.type}`}>
+            <div className={`invite-notification-card ${notification.type}`}>
               {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
               <p>{notification.message}</p>
             </div>
