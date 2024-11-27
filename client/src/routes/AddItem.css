@@ -55,7 +55,7 @@
   color: #000000;
 }
 
-h2 {
+.modal-content h2 {
   margin-bottom: 15px;
   text-align: center;
   color: #333;
