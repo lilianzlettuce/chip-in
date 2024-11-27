@@ -263,19 +263,19 @@ router.post("/addUser/:id", async (req, res) => {
     // find household
     const household = await Household.findById(householdId);
     if (!household) {
-      return res.status(404).json({ message: 'Household not found' });
+      return res.status(404).json({ message: 'household not found' });
     }
 
     // find user
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'user not found' });
     }
 
     // check to make sure that user is not in household
     if (user.households.some(household => household.equals(new mongoose.Types.ObjectId(householdId)))) {
       console.log("User is already in the household");
-      return res.status(400).json({ message: 'User is already in the household' });
+      return res.status(400).json({ message: 'user is already in the household' });
     }
 
     // add household to user

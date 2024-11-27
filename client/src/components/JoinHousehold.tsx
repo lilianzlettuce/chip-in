@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faX} from '@fortawesome/free-solid-svg-icons';
 
-import './CreateHousehold.css';
+import './JoinHousehold.css';
 
 import { useUserContext } from '../UserContext';
+
 
 // Modal component
 type ModalProps = {
@@ -16,10 +19,10 @@ export const Modal2: React.FC<ModalProps> = ({ show, onClose, children }) => {
   if (!show) return null;
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>
-          X
+    <div className="join-modal-overlay">
+      <div className="join-modal-content">
+        <button className="join-close-button" onClick={onClose}>
+        <FontAwesomeIcon icon={faX} className="text-black text-lg" />
         </button>
         {children}
       </div>
@@ -135,34 +138,43 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
   }
 
   return (
-    <div>
-      <h3 style={{ color: 'black', display: 'block', fontSize: '16px' }}>Please enter a household ID to join</h3>
-      <div className="modal-body">
-        {/* Household Name Input */}
-        <div className="input-group">
+    <div className="join-modal-content">
+      <img
+        src="https://i.postimg.cc/yxBj94kZ/join-house.png"
+        alt="Join Household Logo"
+        className="join-household-image"
+      />
+      <h3 className="join-message">
+        Please enter a household ID to join
+      </h3>
+      <div className="join-modal-body">
+        {/* Household ID Input */}
+        <div className="join-input-group">
           <input
             type="text"
-            className="input-field"
+            className="join-input-field"
             value={householdID}
             onChange={(e) => setHouseholdID(e.target.value)}
-            placeholder="Enter household ID"
+            placeholder="Household ID"
           />
         </div>
-
+  
         {/* Join Button */}
-        <div className="input-group">
-          <button className="label-button submit-button" onClick={handleJoin}>
+        <div className="join-input-group">
+          <button className="join-label-button join-submit-button" onClick={handleJoin}>
             Join
           </button>
-
-          {notification.show && (
-            <div className={`notification-card ${notification.type}`}>
-              {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
-              <p>{notification.message}</p>
-            </div>
-          )}
         </div>
+  
+        {/* Notification Message */}
+        {notification.show && (
+          <div className={`join-notification-card ${notification.type}`}>
+            <p>{notification.message}</p>
+          </div>
+        )}
       </div>
     </div>
   );
+  
+  
 };

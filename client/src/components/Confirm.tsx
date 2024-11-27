@@ -39,7 +39,7 @@ export const Confirm: React.FC<ConfirmProps> = ({ show, onClose, onConfirm, mess
         <div className="modal-overlay">
             <div className="modal-content">
                 <button className="close-button" onClick={onClose}>
-                    <FontAwesomeIcon icon={faXmark} className="text-md" />
+                    <FontAwesomeIcon icon={faXmark} className="text-black text-md" />
                 </button>
                 <h2 className="text-md">{message}</h2>
                 <div className="w-full flex justify-between gap-2">

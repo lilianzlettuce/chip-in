@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faX} from '@fortawesome/free-solid-svg-icons';
 
 import './CreateHousehold.css'; 
 import { useUserContext } from '../UserContext';
@@ -33,10 +35,10 @@ export const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
       if (!show) return null;
 
   return ReactDOM.createPortal (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>
-          X
+    <div className="create-modal-overlay">
+      <div className="create-modal-content">
+        <button className="create-close-button" onClick={onClose}>
+        <FontAwesomeIcon icon={faX} className="text-black text-lg" />
         </button>
         {children}
       </div>
@@ -126,28 +128,36 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
 
   return (
     <div>
-        <h3 style={{ color: 'black', display: 'block', fontSize: '16px' }}>Please fill out below and click Submit</h3>
-        <div className="modal-body">
+        <img
+          src="https://i.postimg.cc/Jn8hZMWm/create-house-Photoroom.png"
+          alt="Create Household Logo"
+          className="create-household-image"
+        />
+        <h3 className="create-message">
+        Create a household name
+        </h3>
+        {/*<h3 style={{ color: 'black', display: 'block', fontSize: '16px' }}>Please enter a household name</h3>*/}
+        <div className="create-modal-body">
           {/* Household Name Input */}
-          <div className="input-group">
+          <div className="create-input-group">
             <input
               type="text"
-              className="input-field text-white"
+              className="create-input-field text-white"
               value={householdName}
               onChange={(e) => setHouseholdName(e.target.value)}
-              placeholder="Enter household name"
+              placeholder="Household name"
             />
           </div>
 
           {/* Submit Button */}
-          <div className="input-group">
-            <button className="label-button submit-button" onClick={handleSubmit}>
-              Submit
+          <div className="create-input-group">
+            <button className="create-label-button create-submit-button" onClick={handleSubmit}>
+              Create
             </button>
 
             {/* Notification UI */}
             {notification.show && (
-              <div className={`notification-card ${notification.type}`}>
+              <div className={`create-notification-card ${notification.type}`}>
                 {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
                 <p>{notification.message}</p>
               </div>
