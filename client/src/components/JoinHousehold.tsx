@@ -145,7 +145,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
         className="join-household-image"
       />
       <h3 className="join-message">
-        Please enter a household ID to join
+        Please enter join code
       </h3>
       <div className="join-modal-body">
         {/* Household ID Input */}
@@ -155,7 +155,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
             className="join-input-field"
             value={householdID}
             onChange={(e) => setHouseholdID(e.target.value)}
-            placeholder="Household ID"
+            placeholder="Code"
           />
         </div>
   
