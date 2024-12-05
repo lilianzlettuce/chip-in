@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <RecordList />
+        element: <Profile />
       },
       {
         path: "/profile",
