@@ -25,6 +25,10 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     const householdID = householdId;
     const { user } = useUserContext();
 
+    const [tooltipMessage, setTooltipMessage] = useState('');
+    const [showTooltip, setShowTooltip] = useState(false);
+
+
     const handleModalClose = () => {
         setShowRecipeModal(false);
         onClose();
@@ -113,6 +117,15 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
             setNewItems((prevItems) => [...prevItems, addIngredients.trim()]);
             setAddIngredients('');  // clear field for next additional item
         }
+        else if (isInFilteredIngredients || newItems.includes(trimmedIngredient) || checkedItems.includes(trimmedIngredient)){            
+            setTooltipMessage('Item already in purchased list');
+            setShowTooltip(true);
+
+            setTimeout(() => {
+                setShowTooltip(false);
+            }, 3000);
+            
+        }
     };
 
     // deleting additional items
@@ -151,7 +164,14 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
                                     value={addIngredients}
                                     onChange={(e) => setAddIngredients(e.target.value)}
                                 />
-                                <button className="add-item-button" onClick={handleAddAddtionalItems}>Add</button>
+                                <div className="additem-button-container">
+                                    <button className="add-item-button" onClick={handleAddAddtionalItems}>Add</button>
+                                    {showTooltip && (
+                                        <div className="add-tooltip">
+                                            {tooltipMessage}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <h4>Added Ingredients</h4>
                             <div className="added-ingredients">

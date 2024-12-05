@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './AddItem.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faX} from '@fortawesome/free-solid-svg-icons';
 
 type AddItemModalProps = {
   onClose: () => void;
@@ -13,6 +15,8 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
   const [category, setCategory] = useState('');
   const [sharedBetween, setSharedBetween] = useState<string[]>([]);
   const [purchasedBy, setPurchasedBy] = useState('');
+  const [saveModal, setSaveModal] = useState(false);
+  const [saveModalMessage, setSaveModalMessage] = useState('');
 
   const { householdId } = useParams();
 
@@ -49,6 +53,11 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
       const roommate = roommates.find((roommate) => roommate.name === name);
       return roommate ? roommate._id : null;
     }).filter((id) => id !== null); // Remove any null <values></values> */
+    if (!name || !category || !purchasedBy || !sharedBetween) {
+      setSaveModalMessage('Please fill out all the fields!');
+      setSaveModal(true);
+      return; 
+    }
 
     const purchasedId = roommates.find((roommate) => roommate.name === purchasedBy)?._id || null;
 
@@ -96,7 +105,9 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>
+        <FontAwesomeIcon icon={faX} className="text-black text-sm" />
+        </button>
         <h2>Add New Item</h2>
 
         {/* Form Fields */}
@@ -105,6 +116,7 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="input-group">
+        <label>Category:</label>
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="">Select a category</option>
             <option value="Food">Food</option>
@@ -146,6 +158,14 @@ const AddItemModalGrocery: React.FC<AddItemModalProps> = ({ onClose, onSave, roo
 
         {/* Submit Button */}
         <button className="submit-button" onClick={handleSubmit}>Save Item</button>
+        {saveModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>{saveModalMessage}</h2>
+              <button onClick={() => setSaveModal(false)} className="close-button">x</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

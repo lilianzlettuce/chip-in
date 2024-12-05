@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './AddItem.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faX} from '@fortawesome/free-solid-svg-icons';
 
 type AddItemModalProps = {
   onClose: () => void;
@@ -18,6 +20,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   const [cost, setCost] = useState<number>(0);
   const [roommatePerc, setRoommatePerc] = useState<{ [key: string]: string }>({});
   const [errorMessage, setErrorMessage] = useState('');
+  const [saveModal, setSaveModal] = useState(false);
+  const [saveModalMessage, setSaveModalMessage] = useState('');
 
   const { householdId } = useParams();
 
@@ -66,6 +70,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   };
 
   const handleSubmit = async () => {
+    if (!name || !category || !purchasedBy || !sharedBetween || !purchaseDate|| !expirationDate || !cost) {
+      setSaveModalMessage('Please fill out all the fields!');
+      setSaveModal(true);
+      return; 
+    }
+
     const allEmpty = Object.values(roommatePerc).every((value) => !value || parseFloat(value) === 0);
 
     let splits;
@@ -102,6 +112,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
       splits,
     };
 
+    
+
     try {
       const response = await fetch(`http://localhost:6969/item/addtopurchased`, {
         method: 'POST',
@@ -112,14 +124,34 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
       });
 
       if (!response.ok) {
+        
         const errorData = await response.json();
         console.error('Error details:', errorData);
         throw new Error(`HTTP error! status: ${response.status}`);
+        
       }
 
       console.log('Item added successfully!');
     } catch (error) {
       console.error('Error adding item:', error);
+      
+    }
+
+    try {
+      // Make a PATCH request to update debts
+      const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+          method: 'PATCH',
+          headers: {
+          'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({}) 
+      });
+      
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      } catch (error) {
+          console.error('Error fetching and updating debts:', error);
     }
 
     onSave(requestBody);
@@ -136,7 +168,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>
+        <FontAwesomeIcon icon={faX} className="text-black text-sm" />
+        </button>
         <h2>Add New Item</h2>
 
         {/* Form Fields */}
@@ -207,6 +241,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
           <input
             type="number"
             value={cost || ''}
+            min="0"
+            onKeyPress={(e) => {
+              // Prevent negative sign from being typed
+              if (e.key === '-') {
+                e.preventDefault();
+              }
+            }}
             onChange={(e) => {
               const value = parseFloat(e.target.value);
               setCost(isNaN(value) ? 0 : value);
@@ -229,6 +270,14 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
 
         {/* Submit Button */}
         <button className="submit-button" onClick={handleSubmit}>Save Item</button>
+        {saveModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>{saveModalMessage}</h2>
+              <button onClick={() => setSaveModal(false)} className="close-button">x</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

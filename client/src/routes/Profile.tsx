@@ -952,6 +952,9 @@ const Stats: React.FC = () => {
   const itemName = itemBreakdown.map(item => item[0]); // item name
   const itemCost = itemBreakdown.map(item => item[1]); // item cost
 
+  //const memoizedItemCost = useMemo(() => itemCost, [itemCost]);
+  //const memoizedItemName = useMemo(() => itemName, [itemName]);
+
   const generateRandomColor = () => {
     const letters = '0123456789ABCDEF';
     let color = '#';
@@ -993,6 +996,8 @@ const Stats: React.FC = () => {
                 data: itemCost,
                 backgroundColor: colors,
                 hoverBackgroundColor: colors,
+                borderColor: "black",
+                borderWidth: 1
               },
             ],
           } as ChartData<'pie'>,
@@ -1020,7 +1025,7 @@ const Stats: React.FC = () => {
     return () => {
       chartRef.current?.destroy();
     };
-  }, [itemCost, itemName]);
+  }, [itemBreakdown]);
   
   return (
     <div className="settings-container">
@@ -1040,7 +1045,7 @@ const Stats: React.FC = () => {
             <span className="summary-value">${totalOwedTo.toFixed(2)}</span> owed from roommates
           </p>
           <p className="summary-item">
-            <span className="summary-value">{totalItem}</span> items currently shared
+            <span className="summary-value">{totalItem}</span> items currently purchased/shared
           </p>
           <p className="summary-item">
             <span className="summary-value">${totalOwedBy.toFixed(2)}</span> owed to roommates
@@ -1068,6 +1073,10 @@ const Profile: React.FC = () => {
   const [refreshProfile, setRefreshProfile] = useState<number>(0);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  useEffect(() => {
+    //window.scrollTo(0, 0);
     // Fetch user profile details after the user is available
     const fetchUserProfile = async () => {
       if (!user) return; // Ensure user is available
