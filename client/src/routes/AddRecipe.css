@@ -125,9 +125,11 @@
     overflow-y: auto; 
 }
 
-.recipe-details-modal h2 {
+.recipe-details-modal-overlay .recipe-details-modal h2 {
     margin-top: 0;
     font-weight: bold;
+    font-size: 20px;
+    text-align: center;
 }
 
 .recipe-details-modal h3 {
