@@ -46,7 +46,19 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
 
     const handleGenerateRecipe = async () => {
         setLoading(true);
-        const items = [...checkedItems, ...newItems];
+        // const tempItems = [...checkedItems, ...newItems];
+        let tempItems = "";
+        for (let i = 0; i < checkedItems.length; i++) {
+            tempItems += checkedItems[i] + ', ';
+        }
+        for (let i = 0; i < newItems.length; i++) {
+            tempItems += newItems[i] + ', ';
+        }
+        if (tempItems.endsWith(', ')) {
+            tempItems = tempItems.slice(0, -2); 
+        }
+        const items = [tempItems]
+        //console.log(items);
         try {
             const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {
                 method: 'POST',
