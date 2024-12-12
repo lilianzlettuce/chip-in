@@ -8,13 +8,17 @@ const ForgotPass: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Use the useNavigate hook
 
+  // Get env vars
+  const PORT = process.env.REACT_APP_PORT || 6969;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);  // Start loading
     setMessage(null);  // Clear previous messages
 
     try {
-      const response = await fetch('http://localhost:6969/user/resetpass', {
+      const response = await fetch(`${SERVER_URL}/user/resetpass`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

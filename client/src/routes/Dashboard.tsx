@@ -62,6 +62,10 @@ export default function Dashboard() {
     const [editGroceryModalOpen, setEditGroceryModalOpen] = useState(false);
     const [editItemId, setEditItemId] = useState('');
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
     useEffect(() => {
         if (householdID) {
             fetchRoommates();
@@ -82,7 +86,7 @@ export default function Dashboard() {
         }
         setIsSearching(true);
         try {
-            const response = await fetch(`http://localhost:6969/household/${householdId}/search?name=${encodeURIComponent(value)}`);
+            const response = await fetch(`${SERVER_URL}/household/${householdId}/search?name=${encodeURIComponent(value)}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -138,7 +142,7 @@ export default function Dashboard() {
 
         try {
             // Add the item to the target list (purchased or grocery)
-            const response = await fetch(`http://localhost:6969/item${endpoint}`, {
+            const response = await fetch(`${SERVER_URL}/item${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +159,7 @@ export default function Dashboard() {
             // If moving to the grocery list, keep the item in purchased list in the backend
             if (targetList === 'grocery') {
                 /*
-                const deleteResponse = await fetch(`http://localhost:6969/item/purchased/${itemData._id}?householdId=${householdID}`, {
+                const deleteResponse = await fetch(`${SERVER_URL}/item/purchased/${itemData._id}?householdId=${householdID}`, {
                     method: 'DELETE',
                 });
 
@@ -170,7 +174,7 @@ export default function Dashboard() {
                 */
             } else {
                 // If moving to the purchased list, delete the item from the grocery list
-                const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${itemData._id}?householdId=${householdID}`, {
+                const deleteResponse = await fetch(`${SERVER_URL}/item/grocery/${itemData._id}?householdId=${householdID}`, {
                     method: 'DELETE',
                 });
 
@@ -217,7 +221,7 @@ export default function Dashboard() {
 
         try {
             // Add the item to the purchased list
-            const response = await fetch(`http://localhost:6969/item/addtopurchased`, {
+            const response = await fetch(`${SERVER_URL}/item/addtopurchased`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -232,7 +236,7 @@ export default function Dashboard() {
             }
 
             // Remove the item from the grocery list in the backend
-            const deleteResponse = await fetch(`http://localhost:6969/item/grocery/${updatedItem._id}?householdId=${householdID}`, {
+            const deleteResponse = await fetch(`${SERVER_URL}/item/grocery/${updatedItem._id}?householdId=${householdID}`, {
                 method: 'DELETE',
             });
 
@@ -259,7 +263,7 @@ export default function Dashboard() {
 
     const handlePurchasedEditModalSave = async (updatedItem: any) => {
         try {
-            const response = await fetch(`http://localhost:6969/item/editpurchased/${editItemId}`, {
+            const response = await fetch(`${SERVER_URL}/item/editpurchased/${editItemId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -285,7 +289,7 @@ export default function Dashboard() {
 
     const handleGroceryEditModalSave = async (updatedItem: any) => {
         try {
-            const response = await fetch(`http://localhost:6969/item/editgrocery/${editItemId}`, {
+            const response = await fetch(`${SERVER_URL}/item/editgrocery/${editItemId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -370,7 +374,7 @@ END:VEVENT\n`;
         if (!householdID) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/household/${householdID}/purchasedlist`);
+            const response = await fetch(`${SERVER_URL}/household/${householdID}/purchasedlist`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -391,7 +395,7 @@ END:VEVENT\n`;
         if (!householdID) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/household/${householdID}/grocerylist`);
+            const response = await fetch(`${SERVER_URL}/household/${householdID}/grocerylist`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -412,7 +416,7 @@ END:VEVENT\n`;
         if (!householdID) return;
 
         try {
-            const roommatesResponse = await fetch(`http://localhost:6969/household/members/${householdID}`);
+            const roommatesResponse = await fetch(`${SERVER_URL}/household/members/${householdID}`);
             if (!roommatesResponse.ok) {
                 throw new Error(`HTTP error! status: ${roommatesResponse.status}`);
             }
@@ -460,7 +464,7 @@ END:VEVENT\n`;
             console.log(queryParams.toString());
 
             // Fetch purchased items filtered by selected categories and roommates
-            const purchasedResponse = await fetch(`http://localhost:6969/filter/filterby/${householdID}?${queryParams.toString()}`);
+            const purchasedResponse = await fetch(`${SERVER_URL}/filter/filterby/${householdID}?${queryParams.toString()}`);
             if (!purchasedResponse.ok) {
                 throw new Error(`HTTP error! status: ${purchasedResponse.status}`);
             }
@@ -468,7 +472,7 @@ END:VEVENT\n`;
             setPurchasedItems(filteredPurchasedData);
 
             // Fetch grocery items without roommates filtering (only filter by categories)
-            const groceryResponse = await fetch(`http://localhost:6969/household/${householdID}/grocerylist`);
+            const groceryResponse = await fetch(`${SERVER_URL}/household/${householdID}/grocerylist`);
             if (!groceryResponse.ok) {
                 throw new Error(`HTTP error! status: ${groceryResponse.status}`);
             }
@@ -498,7 +502,7 @@ END:VEVENT\n`;
         if (!householdID) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/household/${householdID}/purchasedlist`);
+            const response = await fetch(`${SERVER_URL}/household/${householdID}/purchasedlist`);
 
 
             if (!response.ok) {
@@ -529,7 +533,7 @@ END:VEVENT\n`;
         }
 
         try {
-            const response = await fetch(`http://localhost:6969/filter/${householdID}/expired`);
+            const response = await fetch(`${SERVER_URL}/filter/${householdID}/expired`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
@@ -549,7 +553,7 @@ END:VEVENT\n`;
         }
 
         try {
-            const response = await fetch(`http://localhost:6969/filter/${householdID}/expiring`);
+            const response = await fetch(`${SERVER_URL}/filter/${householdID}/expiring`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}`);
@@ -577,7 +581,7 @@ END:VEVENT\n`;
 
     const handleDelete = async (id: string, listType: string) => {
         try {
-            const response = await fetch(`http://localhost:6969/item/${listType}/${id}?householdId=${householdID}`, {
+            const response = await fetch(`${SERVER_URL}/item/${listType}/${id}?householdId=${householdID}`, {
                 method: 'DELETE',
             });
 
@@ -602,7 +606,7 @@ END:VEVENT\n`;
 
     const handleReturn = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:6969/payment/return/${householdID}`, {
+            const response = await fetch(`${SERVER_URL}/payment/return/${householdID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json', // Add this line
@@ -622,7 +626,7 @@ END:VEVENT\n`;
 
         try {
             // Make a PATCH request to update debts
-            const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+            const response = await fetch(`${SERVER_URL}/payment/debts/${householdId}`, {
                 method: 'PATCH',
                 headers: {
                 'Content-Type': 'application/json'

@@ -28,6 +28,10 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
     const [tooltipMessage, setTooltipMessage] = useState('');
     const [showTooltip, setShowTooltip] = useState(false);
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
 
     const handleModalClose = () => {
         setShowRecipeModal(false);
@@ -60,7 +64,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
         const items = [tempItems]
         //console.log(items);
         try {
-            const response = await fetch(`http://localhost:6969/recipes/generate-recipe`, {
+            const response = await fetch(`${SERVER_URL}/recipes/generate-recipe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -97,7 +101,7 @@ const AddRecipeModal: React.FC<AddRecipeModalProps> = ({ onClose, onSave, filter
         };
 
         try {
-            const response = await fetch(`http://localhost:6969/recipes/save-recipe`, {
+            const response = await fetch(`${SERVER_URL}/recipes/save-recipe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

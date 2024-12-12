@@ -13,8 +13,12 @@ const VerifyCode: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
     try {
-      const response = await fetch('http://localhost:6969/user/resetcode', {
+      const response = await fetch(`${SERVER_URL}/user/resetcode`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

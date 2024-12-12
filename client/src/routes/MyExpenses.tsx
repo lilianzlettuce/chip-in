@@ -17,6 +17,10 @@ export default function MyExpenses() {
     const [utilities, setUtilities] = useState<Utility[]>([]);
     const [householdMembers, setHouseholdMembers] = useState<User[]>([]);
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
     interface User {
         _id: string;
         username: string;
@@ -70,7 +74,7 @@ export default function MyExpenses() {
     //     if (!householdId || !user) return;
 
     //     try {
-    //         const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`);
+    //         const response = await fetch(`${SERVER_URL}/payment/debts/${householdId}`);
     //         if (!response.ok) {
     //             throw new Error(`HTTP error! status: ${response.status}`);
     //         }
@@ -88,7 +92,7 @@ export default function MyExpenses() {
         if (!householdId) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/household/members/${householdId}`);
+            const response = await fetch(`${SERVER_URL}/household/members/${householdId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch household members');
             }
@@ -103,7 +107,7 @@ export default function MyExpenses() {
         if (!householdId || !user) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+            const response = await fetch(`${SERVER_URL}/payment/debts/${householdId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -129,7 +133,7 @@ export default function MyExpenses() {
 
         try {
             const response = await fetch(
-                `http://localhost:6969/utilities/${householdId}/${user.id}`,
+                `${SERVER_URL}/utilities/${householdId}/${user.id}`,
                 {
                     method: 'GET',
                     headers: {
@@ -203,7 +207,7 @@ export default function MyExpenses() {
 
         try {
             const response = await fetch(
-                `http://localhost:6969/utilities/update-amount/${householdId}`,
+                `${SERVER_URL}/utilities/update-amount/${householdId}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -236,7 +240,7 @@ export default function MyExpenses() {
 
         try {
             const response = await fetch(
-                `http://localhost:6969/utilities/pay/${householdId}`,
+                `${SERVER_URL}/utilities/pay/${householdId}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -265,7 +269,7 @@ export default function MyExpenses() {
             const updatedUtilities = await Promise.all(
                 utilities.map(async (utility) => {
                     const response = await fetch(
-                        `http://localhost:6969/utilities/unpaid/${householdId}/${utility.category}`
+                        `${SERVER_URL}/utilities/unpaid/${householdId}/${utility.category}`
                     );
                     if (!response.ok) {
                         throw new Error('Failed to fetch unpaid usernames');
@@ -288,7 +292,7 @@ export default function MyExpenses() {
 
         try {
             const response = await fetch(
-                `http://localhost:6969/utilities/reset/${householdId}`,
+                `${SERVER_URL}/utilities/reset/${householdId}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -319,8 +323,8 @@ export default function MyExpenses() {
         if (!user || !householdId) return;
 
         const endpoint = currentView
-            ? `http://localhost:6969/utilities/hide/${householdId}`
-            : `http://localhost:6969/utilities/view/${householdId}`;
+            ? `${SERVER_URL}/utilities/hide/${householdId}`
+            : `${SERVER_URL}/utilities/view/${householdId}`;
 
         try {
             const response = await fetch(endpoint, {

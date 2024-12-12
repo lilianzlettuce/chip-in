@@ -20,13 +20,17 @@ const Corkboard: React.FC = () => {
   const [newNoteCategory, setNewNoteCategory] = useState<NoteType>('Note');
   const { householdId } = useParams();
 
+  // Get env vars
+  const PORT = process.env.REACT_APP_PORT || 6969;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
   useEffect(() => {
     if (householdId) fetchNotes();
   }, [householdId]);
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch(`http://localhost:6969/note/${householdId}`);
+      const response = await fetch(`${SERVER_URL}/note/${householdId}`);
       if (!response.ok) throw new Error('Error fetching notes');
       const data = await response.json();
       setNotes(data);
@@ -43,7 +47,7 @@ const Corkboard: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:6969/note/${householdId}`, {
+      const response = await fetch(`${SERVER_URL}/note/${householdId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +65,7 @@ const Corkboard: React.FC = () => {
 
   const deleteNote = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:6969/note/${householdId}/${id}`, {
+      const response = await fetch(`${SERVER_URL}/note/${householdId}/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Error deleting note');

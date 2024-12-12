@@ -21,6 +21,10 @@ function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
     const { householdId } = useParams();
     const [isExpanded, setIsExpanded] = useState(false);
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);
     };
@@ -29,7 +33,7 @@ function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
         if (!recipe._id) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/recipes/${householdId}/${recipe._id}`, {
+            const response = await fetch(`${SERVER_URL}/recipes/${householdId}/${recipe._id}`, {
                 method: 'DELETE',
             });
 

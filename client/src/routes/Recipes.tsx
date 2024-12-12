@@ -38,6 +38,10 @@ export default function Recipes() {
     const [selectedUser, setSelectedUser] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
     useEffect(() => {
         if (!householdId) {
             setError('Household ID is not available');
@@ -49,14 +53,14 @@ export default function Recipes() {
 
         const fetchData = async () => {
             try {
-                const recipeResponse = await fetch(`http://localhost:6969/recipes/${householdId}`);
+                const recipeResponse = await fetch(`${SERVER_URL}/recipes/${householdId}`);
                 if (!recipeResponse.ok) throw new Error('Network response was not ok');
                 const recipeData = await recipeResponse.json();
 
                 if (recipeData && Array.isArray(recipeData)) {
                     const ownerIds = [...new Set(recipeData.map(recipe => recipe.owner).filter(Boolean))];
                     const userResponses = await Promise.all(
-                        ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
+                        ownerIds.map(id => fetch(`${SERVER_URL}/user/${id}`).then(res => res.json()))
                     );
 
                     console.log("User responses:", userResponses);
@@ -80,7 +84,7 @@ export default function Recipes() {
                     throw new Error('Invalid data format received from API');
                 }
 
-                const userResponse = await fetch(`http://localhost:6969/household/members/${householdId}`);
+                const userResponse = await fetch(`${SERVER_URL}/household/members/${householdId}`);
                 if (!userResponse.ok) throw new Error('Error fetching household users');
                 const users = await userResponse.json();
                 setHouseholdUsers(users);
@@ -108,14 +112,14 @@ export default function Recipes() {
         }
 
         try {
-            const response = await fetch(`http://localhost:6969/recipes/search/${householdId}?searchTerm=${encodeURIComponent(e.target.value)}`);
+            const response = await fetch(`${SERVER_URL}/recipes/search/${householdId}?searchTerm=${encodeURIComponent(e.target.value)}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch search results');
             }
             const searchResults = await response.json();
             const ownerIds = [...new Set(searchResults.map((recipe: Recipe) => recipe.owner).filter(Boolean))];
             const userResponses = await Promise.all(
-                ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
+                ownerIds.map(id => fetch(`${SERVER_URL}/user/${id}`).then(res => res.json()))
             );
             const userIdToUsername = userResponses.reduce((map, user) => {
                 if (user && user._id && user.username) {
@@ -137,12 +141,12 @@ export default function Recipes() {
 
     const fetchAllRecipes = async () => {
         try {
-            const recipeResponse = await fetch(`http://localhost:6969/recipes/${householdId}`);
+            const recipeResponse = await fetch(`${SERVER_URL}/recipes/${householdId}`);
             if (!recipeResponse.ok) throw new Error('Network response was not ok');
             const recipeData = await recipeResponse.json();
             const ownerIds = [...new Set(recipeData.map((recipe: Recipe) => recipe.owner).filter(Boolean))];
             const userResponses = await Promise.all(
-                ownerIds.map(id => fetch(`http://localhost:6969/user/${id}`).then(res => res.json()))
+                ownerIds.map(id => fetch(`${SERVER_URL}/user/${id}`).then(res => res.json()))
             );
 
             const userIdToUsername = userResponses.reduce((map, user) => {
@@ -167,7 +171,7 @@ export default function Recipes() {
         if (!householdId) return;
 
         try {
-            const response = await fetch(`http://localhost:6969/household/${householdId}/purchasedlist`);
+            const response = await fetch(`${SERVER_URL}/household/${householdId}/purchasedlist`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

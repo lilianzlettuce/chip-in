@@ -30,6 +30,9 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     const [nudgeAmount, setNudgeAmount] = useState<number | undefined>();
     const [errorMessage, setErrorMessage] = useState(false);
 
+    // Get env vars
+    const PORT = process.env.REACT_APP_PORT || 6969;
+    const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
     if (!user) return;
 
@@ -59,7 +62,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
             amount: nudgeAmount
         }
         try {
-            const response = await fetch(`http://localhost:6969/alert/nudge`, {
+            const response = await fetch(`${SERVER_URL}/alert/nudge`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,7 +83,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
     const handlePayInFull = async () => {
         if (!householdId) return;
         try {
-            const response = await fetch(`http://localhost:6969/payment/payall/${householdId}`, {
+            const response = await fetch(`${SERVER_URL}/payment/payall/${householdId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,7 +114,7 @@ const ExpenseCard: React.FC<ExpenseCardProps> = ({
         }
         if (!householdId) return;
         try {
-            const response = await fetch(`http://localhost:6969/payment/partialpay/${householdId}`, {
+            const response = await fetch(`${SERVER_URL}/payment/partialpay/${householdId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

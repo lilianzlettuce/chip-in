@@ -25,6 +25,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
 
   const { householdId } = useParams();
 
+  // Get env vars
+  const PORT = process.env.REACT_APP_PORT || 6969;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
   useEffect(() => {
     const totalPercentage = Object.values(roommatePerc)
       .map((value) => parseFloat(value) || 0)
@@ -115,7 +119,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
     
 
     try {
-      const response = await fetch(`http://localhost:6969/item/addtopurchased`, {
+      const response = await fetch(`${SERVER_URL}/item/addtopurchased`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +143,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onSave, roommates 
 
     try {
       // Make a PATCH request to update debts
-      const response = await fetch(`http://localhost:6969/payment/debts/${householdId}`, {
+      const response = await fetch(`${SERVER_URL}/payment/debts/${householdId}`, {
           method: 'PATCH',
           headers: {
           'Content-Type': 'application/json'

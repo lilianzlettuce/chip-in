@@ -7,12 +7,16 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 export default () => {
 	const navigate = useNavigate();
 
+	// Get env vars
+	const PORT = process.env.REACT_APP_PORT || 6969;
+	const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
 	const responseGoogle = async (authResult: any) => {
 		try {
 			if (authResult["code"]) {
 				console.log(authResult.code);
 				try {
-					const res = await fetch(`http://localhost:6969/auth/google?code=${authResult.code}`);
+					const res = await fetch(`${SERVER_URL}/auth/google?code=${authResult.code}`);
 			
 					if (res.ok) {
 						const data = await res.json();
