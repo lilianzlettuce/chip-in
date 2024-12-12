@@ -23,10 +23,14 @@ export default function Alerts() {
   const [readAlerts, setReadAlerts] = useState<AlertType[]>([]);
   const [showAlerts, setShowAlerts] = useState(false);
 
+  // Get env vars
+  const PORT = process.env.REACT_APP_PORT || 6969;
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
+
   const fetchAlerts = async () => {
     try {
       // Define the URL with householdId as a path parameter
-      const url = `http://localhost:6969/alert/${householdId}/${userId}`;
+      const url = `${SERVER_URL}/alert/${householdId}/${userId}`;
 
       // Fetch all household alerts relevant to user
       const response = await fetch(url);
@@ -75,7 +79,7 @@ export default function Alerts() {
   const markAsRead = async () => {
     try {
       // Send patch request to update alerts
-      const response = await fetch(`http://localhost:6969/alert/markAsRead/${householdId}/${userId}`, {
+      const response = await fetch(`${SERVER_URL}/alert/markAsRead/${householdId}/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

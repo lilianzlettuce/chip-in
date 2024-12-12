@@ -39,7 +39,7 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
 
   const fetchUserProfile = async () => {
     try {
-      const profileResponse = await fetch(`http://localhost:6969/user/${user?.id}`);
+      const profileResponse = await fetch(`${SERVER_URL}/user/${user?.id}`);
 
       if (profileResponse.ok) {
         const profileData = await profileResponse.json();
@@ -873,7 +873,7 @@ const Stats: React.FC = () => {
 
     // Search item table for the amount spent and total items purchased
     try {
-      const itemResponse = await fetch(`http://localhost:6969/item/search/${user?.id}`, {
+      const itemResponse = await fetch(`${SERVER_URL}/item/search/${user?.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -895,7 +895,7 @@ const Stats: React.FC = () => {
 
     // Search household table for the amount owed
     try {
-      const OweResponse = await fetch(`http://localhost:6969/household/owed/${user?.id}`, {
+      const OweResponse = await fetch(`${SERVER_URL}/household/owed/${user?.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -1055,7 +1055,7 @@ const Profile: React.FC = () => {
       if (!user) return; // Ensure user is available
 
       try {
-        const profileResponse = await fetch(`http://localhost:6969/user/${user?.id}`);
+        const profileResponse = await fetch(`${SERVER_URL}/user/${user?.id}`);
 
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();

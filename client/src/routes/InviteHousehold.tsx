@@ -47,8 +47,6 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ householdId })
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   console.log("Invite household householdId: ", householdId)
-  console.log("port: ", PORT)
-  console.log("server URL", SERVER_URL)
 
   // Function to handle email invitation to join Household
   
