@@ -126,7 +126,7 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ userId }) => {
       const updatedHousehold = await updateResponse.json();
       console.log('Household updated successfully:', updatedHousehold);
       updateUser();
-      setNotification({ message: `User ${userId} has been added to the household: ${updatedHousehold.name}`, type: 'success', show: true });
+      setNotification({ message: `User has been added to the household: ${updatedHousehold.name}`, type: 'success', show: true });
     } catch (error) {
       console.error('Error updating household:', error instanceof Error ? error.message : error);
     }
