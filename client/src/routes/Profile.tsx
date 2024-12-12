@@ -71,16 +71,12 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
   }, [user?.id, refreshProfile]);
 
   // Handler to update the image preview when a new image is uploaded
-  //const MAX_SIZE = 2 * 1024 * 1024;
-  const [canUpdateImage, setCanUpdateImage] = useState(false);
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         const imageString = reader.result as string;
-        //setProfileImage(reader.result as string); // Update profile image state with uploaded image
-        setCanUpdateImage(false);
         handleSubmit(imageString);
       };
       reader.readAsDataURL(file);
@@ -107,7 +103,6 @@ const ProfileSummary: React.FC<ProfileSummaryProps> = ({ refreshProfile }) => {
       });
 
       if (response.ok) {
-        setCanUpdateImage(true);
         setProfileImage(base64String);
         setAlertMessage("Profile picture updated successfully!");
         setIsAlertOpen(true);
@@ -237,10 +232,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
   const [successMessage, setSuccessMessage] = useState('');
 
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const openPasswordModal = () => setIsPasswordModalOpen(true);
-  const closePasswordModal = () => setIsPasswordModalOpen(false);
 
   useEffect(() => {
     setDisplayName(email || '');
@@ -442,24 +433,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({
     } catch (error) {
       console.error('Error:', error);
     }
-  };
-
-  const isValidPassword = (password: string): boolean => {
-    // Check for minimum length of 12 characters
-    const isLongEnough = password.length >= 6 && password.length <= 25;
-
-    // Check for at least one Upper case alphabet 
-    const hasUpperAlphabet = /[A-Z]/.test(password);
-
-    // Check for at least one Lower case alphabet 
-    const hasLowerAlphabet = /[a-z]/.test(password);
-
-    // Check for at least one number
-    const hasNumber = /[0-9]/.test(password);
-
-    const hasNoSpaces = !password.includes(' ');
-
-    return isLongEnough && hasUpperAlphabet && hasLowerAlphabet && hasNumber && hasNoSpaces;
   };
 
   // Event handler to toggle edit mode or display mode
@@ -1126,7 +1099,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile
-
-function setIsPasswordModalOpen(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}

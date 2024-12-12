@@ -47,7 +47,6 @@ export default function Home() {
   const [ debts, setDebts ] = useState<Debt[]>([]);
   const [ totalExpenses, setTotalExpenses ] = useState<string>("0");
   const [ totalPaid, setTotalPaid ] = useState<string>("0");
-  const [ householdAge, setHouseholdAge ] = useState(100);
   const [ avgExpenditure, setAvgExpenditure ] = useState(100);
 
   // Chart data
@@ -330,19 +329,6 @@ export default function Home() {
     // Calculate total expenses
     let expenses = purchaseHistory.reduce((sum, item) => sum + (item.cost || 0), 0);
     setTotalExpenses((expenses / 100).toFixed(2));
-
-    // Calculate household age
-    if (purchaseHistory[0]) {
-      const creationDate = purchaseHistory[0].purchaseDate;
-      const currentDate = new Date(); // Current date
-
-      // Calculate the difference in time (milliseconds)
-      const differenceInMilliseconds = currentDate.getTime() - creationDate.getTime();
-
-      // Convert the difference to days
-      const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
-      setHouseholdAge(differenceInDays);
-    }
   }, [purchaseHistory]);
 
   // Update avg expenditure when per month data fetched

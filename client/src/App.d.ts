@@ -1,6 +1,2 @@
 import './global.css';
-type AppProps = {
-    message: string;
-};
-export default function App({ message }: AppProps): import("react/jsx-runtime").JSX.Element;
-export {};
+export default function App(): import("react/jsx-runtime").JSX.Element;

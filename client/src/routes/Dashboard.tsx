@@ -60,8 +60,6 @@ export default function Dashboard() {
     // Edit Items
     const [editPurchasedModalOpen, setEditPurchasedModalOpen] = useState(false);
     const [editGroceryModalOpen, setEditGroceryModalOpen] = useState(false);
-    const [purchasedName, setPurchasedName] = useState('');
-    const [purchasedCategory, setPurchasedCategory] = useState(['Food', 'Drink', 'Cleaning', 'Toiletries', 'Pet', 'Other']);
     const [editItemId, setEditItemId] = useState('');
 
     useEffect(() => {
@@ -122,6 +120,7 @@ export default function Dashboard() {
 
     const moveItem = async (itemData: any, targetList: string) => {
         setIsLoading(true);
+        console.log(isLoading); // temp
         const endpoint = targetList === 'purchased' ? '/addtopurchased' : '/addtogrocery';
         const householdId = householdID;
         const userId = user?.id;

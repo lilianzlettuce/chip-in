@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import App from "./App";
 import Record from "./components/Record";
-import RecordList from "./components/RecordList";
 
 import Home from "./routes/Home";
 import Dashboard from "./routes/Dashboard";
@@ -42,7 +41,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <App message="this is an example of how to pass in a prop" />,
+    element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -61,7 +60,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile/:userId",
-    element: <App message="OYYYYYYYY" />,
+    element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -72,7 +71,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/households/:householdId",
-    element: <App message="go sniff a muffin, you buffoon" />,
+    element: <App />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -99,7 +98,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/edit/:id",
-    element: <App message="i am the globglogabgalab" />,
+    element: <App />,
     children: [
       {
         path: "/edit/:id",
@@ -109,7 +108,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/create",
-    element: <App  message="no"/>,
+    element: <App />,
     children: [
       {
         path: "/create",

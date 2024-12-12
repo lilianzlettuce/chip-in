@@ -44,7 +44,7 @@ interface Notification {
   show: boolean;
 }
 
-export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId }) => {
+export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ userId }) => {
   const [householdID, setHouseholdID] = useState("");
   const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
@@ -130,11 +130,6 @@ export const JoinHousehold: React.FC<JoinHouseholdProps> = ({ onClose, userId })
     } catch (error) {
       console.error('Error updating household:', error instanceof Error ? error.message : error);
     }
-  }
-
-  const closeNotification = () => {
-    setNotification((prev) => ({ ...prev, show: false }));
-
   }
 
   return (

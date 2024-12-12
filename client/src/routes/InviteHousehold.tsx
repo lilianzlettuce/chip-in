@@ -2,11 +2,6 @@ import React, { useState } from 'react';
 import './InviteHousehold.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faX} from '@fortawesome/free-solid-svg-icons';
-import { useUserContext } from '../UserContext';
-
-  // Get server url
-  const PORT = process.env.REACT_APP_PORT || 5050;
-  const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
 // Modal component
 type ModalProps = {
@@ -43,13 +38,12 @@ interface Notification {
   show: boolean;
 }
 
-export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, householdId }) => {
+export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ householdId }) => {
   const [EmailAddress, setEmailAddress] = useState("");
   const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
-
   // Get env vars
-  const PORT = process.env.REACT_APP_PORT || 5050;
+  const PORT = process.env.REACT_APP_PORT || 6969;
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   console.log("Invite household householdId: ", householdId)
@@ -59,11 +53,11 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
   // Function to handle email invitation to join Household
   
     async function handleInvite() {
-      // Step 1: Fetch all users from `http://localhost:6969/user` to check if the email address exists
+      // Fetch all users from to check if the email address exists
       try {
         console.log("display email address", EmailAddress)
         console.log("local port: ", PORT)
-        const ChkEmailresponse = await fetch(`http://localhost:6969/user`, {
+        const ChkEmailresponse = await fetch(`${SERVER_URL}/user`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -88,22 +82,16 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
         console.error('error fetching user profile:', err);
       }
 
-      // Step 2: send email invitation
+      // Send email invitation
       try {
-        const response = await fetch(`http://localhost:6969/user/invitejoin`, {
+        const response = await fetch(`${SERVER_URL}/user/invitejoin`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ email: EmailAddress,  householdId: householdId}),
         });
-        {/*
-        if (response.ok) {
-          alert('Invitation email sent successfully!');
-        } else {
-          alert('Invitation email sent failed. Please try again.');
-        }
-        */}
+        
         if (response.ok) {
           // Set success notification
           setNotification({ message: 'Invitation email sent successfully!', type: 'success', show: true });
@@ -116,23 +104,11 @@ export const InviteHousehold: React.FC<InviteHouseholdProps> = ({ onClose, house
           console.error('error sending email', err);
           setNotification({ message: 'An error occurred. Please try again.', type: 'error', show: true });
         }  
-            // Hide the notification after 3 seconds
-        //setTimeout(() => {
-        //  setNotification((prev) => ({ ...prev, show: false }));
-        //}, 3000);
 
-        } 
-
-        const closeNotification = () => {
-          setNotification((prev) => ({ ...prev, show: false }));
-
-    }
-
-      
+      }
   
     return (
       <div className="invite-modal-body">
-        {/*<h3 style={{ color: 'black', display: 'block', fontSize: '16px', fontWeight: 'bold'  }}>Household ID: {householdId}</h3>*/}
         <div className="invite-input-group">
           <label className="label-text">Please enter user's email address to invite!</label>
         </div>

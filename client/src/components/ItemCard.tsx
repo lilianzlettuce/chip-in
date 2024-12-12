@@ -43,7 +43,6 @@ const ItemCard: React.FC<ItemCardProps> = ({
     if (!user) return <div>No User</div>;
 
     const displayPurchasedBy = purchasedBy;
-    const displaySharedBy = sharedBy.length > 0 ? sharedBy.join(', ') : 'No one';
     const displayPrice = price ? `$${(price).toFixed(2)}` : 'N/A';
     const displayExpiry = expiryDate ? new Date(expiryDate).toLocaleDateString() : 'N/A';
 
@@ -62,9 +61,6 @@ const ItemCard: React.FC<ItemCardProps> = ({
                     <span className="price">{displayPrice}</span>
                 )}
             </div>
-            {/* <div className="shared-by-text">
-                Shared by <b>{displaySharedBy}</b>
-            </div> */}
             <div>
                 Shared by{' '}
                 {sharedBy.length > 0 ? (

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import chipInLogo from './assets/chip-in-logo1.png';
 import './global.css';
 
 import { Outlet, useNavigate } from "react-router-dom";
@@ -10,11 +9,7 @@ import Footer from './components/Footer';
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-type AppProps = {
-  message: string;
-};
-
-export default function App({ message }: AppProps) {
+export default function App() {
   const navigate = useNavigate();
 
   const googleClientId = "189463683003-7mhrlsq9ihctl9bnd6ii08vagcjhegs1.apps.googleusercontent.com";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faX} from '@fortawesome/free-solid-svg-icons';
@@ -6,7 +6,6 @@ import {faX} from '@fortawesome/free-solid-svg-icons';
 import './CreateHousehold.css'; 
 import { useUserContext } from '../UserContext';
 
-// import { useNavigate } from 'react-router-dom';
 // Modal component
 type ModalProps = {
   show: boolean;
@@ -58,10 +57,10 @@ type HouseholdFormProps = {
   onClose: () => void; // Function to close the modal
 };
 
-export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
+export const HouseholdForm: React.FC<HouseholdFormProps> = () => {
   const [householdName, setHouseholdName] = useState("");
-  const { user, setUser, updateUser} = useUserContext();
-  // const navigate = useNavigate();
+  const { user, updateUser} = useUserContext();
+  
   const [notification, setNotification] = useState<Notification>({ message: '', type: 'success', show: false });
 
   // Get server url
@@ -69,7 +68,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || `http://localhost:${PORT}`;
 
   // Function to handle form submission
-  //const handleSubmit = () => {
   async function handleSubmit() {
     if (!user || !user.id) {
       console.error("User or User ID is not available.");
@@ -107,23 +105,9 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
         setNotification({ message: `Failed: Household ${householdName} already exists`, type: 'error', show: true });
         console.error("Failed to create household:", data.error);
       }
-
-      // Update global user variable from database
-      //updateUser();
     } catch (error) {
       console.error("Error occurred while creating household:", error);
     }
-    
-    //alert(`Household Name: ${householdName} created \n`);
-    // TBD: save householdName and uploadedFileName to server
-    
-    // navigate('/households/ ${householdName}') // reroute to household id??
-    
-    //onClose(); // Close the modal after submission
-  }
-
-  const closeNotification = () => {
-    setNotification((prev) => ({ ...prev, show: false }));
   }
 
   return (
@@ -136,7 +120,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
         <h3 className="create-message">
         Create a household name
         </h3>
-        {/*<h3 style={{ color: 'black', display: 'block', fontSize: '16px' }}>Please enter a household name</h3>*/}
         <div className="create-modal-body">
           {/* Household Name Input */}
           <div className="create-input-group">
@@ -158,7 +141,6 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
             {/* Notification UI */}
             {notification.show && (
               <div className={`create-notification-card ${notification.type}`}>
-                {/*<button className="close-button" onClick={closeNotification}>x</button>*/}
                 <p>{notification.message}</p>
               </div>
             )}
@@ -167,6 +149,3 @@ export const HouseholdForm: React.FC<HouseholdFormProps> = ({ onClose }) => {
     </div>
   );
 };
-
-// export default HouseholdForm;
-
