@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleLogin from '../components/GoogleLogin';
+import Layout from '../Layout';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -76,46 +77,48 @@ const Login: React.FC = () => {
   }, []);
 
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <div className="h-screen flex justify-center items-center">
-        <div className="flex flex-col bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
-          <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-4">Welcome to ChipIn</h2>
-          <form onSubmit={handleLogin}>
-            <input
-              type="username"
-              id="username"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="auth-input"
-            />
-            <input
-              type="password"
-              id="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="auth-input"
-            />
-            <div className="text-red-400 text-left text-sm">
-              {msg}
-            </div>
-            <button type="submit" className="auth-btn my-3">
-              Login
-            </button>
-          </form>
-          <GoogleLogin />
-          <Link to="/forgotpass" className="text-base m-0 mb-1 text-emerald font-medium hover:underline hover:text-blue-800">
-            Forgot Password?
-          </Link>
-          <Link to="/signup" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
-            Don't have an account? Sign up here.
-          </Link>
+    <Layout>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <div className="h-screen flex justify-center items-center">
+          <div className="flex flex-col bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
+            <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-4">Welcome to ChipIn</h2>
+            <form onSubmit={handleLogin}>
+              <input
+                type="username"
+                id="username"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="auth-input"
+              />
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="auth-input"
+              />
+              <div className="text-red-400 text-left text-sm">
+                {msg}
+              </div>
+              <button type="submit" className="auth-btn my-3">
+                Login
+              </button>
+            </form>
+            <GoogleLogin />
+            <Link to="/forgotpass" className="text-base m-0 mb-1 text-emerald font-medium hover:underline hover:text-blue-800">
+              Forgot Password?
+            </Link>
+            <Link to="/signup" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
+              Don't have an account? Sign up here.
+            </Link>
+          </div>
         </div>
-      </div>
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
+    </Layout>
   );
 };
 

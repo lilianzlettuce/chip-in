@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleLogin from '../components/GoogleLogin';
+import Layout from '../Layout';
 
 interface ServerResponse {
     message?: string;
@@ -78,52 +79,54 @@ const SignUp: React.FC = () => {
     }, []);
 
     return (
-        <GoogleOAuthProvider clientId={googleClientId}>
-            <div className="h-screen flex justify-center items-center">
-                <div className="bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
-                    <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-5">Create an Account</h2>
-                    <form onSubmit={(e) => handleSubmit(e)} className="">
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="auth-input"
-                        />
-                        <input
-                            type="username"
-                            id="username"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            className="auth-input"
-                        />
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="auth-input"
-                        />
-                        <div className={`text-${msg ? "red" : "green"}-400 text-left text-sm`}>
-                            {msg}
-                        </div>
-                        <button type="submit" className="auth-btn my-3">
-                            Sign up
-                        </button>
-                    </form>
-                    <GoogleLogin />
-                    <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
-                        Already have an account? Sign in here.
-                    </Link>
+        <Layout>
+            <GoogleOAuthProvider clientId={googleClientId}>
+                <div className="h-screen flex justify-center items-center">
+                    <div className="bg-white p-12 w-full max-w-[400px] shadow-auth-card rounded-xl">
+                        <h2 className="text-2xl text-emerald-950 font-semibold m-0 mb-5">Create an Account</h2>
+                        <form onSubmit={(e) => handleSubmit(e)} className="">
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="auth-input"
+                            />
+                            <input
+                                type="username"
+                                id="username"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                className="auth-input"
+                            />
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="auth-input"
+                            />
+                            <div className={`text-${msg ? "red" : "green"}-400 text-left text-sm`}>
+                                {msg}
+                            </div>
+                            <button type="submit" className="auth-btn my-3">
+                                Sign up
+                            </button>
+                        </form>
+                        <GoogleLogin />
+                        <Link to="/login" className="text-base m-0 text-emerald font-medium hover:underline hover:text-blue-800">
+                            Already have an account? Sign in here.
+                        </Link>
+                    </div>
                 </div>
-            </div>
-        </GoogleOAuthProvider>
+            </GoogleOAuthProvider>
+        </Layout>
     );
 };
 

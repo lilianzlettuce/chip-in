@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './global.css';
 
 import { Outlet, useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
+
+import Layout from './Layout';
 
 export default function App() {
   const navigate = useNavigate();
@@ -40,16 +42,18 @@ export default function App() {
   }, []);
 
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <UserProvider>
-        <div className="flex justify-between items-start">
-          <Navbar />
-          <div className="w-4/5 min-h-screen pt-4 pr-12 flex flex-col justify-between">
-            <Outlet />
-            <Footer />
+    <Layout>
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <UserProvider>
+          <div className="flex justify-between items-start">
+            <Navbar />
+            <div className="w-4/5 min-h-screen pt-4 pr-12 flex flex-col justify-between">
+              <Outlet />
+              <Footer />
+            </div>
           </div>
-        </div>
-      </UserProvider>
-    </GoogleOAuthProvider>
+        </UserProvider>
+      </GoogleOAuthProvider>
+    </Layout>
   );
 };
