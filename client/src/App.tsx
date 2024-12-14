@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import './global.css';
 
 import { Outlet, useNavigate } from "react-router-dom";
