@@ -14,20 +14,40 @@ View the live app at [chipin.vercel.app](https://chipin.vercel.app/)
 1. **Household Management:**  
    Users can create new households and invite others to join, enabling collaborative management of shared items, expenses, and household responsibilities.
 
-2. **Household Dashboard:**  
+   <img width="1386" height="857" alt="image" src="https://github.com/user-attachments/assets/97726ee3-e092-449a-99e1-5d1413326c6d" />
+   
+
+3. **Household Dashboard:**  
    The household dashboard features filterable and searchable sections for managing shared grocery and inventory lists, each populated with item cards. These cards display key details such as price, expiration date, and category. The "shared by" list shows which users share each item, and hovering over their usernames reveals how much each person contributed. Users can easily add or delete items from both lists, move items between them, or add items back to the grocery list from inventory. The dashboard also includes a corkboard where users can post announcements visible to all household members.
 
-3. **My Expenses Page:**  
+   <img width="1383" height="856" alt="image" src="https://github.com/user-attachments/assets/20ff25a6-a03b-4af0-882b-57693a29e395" />
+
+     
+   <img width="550" height="678" alt="image" src="https://github.com/user-attachments/assets/8c34424a-52cb-46c9-a17d-e4eb86bb0b57" />
+   
+
+5. **My Expenses Page:**  
    The expense page tracks debts owed between housemates, with an individual expense card for each member. The amounts on these cards are automatically updated after purchases, returns, or payments, and the system balances the debts, ensuring that only one final transaction is required to settle all amounts.
 
-4. **AI-Generated Meal Suggestions:**  
+   <img width="1296" height="856" alt="image" src="https://github.com/user-attachments/assets/62dbb1c6-ea78-47b5-8d5d-5f8162552e58" />
+
+
+6. **AI-Generated Meal Suggestions:**  
    Users can generate AI-suggested meal ideas based on the ingredients they own and additional ingredients they can choose to add. Users can save their favorite recipes to the Recipes page, making meal planning more efficient and personalized.
 
-5. **Notifications:**  
+   <img width="1386" height="858" alt="image" src="https://github.com/user-attachments/assets/eab776b0-8ad2-41a9-94cc-64521252a05e" />
+
+
+8. **Notifications:**  
    ChipIn notifies users when items are nearing their expiration date, with the option to export these dates as reminders to external calendar apps for better tracking. Users also receive notifications for payments made and can send "Nudges" to other housemates to request payments.
 
-6. **User & Household Statistics:**  
+   <img width="437" height="773" alt="image" src="https://github.com/user-attachments/assets/2b32c45f-a958-4e16-9174-4ddbe3d6b7b6" />
+
+
+9. **User & Household Statistics:**  
    Users can view statistics, such as the top-purchased items and purchase history, for both individual users and the entire household. This feature allows for better tracking of spending and shared item usage.
+
+   <img width="550" height="809" alt="image" src="https://github.com/user-attachments/assets/7991d61c-ef72-4a47-a6c1-b1807f19c467" />
 
 ## Design Outline
 The ChipIn platform has a client-side interface built with React, which allows users to manage grocery items and costs, sending and receiving data to update the interface. The servers use Node.js/Flask to handle client requests, communicate with the database, and interface with external APIs and the GPT model. The database is managed with MongoDB, storing collections such as households, items, and users, while verifying and executing queries based on server requests to update data.
